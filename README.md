@@ -4,3 +4,6 @@
 3. place the folder "w64devkit" under C:\
 4. add "C:\w64devkit\bin" to %PATH%
 5. make sure to disable of the other dev toolchain such as mingw-x64 if applicable
+
+# install vscode extension C++ TestMate
+- https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter
