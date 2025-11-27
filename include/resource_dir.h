@@ -33,7 +33,8 @@
 #include "raylib.h"
 
 #if defined(__cplusplus)
-extern "C" {            // Prevents name mangling of functions
+extern "C"
+{ // Prevents name mangling of functions
 #endif
     /// <summary>
     /// Looks for the specified resource dir in several common locations
@@ -54,7 +55,7 @@ extern "C" {            // Prevents name mangling of functions
         }
 
         const char* appDir = GetApplicationDirectory();
-       
+
         // check the applicationDir
         const char* dir = TextFormat("%s%s", appDir, folderName);
         if (DirectoryExists(dir))

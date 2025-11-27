@@ -3,11 +3,11 @@
 
 Timer::Timer(double duration, bool repeat, bool autostart, Operation callBack)
 {
-    m_duration = duration;
+    m_duration  = duration;
     m_startTime = 0;
-    m_active = false;
-    m_repeat  = repeat;
-    m_callBack = callBack;
+    m_active    = false;
+    m_repeat    = repeat;
+    m_callBack  = callBack;
 
     if (autostart)
     {
@@ -21,7 +21,7 @@ void Timer::update(void)
     {
         if ((GetTime() - m_startTime) >= m_duration)
         {
-            if (( m_callBack != nullptr) && (m_startTime > 0))
+            if ((m_callBack != nullptr) && (m_startTime > 0))
             {
                 m_callBack();
             }
@@ -32,13 +32,13 @@ void Timer::update(void)
 
 void Timer::activate(void)
 {
-    m_active = true;
+    m_active    = true;
     m_startTime = GetTime();
 }
 
 void Timer::deactivate(void)
 {
-    m_active = false;
+    m_active    = false;
     m_startTime = 0;
     if (m_repeat)
     {

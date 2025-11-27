@@ -13,6 +13,20 @@
             ],
             "group": "build",
             "detail": "Build our program using make"
+        },
+        {
+            "type": "process",
+            "label": "format",
+            "command": "style_formatter.bat",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "buildall",
+            "dependsOn": ["format", "make"],
+            "dependsOrder": "sequence"
         }
     ],
     "version": "2.0.0"
