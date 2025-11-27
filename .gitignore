@@ -2,5 +2,7 @@ obj/
 *.o
 *.exe
 *.a
+*.gcda
+*.gcno
 
 !clang-format.exe
