@@ -26,6 +26,7 @@ endif
 DEFINEFLAGS := $(DFLAGS:%=-D%)
 CXX := g++
 CXXFLAGS := -g -std=c++20 -Wall -Wextra -Werror -O3 -pthread $(DEFINEFLAGS)
+TESTFLAGS := -g -std=c++20 -Wextra -Werror -O3 -pthread -fprofile-arcs -ftest-coverage $(DEFINEFLAGS)
 
 CC := gcc
 CCFLAGS := -g $(DEFINEFLAGS)
@@ -38,16 +39,18 @@ GOOGLETESTINCDIR := $(GOOGLETESTDIR)/googletest/include
 GOOGLEMOCKINCDIR := $(GOOGLETESTDIR)/googlemock/include
 GOOGLETESTFLAGS := -Wall -Wextra -Werror -O3 -std=c++17 -pthread -c
 OBJDIR := obj
+TESTOBJDIR := tstobj
 SRCDIR := src
 TESTSRCDIR := test/testSrc
-FAKESRCDIR := test/fake
+MOCKINCDIR := test/mockInclude
+MOCKSRCDIR := test/mockSrc
 LIBS := -L ./raylib/lib/ -lraylib -lgdi32 -lwinmm
-TESTLIBS := $(GOOGLETESTBIN)/libgtest.a $(GOOGLETESTBIN)/libgtest_main.a
+TESTLIBS := $(GOOGLETESTBIN)/libgtest.a $(GOOGLETESTBIN)/libgtest_main.a $(GOOGLETESTBIN)/libgmock.a $(GOOGLETESTBIN)/libgmock_main.a -lgcov
 
 INC := $(INCDIR) $(RAYLIBINCDIR)
 INCLUDE := $(INC:%=-I%)
 
-TESTINC := $(GOOGLETESTINCDIR) $(GOOGLEMOCKINCDIR)
+TESTINC := $(GOOGLETESTINCDIR) $(GOOGLEMOCKINCDIR) $(MOCKINCDIR)
 TESTINCLUDE := $(TESTINC:%=-I%)
 
 CXXSRC := $(SRCDIR)
@@ -56,27 +59,39 @@ CXXSRCS := $(wildcard $(CXXSRC)/*.cpp)
 TESTSRC := $(TESTSRCDIR)
 TESTSRCS := $(wildcard $(TESTSRC)/*.cpp)
 
-FAKESRC := $(FAKESRCDIR)
-FAKESRCS := $(wildcard $(FAKESRC)/*.cpp)
+MOCKSRC := $(MOCKSRCDIR)
+MOCKSRCS := $(wildcard $(MOCKSRC)/*.cpp)
 
 OBJS := $(patsubst $(CXXSRC)/%.cpp, $(OBJDIR)/%.o, $(CXXSRCS))
-TESTOBJS := $(patsubst $(TESTSRC)/%.cpp, $(OBJDIR)/%.o, $(TESTSRCS))
-FAKEOBJS := $(patsubst $(FAKESRC)/%.cpp, $(OBJDIR)/%.o, $(FAKESRCS))
+TESTOBJS := $(patsubst $(CXXSRC)/%.cpp, $(TESTOBJDIR)/%.o, $(CXXSRCS))
+TESTSRCOBJS := $(patsubst $(TESTSRC)/%.cpp, $(TESTOBJDIR)/%.o, $(TESTSRCS))
+MOCKOBJS := $(patsubst $(MOCKSRC)/%.cpp, $(TESTOBJDIR)/%.o, $(MOCKSRCS))
+
+FORMAT := format
+
+#parallel compilation
+MAKEFLAGS += -j$(nproc)
 
 .PHONY: all testall clean help
 all: $(OBJDIR) $(OBJS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(OBJS) main.cpp -o $(TARGET) $(LIBS)
 	@echo make all successful
 
+$(FORMAT):
+	@echo "Formatting..."
+	style_formatter.bat
+	@echo "Formatting complete"
+
 $(OBJDIR):
 	@echo Creating $(OBJDIR)
 	mkdir -p $(OBJDIR)
 
-$(OBJDIR)/%.o : $(CXXSRC)/%.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $^ -o $@
+$(OBJDIR)/%.o : $(CXXSRC)/%.cpp $(OBJDIR) $(FORMAT)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
-testall:  $(GOOGLETESTBIN) $(OBJDIR) $(OBJS) $(TESTOBJS) $(FAKEOBJS)
-	$(CXX) $(INCLUDE) $(TESTINCLUDE) $(CXXFLAGS) $(OBJS) $(TESTOBJS) $(FAKEOBJS) -o $(TESTTARGET) $(TESTLIBS)
+testall: $(GOOGLETESTBIN) $(TESTOBJDIR) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS)
+	$(CXX) $(INCLUDE) $(TESTINCLUDE) $(CXXFLAGS) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS) -o $(TESTTARGET) $(TESTLIBS) $(LIBS)
+	$(TESTTARGET)
 	@echo make testall successful
 
 $(GOOGLETESTBIN):
@@ -103,16 +118,24 @@ $(GOOGLETESTBIN):
 		ar -rv $(GOOGLETESTBIN)/libgmock_main.a $(GOOGLETESTBIN)/gmock_main.o; \
 	fi
 
-$(OBJDIR)/%.o : $(TESTSRC)/%.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $(TESTINCLUDE) -c $^ -o $@
+$(TESTOBJDIR):
+	@echo Creating $(TESTOBJDIR)
+	mkdir -p $(TESTOBJDIR)
 
-$(OBJDIR)/%.o : $(FAKESRC)/%.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $(TESTINCLUDE) -c $^ -o $@
+$(TESTOBJDIR)/%.o : $(CXXSRC)/%.cpp $(TESTOBJDIR) $(FORMAT)
+	$(CXX) $(TESTFLAGS) $(INCLUDE) -c $< -o $@
+
+$(TESTOBJDIR)/%.o : $(TESTSRC)/%.cpp $(TESTOBJDIR) $(FORMAT)
+	$(CXX) $(TESTFLAGS) $(INCLUDE) $(TESTINCLUDE) -c $< -o $@
+
+$(TESTOBJDIR)/%.o : $(MOCKSRC)/%.cpp $(TESTOBJDIR) $(FORMAT)
+	$(CXX) $(TESTFLAGS) $(INCLUDE) $(TESTINCLUDE) -c $< -o $@
 
 clean:
 	rm -f $(TARGET)
 	rm -f $(TESTTARGET)
 	rm -rf $(OBJDIR)
+	rm -rf $(TESTOBJDIR)
 
 help:
 	@echo "Usage: make [config=name] [target]"

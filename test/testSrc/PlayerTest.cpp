@@ -1,0 +1,55 @@
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include "Player.h"
+#include <memory>
+#include "RaylibMock.h"
+
+using ::testing::_;
+using ::testing::A;
+using ::testing::EndsWith;
+using ::testing::Exactly;
+using ::testing::FieldsAre;
+using ::testing::Mock;
+
+namespace PlayerTest
+{
+class PlayerTest : public ::testing::Test
+{
+public:
+    std::shared_ptr<Player>     m_Player     = nullptr;
+    std::shared_ptr<RaylibMock> m_raylibMock = nullptr;
+
+    void SetUp(void)
+    {
+        m_raylibMock = std::make_shared<RaylibMock>();
+        ASSERT_TRUE(m_raylibMock != nullptr);
+
+        EXPECT_CALL((*m_raylibMock), loadTexture(EndsWith("spaceship.png"))).Times(Exactly(1));
+        Vector2 position = {0, 0};
+        m_Player         = std::make_shared<Player>(m_raylibMock, "", position);
+        ASSERT_TRUE(m_Player != nullptr);
+    }
+
+    void TearDown(void)
+    {
+        Mock::VerifyAndClearExpectations(&m_raylibMock);
+    }
+};
+
+TEST_F(PlayerTest, update)
+{
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_RIGHT)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_LEFT)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_DOWN)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_UP)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).Times(Exactly(1));
+    m_Player->update();
+}
+
+TEST_F(PlayerTest, draw)
+{
+    EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(255, 255, 255, 255))).Times(Exactly(1));
+    m_Player->draw();
+}
+
+} // namespace PlayerTest

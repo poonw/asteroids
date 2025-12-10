@@ -1,8 +1,12 @@
 #include "Timer.h"
-#include "raylib.h"
 
-Timer::Timer(double duration, bool repeat, bool autostart, Operation callBack)
+Timer::Timer(std::shared_ptr<RaylibInterface> raylibPtr,
+             double                           duration,
+             bool                             repeat,
+             bool                             autostart,
+             Operation                        callBack)
 {
+    m_raylibPtr = raylibPtr;
     m_duration  = duration;
     m_startTime = 0;
     m_active    = false;
@@ -19,7 +23,7 @@ void Timer::update(void)
 {
     if (m_active)
     {
-        if ((GetTime() - m_startTime) >= m_duration)
+        if ((m_raylibPtr->getTime() - m_startTime) >= m_duration)
         {
             if ((m_callBack != nullptr) && (m_startTime > 0))
             {
@@ -33,7 +37,7 @@ void Timer::update(void)
 void Timer::activate(void)
 {
     m_active    = true;
-    m_startTime = GetTime();
+    m_startTime = m_raylibPtr->getTime();
 }
 
 void Timer::deactivate(void)

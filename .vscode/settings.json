@@ -1,4 +1,8 @@
 {
     "testMate.cpp.debug.configTemplate": null,
-    "testMate.cpp.test.executables": "asteroidsTest.exe"
+    "testMate.cpp.test.executables": "asteroidsTest.exe",
+    "files.associations": {
+        "mutex": "cpp",
+        "type_traits": "cpp"
+    }
 }
