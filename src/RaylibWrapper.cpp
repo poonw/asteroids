@@ -25,7 +25,8 @@ void RaylibWrapper::closeWindow(void)
 
 Texture2D RaylibWrapper::loadTexture(std::string filename)
 {
-    return LoadTexture(filename.c_str());
+    const char* filefullpath = filename.c_str();
+    return LoadTexture(filefullpath);
 }
 
 bool RaylibWrapper::windowShouldClose(void)
@@ -61,4 +62,14 @@ void RaylibWrapper::drawTextureV(Texture2D texture, Vector2 position, Color tint
 bool RaylibWrapper::isKeyDown(int key)
 {
     return IsKeyDown(key);
+}
+
+bool RaylibWrapper::isWindowReady(void)
+{
+    return IsWindowReady();
+}
+
+void RaylibWrapper::drawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint)
+{
+    DrawTextureEx(texture, position, rotation, scale, tint);
 }

@@ -25,8 +25,8 @@ endif
 
 DEFINEFLAGS := $(DFLAGS:%=-D%)
 CXX := g++
-CXXFLAGS := -g -std=c++20 -Wall -Wextra -Werror -O3 -pthread $(DEFINEFLAGS)
-TESTFLAGS := -g -std=c++20 -Wextra -Werror -O3 -pthread -fprofile-arcs -ftest-coverage $(DEFINEFLAGS)
+CXXFLAGS := -g -std=c++20 -Wall -Wextra -Werror -O0 -pthread $(DEFINEFLAGS)
+TESTFLAGS := -g -std=c++20 -Wextra -Werror -O0 -pthread -fprofile-arcs -ftest-coverage $(DEFINEFLAGS)
 
 CC := gcc
 CCFLAGS := -g $(DEFINEFLAGS)

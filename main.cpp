@@ -4,6 +4,7 @@
 #include "Logger.h"
 #include "Player.h"
 #include "RaylibWrapper.h"
+#include "Star.h"
 
 int main(void)
 {
@@ -16,12 +17,19 @@ int main(void)
     std::filesystem::path fontPath      = resourcesPath / "font";
     std::filesystem::path imagesPath    = resourcesPath / "images";
 
-    Vector2 startPosition = {0,0};
-    std::shared_ptr<Player> player = std::make_shared<Player>(raylibPtr, imagesPath, startPosition);
+    std::shared_ptr<Game> m_game = std::make_shared<Game>(raylibPtr);
 
-    std::shared_ptr<Game> m_game = std::make_shared<Game>(raylibPtr, player);
+    std::shared_ptr<Player> player = std::make_shared<Player>(raylibPtr, imagesPath);
+    m_game->setPlayer(player);
 
-    m_game->loop();
+    std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> starsList;
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        starsList[n] = std::make_shared<Star>(raylibPtr, imagesPath);
+    }
+    m_game->setStarsList(starsList);
+
+    m_game->run();
 
     return 0;
 }

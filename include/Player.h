@@ -9,8 +9,7 @@ class Player : public Sprite
 {
 public:
     Player(std::shared_ptr<RaylibInterface> raylibPtr,
-           std::filesystem::path            resourcePath,
-           Vector2                          position);
+           std::filesystem::path            resourcePath);
     ~Player(void) = default;
 
     void update(void) override;
@@ -21,8 +20,8 @@ private:
     Texture2D                        m_texture;
     Vector2                          m_position  = {0, 0};
     Vector2                          m_direction = {0, 0};
-    int                              m_maxXPos   = 0;
-    int                              m_maxYPos   = 0;
+    float                            m_maxXPos   = 0.0;
+    float                            m_maxYPos   = 0.0;
 };
 
 #endif // PLAYER_H

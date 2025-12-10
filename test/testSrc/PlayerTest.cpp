@@ -4,12 +4,12 @@
 #include <memory>
 #include "RaylibMock.h"
 
-using ::testing::_;
 using ::testing::A;
 using ::testing::EndsWith;
 using ::testing::Exactly;
 using ::testing::FieldsAre;
 using ::testing::Mock;
+using ::testing::Return;
 
 namespace PlayerTest
 {
@@ -24,9 +24,9 @@ public:
         m_raylibMock = std::make_shared<RaylibMock>();
         ASSERT_TRUE(m_raylibMock != nullptr);
 
+        EXPECT_CALL((*m_raylibMock), isWindowReady()).WillOnce(Return(true));
         EXPECT_CALL((*m_raylibMock), loadTexture(EndsWith("spaceship.png"))).Times(Exactly(1));
-        Vector2 position = {0, 0};
-        m_Player         = std::make_shared<Player>(m_raylibMock, "", position);
+        m_Player = std::make_shared<Player>(m_raylibMock, "");
         ASSERT_TRUE(m_Player != nullptr);
     }
 

@@ -20,6 +20,8 @@ public:
     void      endDrawing(void) override;
     void      drawTextureV(Texture2D texture, Vector2 position, Color tint) override;
     bool      isKeyDown(int key) override;
+    bool      isWindowReady(void) override;
+    void      drawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint) override;
 };
 
 #endif // RAYLIBWRAPPER_H

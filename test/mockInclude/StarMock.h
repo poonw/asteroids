@@ -1,17 +1,17 @@
-#ifndef PLAYERMOCK_H
-#define PLAYERMOCK_H
+#ifndef STARMOCK_H
+#define STARMOCK_H
 
 #include "Sprite.h"
 #include "gmock/gmock.h"
 
-class PlayerMock : public Sprite
+class StarMock : public Sprite
 {
 public:
-    PlayerMock(void);
-    virtual ~PlayerMock(void);
+    StarMock(void);
+    virtual ~StarMock(void);
 
     MOCK_METHOD(void, update, (), (override));
     MOCK_METHOD(void, draw, (), (override));
 };
 
-#endif // PLAYERMOCK_H
+#endif // STARMOCK_H
