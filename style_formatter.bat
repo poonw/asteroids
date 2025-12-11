@@ -3,6 +3,7 @@ set FILES_LIST=files_to_be_formatted.txt
 
 @REM del %FILES_LIST%
 
+dir /s /b main.cpp   >> %FILES_LIST%
 dir /s /b src\*.cpp   >> %FILES_LIST%
 dir /s /b include\*.h >> %FILES_LIST%
 dir /s /b test\*.h    >> %FILES_LIST%

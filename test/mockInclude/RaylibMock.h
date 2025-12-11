@@ -21,6 +21,8 @@ public:
     MOCK_METHOD(void, endDrawing, (), (override));
     MOCK_METHOD(void, drawTextureV, (Texture2D texture, Vector2 position, Color tint), (override));
     MOCK_METHOD(bool, isKeyDown, (int key), (override));
+    MOCK_METHOD(bool, isWindowReady, (), (override));
+    MOCK_METHOD(void, drawTextureEx, (Texture2D texture, Vector2 position, float rotation, float scale, Color tint), (override));
 };
 
 #endif // RAYLIBMOCK_H

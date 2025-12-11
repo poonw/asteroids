@@ -1,15 +1,19 @@
 #include "Player.h"
+#include <algorithm>
+#include <cassert>
 #include "GameSettings.h"
 
 Player::Player(std::shared_ptr<RaylibInterface> raylibPtr,
-               std::filesystem::path            resourcePath,
-               Vector2                          position)
-    : m_raylibPtr(raylibPtr),
-      m_position(position)
+               std::filesystem::path            resourcePath)
+    : m_raylibPtr(raylibPtr)
 {
+    assert(m_raylibPtr->isWindowReady());
     m_texture = m_raylibPtr->loadTexture((resourcePath / "spaceship.png").string());
-    m_maxXPos = (WINDOW_WIDTH - m_texture.width);
-    m_maxYPos = (WINDOW_HEIGHT - m_texture.height);
+    m_maxXPos = (float)(WINDOW_WIDTH - m_texture.width);
+    m_maxYPos = (float)(WINDOW_HEIGHT - m_texture.height);
+
+    m_position.x = (m_maxXPos / 2);
+    m_position.y = (m_maxYPos - 10);
 }
 
 void Player::update(void)
@@ -21,23 +25,8 @@ void Player::update(void)
     m_position.x += m_direction.x * PLAYER_SPEED * dt;
     m_position.y += m_direction.y * PLAYER_SPEED * dt;
 
-    if (m_position.x > m_maxXPos)
-    {
-        m_position.x = m_maxXPos;
-    }
-    else if (m_position.x < 0)
-    {
-        m_position.x = 0;
-    }
-
-    if (m_position.y > m_maxYPos)
-    {
-        m_position.y = m_maxYPos;
-    }
-    else if (m_position.y < 0)
-    {
-        m_position.y = 0;
-    }
+    m_position.x = std::clamp(m_position.x, (float)0, m_maxXPos);
+    m_position.y = std::clamp(m_position.y, (float)0, m_maxYPos);
 }
 
 void Player::draw(void)

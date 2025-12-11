@@ -7,3 +7,6 @@
 
 # Install vscode extension C++ TestMate
 - https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter
+
+# init googletest repo
+- call git clone https://github.com/google/googletest.git in the same level directory where asteroids in initialized
