@@ -16,10 +16,6 @@ public:
     void draw(void) override;
 
 private:
-    std::shared_ptr<RaylibInterface> m_raylibPtr = nullptr;
-    Texture2D                        m_texture;
-    Vector2                          m_position = {0, 0};
-    float                            m_scale    = 0;
 };
 
 #endif // STAR_H

@@ -1,10 +1,19 @@
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include "Game.h"
+#include "Laser.h"
 #include "Logger.h"
 #include "Player.h"
 #include "RaylibWrapper.h"
 #include "Star.h"
+
+std::shared_ptr<Sprite> createLaser(std::shared_ptr<RaylibInterface> raylibPtr,
+                                    std::filesystem::path            resourcePath,
+                                    Vector2                          position)
+{
+    return (std::make_shared<Laser>(raylibPtr, resourcePath, position));
+}
 
 int main(void)
 {
@@ -17,9 +26,16 @@ int main(void)
     std::filesystem::path fontPath      = resourcesPath / "font";
     std::filesystem::path imagesPath    = resourcesPath / "images";
 
-    std::shared_ptr<Game> m_game = std::make_shared<Game>(raylibPtr);
+    std::function<std::shared_ptr<Sprite>(
+        std::shared_ptr<RaylibInterface> raylibPtr,
+        std::filesystem::path            resourcePath,
+        Vector2                          position)>
+        createLaserWrapper = createLaser;
 
-    std::shared_ptr<Player> player = std::make_shared<Player>(raylibPtr, imagesPath);
+    std::shared_ptr<Game>                 m_game            = std::make_shared<Game>(raylibPtr, imagesPath, createLaserWrapper);
+    std::function<void(Vector2 position)> shootLaserWrapper = std::bind(&Game::shootLaser, m_game, std::placeholders::_1);
+
+    std::shared_ptr<Player> player = std::make_shared<Player>(raylibPtr, imagesPath, shootLaserWrapper);
     m_game->setPlayer(player);
 
     std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> starsList;

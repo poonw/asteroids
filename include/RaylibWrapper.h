@@ -22,6 +22,7 @@ public:
     bool      isKeyDown(int key) override;
     bool      isWindowReady(void) override;
     void      drawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint) override;
+    bool      isKeyPressed(int key) override;
 };
 
 #endif // RAYLIBWRAPPER_H
