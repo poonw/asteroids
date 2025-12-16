@@ -5,10 +5,10 @@
 
 Star::Star(std::shared_ptr<RaylibInterface> raylibPtr,
            std::filesystem::path            resourcePath)
-    : m_raylibPtr(raylibPtr)
 {
-    assert(m_raylibPtr->isWindowReady());
-    m_texture = m_raylibPtr->loadTexture((resourcePath / "star.png").string());
+    assert(raylibPtr->isWindowReady());
+    m_raylibPtr = raylibPtr;
+    m_texture   = m_raylibPtr->loadTexture((resourcePath / "star.png").string());
 
     // Random number generator
     std::random_device rd;

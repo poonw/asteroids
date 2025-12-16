@@ -21,6 +21,7 @@ public:
     virtual bool      isKeyDown(int key)                                                                          = 0;
     virtual bool      isWindowReady(void)                                                                         = 0;
     virtual void      drawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint) = 0;
+    virtual bool      isKeyPressed(int key)                                                                       = 0;
 };
 
 #endif // RAYLIBINTERFACE_H

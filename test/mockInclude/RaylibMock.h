@@ -23,6 +23,7 @@ public:
     MOCK_METHOD(bool, isKeyDown, (int key), (override));
     MOCK_METHOD(bool, isWindowReady, (), (override));
     MOCK_METHOD(void, drawTextureEx, (Texture2D texture, Vector2 position, float rotation, float scale, Color tint), (override));
+    MOCK_METHOD(bool, isKeyPressed, (int key), (override));
 };
 
 #endif // RAYLIBMOCK_H

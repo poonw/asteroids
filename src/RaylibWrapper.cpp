@@ -73,3 +73,8 @@ void RaylibWrapper::drawTextureEx(Texture2D texture, Vector2 position, float rot
 {
     DrawTextureEx(texture, position, rotation, scale, tint);
 }
+
+bool RaylibWrapper::isKeyPressed(int key)
+{
+    return IsKeyPressed(key);
+}

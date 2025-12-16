@@ -11,6 +11,15 @@ using ::testing::Exactly;
 using ::testing::FieldsAre;
 using ::testing::Mock;
 using ::testing::Return;
+using ::testing::Sequence;
+Sequence seq;
+
+std::shared_ptr<PlayerMock> createLaser(std::shared_ptr<RaylibInterface> raylibPtr,
+                                        std::filesystem::path            resourcePath,
+                                        Vector2                          position)
+{
+    return (std::make_shared<PlayerMock>());
+}
 
 namespace GameTest
 {
@@ -21,6 +30,11 @@ public:
     std::shared_ptr<RaylibMock>                          m_raylibMock = nullptr;
     std::shared_ptr<PlayerMock>                          m_playerMock = nullptr;
     std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starMocksList;
+    std::function<std::shared_ptr<PlayerMock>(
+        std::shared_ptr<RaylibInterface> raylibPtr,
+        std::filesystem::path            resourcePath,
+        Vector2                          position)>
+        f_createLaser = createLaser;
 
     void SetUp(void)
     {
@@ -35,14 +49,18 @@ public:
             ASSERT_TRUE(m_starMocksList[n] != nullptr);
         }
 
-        EXPECT_CALL((*m_raylibMock), initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game")).Times(Exactly(1));
-        EXPECT_CALL((*m_raylibMock), closeWindow()).Times(Exactly(1));
-        m_Game = std::make_shared<Game>(m_raylibMock);
+        EXPECT_CALL((*m_raylibMock), initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game"))
+            .Times(Exactly(1))
+            .InSequence(seq);
+        m_Game = std::make_shared<Game>(m_raylibMock, "", f_createLaser);
         ASSERT_TRUE(m_Game != nullptr);
     }
 
     void TearDown(void)
     {
+        EXPECT_CALL((*m_raylibMock), closeWindow())
+            .Times(Exactly(1))
+            .InSequence(seq);
         Mock::VerifyAndClearExpectations(&m_raylibMock);
     }
 };
@@ -65,17 +83,21 @@ TEST_F(GameTest, loop)
     m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
-        .WillOnce(Return(false))
-        .WillOnce(Return(true));
-    EXPECT_CALL((*m_playerMock), update());
-    EXPECT_CALL((*m_raylibMock), beginDrawing());
-    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255)));
+        .InSequence(seq)
+        .WillOnce(Return(false));
+    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<StarMock>(m_starMocksList[n]))), draw());
+        EXPECT_CALL((*(std::dynamic_pointer_cast<StarMock>(m_starMocksList[n]))), draw())
+            .InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw());
-    EXPECT_CALL((*m_raylibMock), endDrawing());
+    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), windowShouldClose())
+        .InSequence(seq)
+        .WillOnce(Return(true));
 
     m_Game->run();
 }
