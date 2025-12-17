@@ -4,7 +4,7 @@ Timer::Timer(std::shared_ptr<RaylibInterface> raylibPtr,
              double                           duration,
              bool                             repeat,
              bool                             autostart,
-             Operation                        callBack)
+             std::function<void(void)>        callBack)
 {
     m_raylibPtr = raylibPtr;
     m_duration  = duration;

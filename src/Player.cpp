@@ -18,6 +18,8 @@ Player::Player(std::shared_ptr<RaylibInterface> raylibPtr,
 
     m_position.x = (m_maxXPos / 2);
     m_position.y = (m_maxYPos - 10);
+
+    m_speed = PLAYER_SPEED;
 }
 
 void Player::input(void)
@@ -37,8 +39,8 @@ void Player::input(void)
 void Player::move(void)
 {
     float dt      = m_raylibPtr->getFrameTime();
-    m_position.x += m_direction.x * PLAYER_SPEED * dt;
-    m_position.y += m_direction.y * PLAYER_SPEED * dt;
+    m_position.x += m_direction.x * m_speed * dt;
+    m_position.y += m_direction.y * m_speed * dt;
 
     m_position.x = std::clamp(m_position.x, (float)0, m_maxXPos);
     m_position.y = std::clamp(m_position.y, (float)0, m_maxYPos);
