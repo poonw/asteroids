@@ -24,6 +24,8 @@ public:
     MOCK_METHOD(bool, isWindowReady, (), (override));
     MOCK_METHOD(void, drawTextureEx, (Texture2D texture, Vector2 position, float rotation, float scale, Color tint), (override));
     MOCK_METHOD(bool, isKeyPressed, (int key), (override));
+    MOCK_METHOD(bool, checkCollisionCircles, (Vector2 center1, float radius1, Vector2 center2, float radius2), (override));
+    MOCK_METHOD(bool, checkCollisionCircleRec, (Vector2 center, float radius, Rectangle rec), (override));
 };
 
 #endif // RAYLIBMOCK_H

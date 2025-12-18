@@ -23,6 +23,7 @@ Meteor::Meteor(std::shared_ptr<RaylibInterface> raylibPtr,
     m_speed     = distSpeed(gen);
     m_direction = {distDirection(gen), 1};
     m_scale     = 1;
+    m_radius    = (float)(std::min(m_texture.width, m_texture.height)) / 2;
 }
 
 void Meteor::move(void)
@@ -47,4 +48,15 @@ void Meteor::update(void)
 void Meteor::draw(void)
 {
     m_raylibPtr->drawTextureEx(m_texture, m_position, m_rotation, m_scale, WHITE);
+}
+
+Vector2 Meteor::getCenter(void)
+{
+    return (Vector2((m_position.x + ((float)(m_texture.width) / 2)),
+                    (m_position.y + ((float)(m_texture.height) / 2))));
+}
+
+float Meteor::getRadius(void)
+{
+    return m_radius;
 }

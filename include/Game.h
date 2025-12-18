@@ -32,11 +32,12 @@ public:
     void setPlayer(std::shared_ptr<Sprite> player);
     void setStarsList(std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS>& starsList);
     void shootLaser(Vector2 position);
+    void createMeteor(void);
 
 private:
     void drawStars(void);
     void discardSprites(void);
-    void createMeteor(void);
+    void checkPlayerMeteorCollision(void);
 
     std::shared_ptr<RaylibInterface>                     m_raylibPtr = nullptr;
     std::filesystem::path                                m_resourcePath;

@@ -14,8 +14,10 @@ public:
            std::function<void(Vector2)>     shootLaser);
     ~Player(void) = default;
 
-    void update(void) override;
-    void draw(void) override;
+    void    update(void) override;
+    void    draw(void) override;
+    Vector2 getCenter(void) override;
+    float   getRadius(void) override;
 
 private:
     void input(void);

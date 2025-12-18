@@ -80,6 +80,8 @@ void Game::run(void)
         }
 
         m_raylibPtr->endDrawing();
+
+        checkPlayerMeteorCollision();
     }
 }
 
@@ -135,4 +137,18 @@ void Game::discardSprites(void)
 void Game::createMeteor(void)
 {
     m_meteorsList.push_back(m_createMeteor(m_raylibPtr, m_resourcePath));
+}
+
+void Game::checkPlayerMeteorCollision(void)
+{
+    for (uint32_t index = 0; index < m_meteorsList.size(); index++)
+    {
+        if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
+                                               m_player->getRadius(),
+                                               m_meteorsList[index]->getCenter(),
+                                               m_meteorsList[index]->getRadius()))
+        {
+            m_raylibPtr->closeWindow();
+        }
+    }
 }

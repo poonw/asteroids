@@ -12,6 +12,8 @@ public:
 
     MOCK_METHOD(void, update, (), (override));
     MOCK_METHOD(void, draw, (), (override));
+    MOCK_METHOD(Vector2, getCenter, (), (override));
+    MOCK_METHOD(float, getRadius, (), (override));
 };
 
 #endif // METEORMOCK_H
