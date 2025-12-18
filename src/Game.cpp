@@ -1,8 +1,10 @@
 #include "Game.h"
 #include <algorithm>
 #include <cassert>
+#include <functional>
 #include "GameSettings.h"
 #include "Sprite.h"
+#include "Timer.h"
 
 Game::Game(std::shared_ptr<RaylibInterface> raylibPtr,
            std::filesystem::path            resourcePath,
@@ -10,18 +12,29 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr,
                std::shared_ptr<RaylibInterface> raylibPtr,
                std::filesystem::path            resourcePath,
                Vector2                          position)>
-               createLaserWrapper)
+               createLaserWrapper,
+           std::function<std::shared_ptr<Sprite>(
+               std::shared_ptr<RaylibInterface> raylibPtr,
+               std::filesystem::path            resourcePath)>
+               createMeteorWrapper)
     : m_raylibPtr(raylibPtr),
       m_resourcePath(resourcePath)
 {
     assert(createLaserWrapper);
-    m_createLaser = createLaserWrapper;
+    assert(createMeteorWrapper);
+    m_createLaser  = createLaserWrapper;
+    m_createMeteor = createMeteorWrapper;
+
     m_raylibPtr->initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         m_starsList[n] = nullptr;
     }
+
+    std::function<void(void)> createMeteorCallback = std::bind(&Game::createMeteor, this);
+
+    m_meteorTimer = std::make_shared<Timer>(m_raylibPtr, METEOR_TIMER_DURATION, true, true, createMeteorCallback);
 }
 
 Game::~Game(void)
@@ -41,10 +54,15 @@ void Game::run(void)
     {
         discardSprites();
 
+        m_meteorTimer->update();
         m_player->update();
         for (uint32_t index = 0; index < m_lasersList.size(); index++)
         {
             m_lasersList[index]->update();
+        }
+        for (uint32_t index = 0; index < m_meteorsList.size(); index++)
+        {
+            m_meteorsList[index]->update();
         }
 
         m_raylibPtr->beginDrawing();
@@ -55,6 +73,10 @@ void Game::run(void)
         for (uint32_t index = 0; index < m_lasersList.size(); index++)
         {
             m_lasersList[index]->draw();
+        }
+        for (uint32_t index = 0; index < m_meteorsList.size(); index++)
+        {
+            m_meteorsList[index]->draw();
         }
 
         m_raylibPtr->endDrawing();
@@ -97,4 +119,20 @@ void Game::discardSprites(void)
             ++it;
         }
     }
+    for (auto it = m_meteorsList.begin(); it != m_meteorsList.end();)
+    {
+        if ((*(*it)).m_discard)
+        {
+            it = m_meteorsList.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
+void Game::createMeteor(void)
+{
+    m_meteorsList.push_back(m_createMeteor(m_raylibPtr, m_resourcePath));
 }

@@ -2,19 +2,22 @@
 #define TIMER_H
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include "RaylibInterface.h"
 
-typedef void (*Operation)(void);
+class Game;
+
+typedef void (Game::*Operation)(void);
 
 class Timer
 {
 public:
     Timer(std::shared_ptr<RaylibInterface> raylibPtr,
           double                           duration,
-          bool                             repeat    = false,
-          bool                             autostart = false,
-          Operation                        callBack  = nullptr);
+          bool                             repeat,
+          bool                             autostart,
+          std::function<void(void)>        callBack);
     ~Timer(void) = default;
 
     void update(void);
@@ -28,7 +31,7 @@ private:
     double                           m_startTime = 0;
     bool                             m_active    = false;
     bool                             m_repeat    = false;
-    Operation                        m_callBack  = nullptr;
+    std::function<void(void)>        m_callBack;
 };
 
 #endif // TIMER_H

@@ -3,6 +3,8 @@
 #include "Game.h"
 #include "GameSettings.h"
 #include <memory>
+#include "LaserMock.h"
+#include "MeteorMock.h"
 #include "PlayerMock.h"
 #include "RaylibMock.h"
 #include "StarMock.h"
@@ -14,11 +16,17 @@ using ::testing::Return;
 using ::testing::Sequence;
 Sequence seq;
 
-std::shared_ptr<PlayerMock> createLaser(std::shared_ptr<RaylibInterface> raylibPtr,
-                                        std::filesystem::path            resourcePath,
-                                        Vector2                          position)
+std::shared_ptr<LaserMock> createLaser(std::shared_ptr<RaylibInterface> raylibPtr,
+                                       std::filesystem::path            resourcePath,
+                                       Vector2                          position)
 {
-    return (std::make_shared<PlayerMock>());
+    return (std::make_shared<LaserMock>());
+}
+
+std::shared_ptr<MeteorMock> createMeteor(std::shared_ptr<RaylibInterface> raylibPtr,
+                                         std::filesystem::path            resourcePath)
+{
+    return (std::make_shared<MeteorMock>());
 }
 
 namespace GameTest
@@ -30,11 +38,15 @@ public:
     std::shared_ptr<RaylibMock>                          m_raylibMock = nullptr;
     std::shared_ptr<PlayerMock>                          m_playerMock = nullptr;
     std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starMocksList;
-    std::function<std::shared_ptr<PlayerMock>(
+    std::function<std::shared_ptr<LaserMock>(
         std::shared_ptr<RaylibInterface> raylibPtr,
         std::filesystem::path            resourcePath,
         Vector2                          position)>
         f_createLaser = createLaser;
+    std::function<std::shared_ptr<MeteorMock>(
+        std::shared_ptr<RaylibInterface> raylibPtr,
+        std::filesystem::path            resourcePath)>
+        f_createMeteor = createMeteor;
 
     void SetUp(void)
     {
@@ -52,7 +64,8 @@ public:
         EXPECT_CALL((*m_raylibMock), initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game"))
             .Times(Exactly(1))
             .InSequence(seq);
-        m_Game = std::make_shared<Game>(m_raylibMock, "", f_createLaser);
+        EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
+        m_Game = std::make_shared<Game>(m_raylibMock, "", f_createLaser, f_createMeteor);
         ASSERT_TRUE(m_Game != nullptr);
     }
 
@@ -85,6 +98,7 @@ TEST_F(GameTest, loop)
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .InSequence(seq)
         .WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);

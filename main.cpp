@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "Laser.h"
 #include "Logger.h"
+#include "Meteor.h"
 #include "Player.h"
 #include "RaylibWrapper.h"
 #include "Star.h"
@@ -13,6 +14,12 @@ std::shared_ptr<Sprite> createLaser(std::shared_ptr<RaylibInterface> raylibPtr,
                                     Vector2                          position)
 {
     return (std::make_shared<Laser>(raylibPtr, resourcePath, position));
+}
+
+std::shared_ptr<Sprite> createMeteor(std::shared_ptr<RaylibInterface> raylibPtr,
+                                     std::filesystem::path            resourcePath)
+{
+    return (std::make_shared<Meteor>(raylibPtr, resourcePath));
 }
 
 int main(void)
@@ -32,7 +39,16 @@ int main(void)
         Vector2                          position)>
         createLaserWrapper = createLaser;
 
-    std::shared_ptr<Game>                 m_game            = std::make_shared<Game>(raylibPtr, imagesPath, createLaserWrapper);
+    std::function<std::shared_ptr<Sprite>(
+        std::shared_ptr<RaylibInterface> raylibPtr,
+        std::filesystem::path            resourcePath)>
+        createMeteorWrapper = createMeteor;
+
+    std::shared_ptr<Game> m_game = std::make_shared<Game>(raylibPtr,
+                                                          imagesPath,
+                                                          createLaserWrapper,
+                                                          createMeteorWrapper);
+
     std::function<void(Vector2 position)> shootLaserWrapper = std::bind(&Game::shootLaser, m_game, std::placeholders::_1);
 
     std::shared_ptr<Player> player = std::make_shared<Player>(raylibPtr, imagesPath, shootLaserWrapper);
