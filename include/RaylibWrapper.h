@@ -23,6 +23,8 @@ public:
     bool      isWindowReady(void) override;
     void      drawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint) override;
     bool      isKeyPressed(int key) override;
+    bool      checkCollisionCircles(Vector2 center1, float radius1, Vector2 center2, float radius2) override;
+    bool      checkCollisionCircleRec(Vector2 center, float radius, Rectangle rec) override;
 };
 
 #endif // RAYLIBWRAPPER_H

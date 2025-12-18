@@ -78,3 +78,13 @@ bool RaylibWrapper::isKeyPressed(int key)
 {
     return IsKeyPressed(key);
 }
+
+bool RaylibWrapper::checkCollisionCircles(Vector2 center1, float radius1, Vector2 center2, float radius2)
+{
+    return (CheckCollisionCircles(center1, radius1, center2, radius2));
+}
+
+bool RaylibWrapper::checkCollisionCircleRec(Vector2 center, float radius, Rectangle rec)
+{
+    return (CheckCollisionCircleRec(center, radius, rec));
+}

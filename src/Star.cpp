@@ -31,3 +31,13 @@ void Star::draw(void)
 {
     m_raylibPtr->drawTextureEx(m_texture, m_position, 0, m_scale, WHITE);
 }
+
+Vector2 Star::getCenter(void)
+{
+    return {0, 0};
+}
+
+float Star::getRadius(void)
+{
+    return m_radius;
+}

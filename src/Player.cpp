@@ -19,7 +19,8 @@ Player::Player(std::shared_ptr<RaylibInterface> raylibPtr,
     m_position.x = (m_maxXPos / 2);
     m_position.y = (m_maxYPos - 10);
 
-    m_speed = PLAYER_SPEED;
+    m_speed  = PLAYER_SPEED;
+    m_radius = (float)(std::min(m_texture.width, m_texture.height)) / 2;
 }
 
 void Player::input(void)
@@ -41,9 +42,8 @@ void Player::move(void)
     float dt      = m_raylibPtr->getFrameTime();
     m_position.x += m_direction.x * m_speed * dt;
     m_position.y += m_direction.y * m_speed * dt;
-
-    m_position.x = std::clamp(m_position.x, (float)0, m_maxXPos);
-    m_position.y = std::clamp(m_position.y, (float)0, m_maxYPos);
+    m_position.x  = std::clamp(m_position.x, (float)0, m_maxXPos);
+    m_position.y  = std::clamp(m_position.y, (float)0, m_maxYPos);
 }
 
 void Player::update(void)
@@ -55,4 +55,15 @@ void Player::update(void)
 void Player::draw(void)
 {
     m_raylibPtr->drawTextureV(m_texture, m_position, WHITE);
+}
+
+Vector2 Player::getCenter(void)
+{
+    return (Vector2((m_position.x + ((float)(m_texture.width) / 2)),
+                    (m_position.y + ((float)(m_texture.height) / 2))));
+}
+
+float Player::getRadius(void)
+{
+    return m_radius;
 }

@@ -12,8 +12,10 @@ public:
            std::filesystem::path            resourcePath);
     ~Meteor(void) = default;
 
-    void update(void) override;
-    void draw(void) override;
+    void    update(void) override;
+    void    draw(void) override;
+    Vector2 getCenter(void) override;
+    float   getRadius(void) override;
 
 private:
     void move(void);

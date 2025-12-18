@@ -10,8 +10,10 @@ public:
     Sprite(void);
     virtual ~Sprite(void);
 
-    virtual void update(void) = 0;
-    virtual void draw(void)   = 0;
+    virtual void    update(void)    = 0;
+    virtual void    draw(void)      = 0;
+    virtual Vector2 getCenter(void) = 0;
+    virtual float   getRadius(void) = 0;
 
     bool m_discard = false;
 
@@ -23,6 +25,7 @@ protected:
     float                            m_scale     = 0;
     float                            m_speed     = 0;
     float                            m_rotation  = 0;
+    float                            m_radius    = 0;
 
 private:
 };
