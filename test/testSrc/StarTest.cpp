@@ -25,8 +25,8 @@ public:
         ASSERT_TRUE(m_raylibMock != nullptr);
 
         EXPECT_CALL((*m_raylibMock), isWindowReady()).WillOnce(Return(true));
-        EXPECT_CALL((*m_raylibMock), loadTexture(EndsWith("star.png"))).Times(Exactly(1));
-        m_Star = std::make_shared<Star>(m_raylibMock, "");
+
+        m_Star = std::make_shared<Star>(m_raylibMock);
         ASSERT_TRUE(m_Star != nullptr);
     }
 
@@ -38,11 +38,14 @@ public:
 
 TEST_F(StarTest, update)
 {
-    m_Star->update();
+    EXPECT_DEATH(m_Star->update(), "Assertion failed");
 }
 
 TEST_F(StarTest, draw)
 {
+    Texture2D fakeTexture = {0, 0, 0, 0, 0};
+    m_Star->setTextures({fakeTexture});
+
     EXPECT_CALL((*m_raylibMock), drawTextureEx(A<Texture2D>(),
                                                A<Vector2>(),
                                                0,
@@ -50,6 +53,28 @@ TEST_F(StarTest, draw)
                                                FieldsAre(255, 255, 255, 255)))
         .Times(Exactly(1));
     m_Star->draw();
+}
+
+TEST_F(StarTest, getCenter_death)
+{
+    EXPECT_DEATH(m_Star->getCenter(), "Assertion failed");
+}
+
+TEST_F(StarTest, getRadius_death)
+{
+    EXPECT_DEATH(m_Star->getRadius(), "Assertion failed");
+}
+
+TEST_F(StarTest, getRect_death)
+{
+    EXPECT_DEATH(m_Star->getRect(), "Assertion failed");
+}
+
+TEST_F(StarTest, setTextures_death)
+{
+    Texture2D              fakeTexture  = {0, 0, 0, 0, 0};
+    std::vector<Texture2D> fakeTextures = {fakeTexture, fakeTexture};
+    EXPECT_DEATH(m_Star->setTextures(fakeTextures), "Assertion failed");
 }
 
 } // namespace StarTest

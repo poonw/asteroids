@@ -3,12 +3,10 @@
 #include <random>
 #include "GameSettings.h"
 
-Star::Star(std::shared_ptr<RaylibInterface> raylibPtr,
-           std::filesystem::path            resourcePath)
+Star::Star(std::shared_ptr<RaylibInterface> raylibPtr)
 {
     assert(raylibPtr->isWindowReady());
     m_raylibPtr = raylibPtr;
-    m_texture   = m_raylibPtr->loadTexture((resourcePath / "star.png").string());
 
     // Random number generator
     std::random_device rd;
@@ -25,19 +23,35 @@ Star::Star(std::shared_ptr<RaylibInterface> raylibPtr,
 
 void Star::update(void)
 {
+    assert(false);
 }
 
 void Star::draw(void)
 {
-    m_raylibPtr->drawTextureEx(m_texture, m_position, 0, m_scale, WHITE);
+    assert(m_textures.size() == 1);
+    m_raylibPtr->drawTextureEx(m_textures[0], m_position, 0, m_scale, WHITE);
 }
 
 Vector2 Star::getCenter(void)
 {
+    assert(false);
     return {0, 0};
 }
 
 float Star::getRadius(void)
 {
-    return m_radius;
+    assert(false);
+    return 0;
+}
+
+Rectangle Star::getRect(void)
+{
+    assert(false);
+    return (Rectangle(0, 0, 0, 0));
+}
+
+void Star::setTextures(std::vector<Texture2D> textures)
+{
+    assert(textures.size() == 1);
+    m_textures = textures;
 }

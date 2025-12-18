@@ -25,14 +25,10 @@ public:
         m_raylibMock = std::make_shared<RaylibMock>();
         ASSERT_TRUE(m_raylibMock != nullptr);
 
-        Vector2   startPos    = {0, WINDOW_HEIGHT};
-        Texture2D fakeTexture = {0, 0, 0, 0, 0};
+        Vector2 startPos = {0, WINDOW_HEIGHT};
         EXPECT_CALL((*m_raylibMock), isWindowReady()).WillOnce(Return(true));
-        EXPECT_CALL((*m_raylibMock), loadTexture(EndsWith("laser.png")))
-            .Times(Exactly(1))
-            .WillOnce(Return(fakeTexture));
 
-        m_Laser = std::make_shared<Laser>(m_raylibMock, "", startPos);
+        m_Laser = std::make_shared<Laser>(m_raylibMock, startPos);
         ASSERT_TRUE(m_Laser != nullptr);
     }
 
@@ -42,8 +38,16 @@ public:
     }
 };
 
+TEST_F(LaserTest, updateWithoutTextures_death)
+{
+    EXPECT_DEATH(m_Laser->update(), "Assertion failed");
+}
+
 TEST_F(LaserTest, update)
 {
+    Texture2D fakeTexture = {0, 0, 0, 0, 0};
+    m_Laser->setTextures({fakeTexture});
+
     EXPECT_FALSE(m_Laser->m_discard);
 
     //first call, the laser is still within frame
@@ -57,11 +61,49 @@ TEST_F(LaserTest, update)
     EXPECT_TRUE(m_Laser->m_discard);
 }
 
+TEST_F(LaserTest, drawWithoutTextures_death)
+{
+    EXPECT_DEATH(m_Laser->draw(), "Assertion failed");
+}
+
 TEST_F(LaserTest, draw)
 {
+    Texture2D fakeTexture = {0, 0, 0, 0, 0};
+    m_Laser->setTextures({fakeTexture});
+
     EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(255, 255, 255, 255)))
         .Times(Exactly(1));
     m_Laser->draw();
+}
+
+TEST_F(LaserTest, getCenter_death)
+{
+    EXPECT_DEATH(m_Laser->getCenter(), "Assertion failed");
+}
+
+TEST_F(LaserTest, getRadius_death)
+{
+    EXPECT_DEATH(m_Laser->getRadius(), "Assertion failed");
+}
+
+TEST_F(LaserTest, getRectWithoutTextures_death)
+{
+    EXPECT_DEATH(m_Laser->getRect(), "Assertion failed");
+}
+
+TEST_F(LaserTest, getRect)
+{
+    Texture2D fakeTexture = {0, 5, 15, 0, 0};
+    m_Laser->setTextures({fakeTexture});
+
+    EXPECT_THAT(m_Laser->getRect(), FieldsAre(0, WINDOW_HEIGHT, 5, 15));
+}
+
+TEST_F(LaserTest, setTextures_death)
+{
+    Texture2D              fakeTexture  = {0, 0, 0, 0, 0};
+    std::vector<Texture2D> fakeTextures = {fakeTexture, fakeTexture};
+    EXPECT_DEATH(m_Laser->setTextures(fakeTextures), "Assertion failed");
 }
 
 } // namespace LaserTest

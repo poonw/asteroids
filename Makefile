@@ -26,7 +26,8 @@ endif
 DEFINEFLAGS := $(DFLAGS:%=-D%)
 CXX := g++
 CXXFLAGS := -g -std=c++20 -Wall -Wextra -Werror -O0 -pthread $(DEFINEFLAGS)
-TESTFLAGS := -g -std=c++20 -Wextra -Werror -O0 -pthread -fprofile-arcs -ftest-coverage $(DEFINEFLAGS)
+TESTFLAGS := -g -std=c++20 -Wextra -Werror -O0 -pthread $(DEFINEFLAGS)
+TESTCOVERAGEFLAGS := $(TESTFLAGS) -fprofile-arcs -ftest-coverage
 
 CC := gcc
 CCFLAGS := -g $(DEFINEFLAGS)
@@ -77,16 +78,16 @@ all: $(OBJDIR) $(OBJS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(OBJS) main.cpp -o $(TARGET) $(LIBS)
 	@echo make all successful
 
-$(FORMAT):
-	@echo "Formatting..."
-	style_formatter.bat
-	@echo "Formatting complete"
+# $(FORMAT):
+# 	@echo "Formatting..."
+# 	style_formatter.bat
+# 	@echo "Formatting complete"
 
 $(OBJDIR):
 	@echo Creating $(OBJDIR)
 	mkdir -p $(OBJDIR)
 
-$(OBJDIR)/%.o : $(CXXSRC)/%.cpp $(OBJDIR) $(FORMAT)
+$(OBJDIR)/%.o : $(CXXSRC)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 testall: $(GOOGLETESTBIN) $(TESTOBJDIR) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS)
@@ -122,13 +123,13 @@ $(TESTOBJDIR):
 	@echo Creating $(TESTOBJDIR)
 	mkdir -p $(TESTOBJDIR)
 
-$(TESTOBJDIR)/%.o : $(CXXSRC)/%.cpp $(TESTOBJDIR) $(FORMAT)
+$(TESTOBJDIR)/%.o : $(CXXSRC)/%.cpp
 	$(CXX) $(TESTFLAGS) $(INCLUDE) -c $< -o $@
 
-$(TESTOBJDIR)/%.o : $(TESTSRC)/%.cpp $(TESTOBJDIR) $(FORMAT)
+$(TESTOBJDIR)/%.o : $(TESTSRC)/%.cpp
 	$(CXX) $(TESTFLAGS) $(INCLUDE) $(TESTINCLUDE) -c $< -o $@
 
-$(TESTOBJDIR)/%.o : $(MOCKSRC)/%.cpp $(TESTOBJDIR) $(FORMAT)
+$(TESTOBJDIR)/%.o : $(MOCKSRC)/%.cpp
 	$(CXX) $(TESTFLAGS) $(INCLUDE) $(TESTINCLUDE) -c $< -o $@
 
 clean:

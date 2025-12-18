@@ -3,12 +3,10 @@
 #include <random>
 #include "GameSettings.h"
 
-Meteor::Meteor(std::shared_ptr<RaylibInterface> raylibPtr,
-               std::filesystem::path            resourcePath)
+Meteor::Meteor(std::shared_ptr<RaylibInterface> raylibPtr)
 {
     assert(raylibPtr->isWindowReady());
     m_raylibPtr = raylibPtr;
-    m_texture   = m_raylibPtr->loadTexture((resourcePath / "meteor.png").string());
 
     // Random number generator
     std::random_device rd;
@@ -23,7 +21,6 @@ Meteor::Meteor(std::shared_ptr<RaylibInterface> raylibPtr,
     m_speed     = distSpeed(gen);
     m_direction = {distDirection(gen), 1};
     m_scale     = 1;
-    m_radius    = (float)(std::min(m_texture.width, m_texture.height)) / 2;
 }
 
 void Meteor::move(void)
@@ -31,15 +28,15 @@ void Meteor::move(void)
     float dt      = m_raylibPtr->getFrameTime();
     m_position.x += m_direction.x * m_speed * dt;
     m_position.y += m_direction.y * m_speed * dt;
-
-    m_rotation += 50 * dt;
+    m_rotation   += 50 * dt;
 }
 
 void Meteor::update(void)
 {
+    assert(m_textures.size() == 1);
     move();
 
-    if ((m_position.y - m_texture.height) > WINDOW_HEIGHT)
+    if ((m_position.y - m_textures[0].height) > WINDOW_HEIGHT)
     {
         m_discard = true;
     }
@@ -47,16 +44,34 @@ void Meteor::update(void)
 
 void Meteor::draw(void)
 {
-    m_raylibPtr->drawTextureEx(m_texture, m_position, m_rotation, m_scale, WHITE);
+    assert(m_textures.size() == 1);
+    Rectangle targetRect = Rectangle(m_position.x, m_position.y, m_textures[0].width, m_textures[0].height);
+    m_raylibPtr->drawTexturePro(m_textures[0], m_rect, targetRect, m_origin, m_rotation, WHITE);
 }
 
 Vector2 Meteor::getCenter(void)
 {
-    return (Vector2((m_position.x + ((float)(m_texture.width) / 2)),
-                    (m_position.y + ((float)(m_texture.height) / 2))));
+    assert(m_textures.size() == 1);
+    return m_position;
 }
 
 float Meteor::getRadius(void)
 {
+    assert(m_textures.size() == 1);
     return m_radius;
+}
+
+Rectangle Meteor::getRect(void)
+{
+    assert(false);
+    return (Rectangle(0, 0, 0, 0));
+}
+
+void Meteor::setTextures(std::vector<Texture2D> textures)
+{
+    assert(textures.size() == 1);
+    m_textures = textures;
+    m_radius   = (float)(std::min(m_textures[0].width, m_textures[0].height)) / 2;
+    m_rect     = Rectangle(0, 0, m_textures[0].width, m_textures[0].height);
+    m_origin   = Vector2(m_textures[0].width / 2, m_textures[0].height / 2);
 }
