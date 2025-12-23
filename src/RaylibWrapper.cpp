@@ -88,3 +88,8 @@ bool RaylibWrapper::checkCollisionCircleRec(Vector2 center, float radius, Rectan
 {
     return (CheckCollisionCircleRec(center, radius, rec));
 }
+
+void RaylibWrapper::drawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint)
+{
+    DrawTexturePro(texture, source, dest, origin, rotation, tint);
+}

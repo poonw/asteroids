@@ -1,14 +1,15 @@
-#ifndef STAR_H
-#define STAR_H
+#ifndef EXPLOSION_H
+#define EXPLOSION_H
 
 #include "RaylibInterface.h"
 #include "Sprite.h"
 
-class Star : public Sprite
+class Explosion : public Sprite
 {
 public:
-    Star(std::shared_ptr<RaylibInterface> raylibPtr);
-    ~Star(void) = default;
+    Explosion(std::shared_ptr<RaylibInterface> raylibPtr,
+              Vector2                          position);
+    ~Explosion(void) = default;
 
     void      update(void) override;
     void      draw(void) override;
@@ -18,7 +19,7 @@ public:
     void      setTextures(std::vector<Texture2D> textures) override;
 
 private:
-    float m_scale = 0;
+    uint32_t m_index = 0;
 };
 
-#endif // STAR_H
+#endif // EXPLOSION_H
