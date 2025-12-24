@@ -116,6 +116,7 @@ void Game::draw(void)
 
     m_raylibPtr->clearBackground(BLACK);
     drawStars();
+    drawScore();
     m_player->draw();
     for (uint32_t index = 0; index < m_lasersList.size(); index++)
     {
@@ -194,6 +195,8 @@ void Game::checkCollisions(void)
                 std::shared_ptr<Sprite> explosion = m_explodeMeteor(m_raylibPtr, m_meteorsList[imeteor]->getCenter());
                 explosion->setTextures(m_texturesMap["explosion"]);
                 m_explosionsList.push_back(explosion);
+
+                m_score++;
             }
         }
     }
@@ -208,6 +211,11 @@ void Game::checkCollisions(void)
             m_raylibPtr->closeWindow();
         }
     }
+}
+
+void Game::drawScore(void)
+{
+    m_raylibPtr->drawTextEx(m_fontType, std::to_string(m_score), Vector2(50, 50), FONT_SIZE, 0, WHITE);
 }
 
 void Game::loadResources(void)
@@ -228,4 +236,6 @@ void Game::loadResources(void)
         explosionTextures[index] = m_raylibPtr->loadTexture((imagesPath / "explosion" / (std::to_string(index + 1) + ".png")).string());
     }
     m_texturesMap["explosion"] = explosionTextures;
+
+    m_fontType = m_raylibPtr->loadFontEx((fontPath / "Stormfaze.otf").string(), FONT_SIZE, NULL, 0);
 }

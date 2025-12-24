@@ -25,6 +25,8 @@ public:
     virtual bool      checkCollisionCircles(Vector2 center1, float radius1, Vector2 center2, float radius2)                           = 0;
     virtual bool      checkCollisionCircleRec(Vector2 center, float radius, Rectangle rec)                                            = 0;
     virtual void      drawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint) = 0;
+    virtual Font      loadFontEx(std::string fileName, int fontSize, int* codepoints, int codepointCount)                             = 0;
+    virtual void      drawTextEx(Font font, std::string text, Vector2 position, float fontSize, float spacing, Color tint)            = 0;
 };
 
 #endif // RAYLIBINTERFACE_H

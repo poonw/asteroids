@@ -42,18 +42,23 @@ private:
     void drawStars(void);
     void discardSprites(void);
     void checkCollisions(void);
+    void drawScore(void);
     void loadResources(void);
 
     const std::filesystem::path      m_resourcePath = "resources";
     std::shared_ptr<RaylibInterface> m_raylibPtr    = nullptr;
     std::shared_ptr<Timer>           m_meteorTimer  = nullptr;
 
-    std::shared_ptr<Sprite>                                 m_player = nullptr;
-    std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS>    m_starsList;
-    std::vector<std::shared_ptr<Sprite>>                    m_lasersList;
-    std::vector<std::shared_ptr<Sprite>>                    m_meteorsList;
-    std::vector<std::shared_ptr<Sprite>>                    m_explosionsList;
+    std::shared_ptr<Sprite>                              m_player = nullptr;
+    std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starsList;
+    std::vector<std::shared_ptr<Sprite>>                 m_lasersList;
+    std::vector<std::shared_ptr<Sprite>>                 m_meteorsList;
+    std::vector<std::shared_ptr<Sprite>>                 m_explosionsList;
+
     std::unordered_map<std::string, std::vector<Texture2D>> m_texturesMap;
+    Font                                                    m_fontType;
+
+    uint32_t m_score = 0;
 
     std::function<std::shared_ptr<Sprite>(
         std::shared_ptr<RaylibInterface> raylibPtr,
