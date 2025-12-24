@@ -27,6 +27,8 @@ public:
     MOCK_METHOD(bool, checkCollisionCircles, (Vector2 center1, float radius1, Vector2 center2, float radius2), (override));
     MOCK_METHOD(bool, checkCollisionCircleRec, (Vector2 center, float radius, Rectangle rec), (override));
     MOCK_METHOD(void, drawTexturePro, (Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint), (override));
+    MOCK_METHOD(Font, loadFontEx, (std::string fileName, int fontSize, int* codepoints, int codepointCount), (override));
+    MOCK_METHOD(void, drawTextEx, (Font font, std::string text, Vector2 position, float fontSize, float spacing, Color tint), (override));
 };
 
 #endif // RAYLIBMOCK_H

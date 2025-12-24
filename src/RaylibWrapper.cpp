@@ -93,3 +93,15 @@ void RaylibWrapper::drawTexturePro(Texture2D texture, Rectangle source, Rectangl
 {
     DrawTexturePro(texture, source, dest, origin, rotation, tint);
 }
+
+Font RaylibWrapper::loadFontEx(std::string fileName, int fontSize, int* codepoints, int codepointCount)
+{
+    const char* filefullpath = fileName.c_str();
+    return (LoadFontEx(filefullpath, fontSize, codepoints, codepointCount));
+}
+
+void RaylibWrapper::drawTextEx(Font font, std::string text, Vector2 position, float fontSize, float spacing, Color tint)
+{
+    const char* charText = text.c_str();
+    DrawTextEx(font, charText, position, fontSize, spacing, tint);
+}
