@@ -29,6 +29,14 @@ public:
     MOCK_METHOD(void, drawTexturePro, (Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint), (override));
     MOCK_METHOD(Font, loadFontEx, (std::string fileName, int fontSize, int* codepoints, int codepointCount), (override));
     MOCK_METHOD(void, drawTextEx, (Font font, std::string text, Vector2 position, float fontSize, float spacing, Color tint), (override));
+    MOCK_METHOD(void, initAudioDevice, (), (override));
+    MOCK_METHOD(void, closeAudioDevice, (), (override));
+    MOCK_METHOD(Sound, loadSound, (std::string fileName), (override));
+    MOCK_METHOD(void, playSound, (Sound sound), (override));
+    MOCK_METHOD(Music, loadMusicStream, (std::string fileName), (override));
+    MOCK_METHOD(void, unloadMusicStream, (Music music), (override));
+    MOCK_METHOD(void, updateMusicStream, (Music music), (override));
+    MOCK_METHOD(void, playMusicStream, (Music music), (override));
 };
 
 #endif // RAYLIBMOCK_H

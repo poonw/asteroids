@@ -58,5 +58,4 @@ void Laser::setTextures(std::vector<Texture2D> textures)
 {
     assert(textures.size() == 1);
     m_textures = textures;
-    m_radius   = (float)(std::min(m_textures[0].width, m_textures[0].height)) / 2;
 }

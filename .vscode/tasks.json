@@ -15,6 +15,20 @@
             "detail": "Build our program using make"
         },
         {
+            "type": "cppbuild",
+            "label": "make testall",
+            "command": "make testall",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "Build our test using make"
+        },
+        {
             "type": "process",
             "label": "format",
             "command": "style_formatter.bat",
@@ -26,6 +40,11 @@
         {
             "label": "buildall",
             "dependsOn": ["format", "make"],
+            "dependsOrder": "sequence"
+        },
+        {
+            "label": "buildtestall",
+            "dependsOn": ["format", "make testall"],
             "dependsOrder": "sequence"
         }
     ],

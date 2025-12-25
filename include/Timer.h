@@ -1,14 +1,9 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include <cstdint>
 #include <functional>
 #include <memory>
 #include "RaylibInterface.h"
-
-class Game;
-
-typedef void (Game::*Operation)(void);
 
 class Timer
 {

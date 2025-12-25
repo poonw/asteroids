@@ -21,7 +21,6 @@ private:
     void move(void);
 
     Vector2   m_direction = {0, 0};
-    float     m_scale     = 0;
     float     m_speed     = 0;
     float     m_rotation  = 0;
     float     m_radius    = 0;

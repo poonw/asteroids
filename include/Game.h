@@ -57,6 +57,9 @@ private:
 
     std::unordered_map<std::string, std::vector<Texture2D>> m_texturesMap;
     Font                                                    m_fontType;
+    Sound                                                   m_explosionSound;
+    Sound                                                   m_laserSound;
+    Music                                                   m_backGroundMusic;
 
     uint32_t m_score = 0;
 

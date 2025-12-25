@@ -23,7 +23,6 @@ private:
 
     Vector2 m_direction = {0, 0};
     float   m_speed     = 0;
-    float   m_radius    = 0;
 };
 
 #endif // LASER_H

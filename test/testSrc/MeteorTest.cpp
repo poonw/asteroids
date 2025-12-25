@@ -2,11 +2,9 @@
 #include "gtest/gtest.h"
 #include "Meteor.h"
 #include <memory>
-#include "GameSettings.h"
 #include "RaylibMock.h"
 
 using ::testing::A;
-using ::testing::EndsWith;
 using ::testing::Exactly;
 using ::testing::FieldsAre;
 using ::testing::Mock;
