@@ -28,6 +28,14 @@ public:
     void      drawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint) override;
     Font      loadFontEx(std::string fileName, int fontSize, int* codepoints, int codepointCount) override;
     void      drawTextEx(Font font, std::string text, Vector2 position, float fontSize, float spacing, Color tint) override;
+    void      initAudioDevice(void) override;
+    void      closeAudioDevice(void) override;
+    Sound     loadSound(std::string fileName) override;
+    Music     loadMusicStream(std::string fileName) override;
+    void      unloadMusicStream(Music music) override;
+    void      updateMusicStream(Music music) override;
+    void      playSound(Sound sound) override;
+    void      playMusicStream(Music music) override;
 };
 
 #endif // RAYLIBWRAPPER_H

@@ -27,8 +27,6 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr,
     m_createMeteor  = createMeteorWrapper;
     m_explodeMeteor = explodeMeteorWrapper;
 
-    m_raylibPtr->initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
-
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         m_starsList[n] = nullptr;
@@ -36,13 +34,17 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr,
 
     std::function<void(void)> createMeteorCallback = std::bind(&Game::createMeteor, this);
 
+    m_raylibPtr->initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
     m_meteorTimer = std::make_shared<Timer>(m_raylibPtr, METEOR_TIMER_DURATION, true, true, createMeteorCallback);
-
+    m_raylibPtr->initAudioDevice();
     loadResources();
+    m_raylibPtr->playMusicStream(m_backGroundMusic);
 }
 
 Game::~Game(void)
 {
+    m_raylibPtr->closeAudioDevice();
+    m_raylibPtr->unloadMusicStream(m_backGroundMusic);
     m_raylibPtr->closeWindow();
 }
 
@@ -83,6 +85,7 @@ void Game::shootLaser(Vector2 position)
     std::shared_ptr<Sprite> laser = m_createLaser(m_raylibPtr, position);
     laser->setTextures(m_texturesMap["laser"]);
     m_lasersList.push_back(laser);
+    m_raylibPtr->playSound(m_laserSound);
 }
 
 void Game::createMeteor(void)
@@ -108,6 +111,7 @@ void Game::update(void)
     {
         m_explosionsList[index]->update();
     }
+    m_raylibPtr->updateMusicStream(m_backGroundMusic);
 }
 
 void Game::draw(void)
@@ -195,6 +199,7 @@ void Game::checkCollisions(void)
                 std::shared_ptr<Sprite> explosion = m_explodeMeteor(m_raylibPtr, m_meteorsList[imeteor]->getCenter());
                 explosion->setTextures(m_texturesMap["explosion"]);
                 m_explosionsList.push_back(explosion);
+                m_raylibPtr->playSound(m_explosionSound);
 
                 m_score++;
             }
@@ -237,5 +242,8 @@ void Game::loadResources(void)
     }
     m_texturesMap["explosion"] = explosionTextures;
 
-    m_fontType = m_raylibPtr->loadFontEx((fontPath / "Stormfaze.otf").string(), FONT_SIZE, NULL, 0);
+    m_fontType        = m_raylibPtr->loadFontEx((fontPath / "Stormfaze.otf").string(), FONT_SIZE, NULL, 0);
+    m_explosionSound  = m_raylibPtr->loadSound((audioPath / "explosion.wav").string());
+    m_laserSound      = m_raylibPtr->loadSound((audioPath / "laser.wav").string());
+    m_backGroundMusic = m_raylibPtr->loadMusicStream((audioPath / "music.wav").string());
 }

@@ -1,9 +1,7 @@
-#define WINDOW_WIDTH 1600
-#define WINDOW_HEIGHT 900
-#define BG_COLOR (15,10,25,255)
-#define PLAYER_SPEED 500
-#define LASER_SPEED 600
-#define METEOR_SPEED_RANGE [300,400]
+#define WINDOW_WIDTH          1600
+#define WINDOW_HEIGHT         900
+#define PLAYER_SPEED          500
+#define LASER_SPEED           600
 #define METEOR_TIMER_DURATION 0.4
-#define FONT_SIZE 120
-#define NUMBER_OF_STARS 50
+#define FONT_SIZE             120
+#define NUMBER_OF_STARS       50

@@ -27,6 +27,14 @@ public:
     virtual void      drawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint) = 0;
     virtual Font      loadFontEx(std::string fileName, int fontSize, int* codepoints, int codepointCount)                             = 0;
     virtual void      drawTextEx(Font font, std::string text, Vector2 position, float fontSize, float spacing, Color tint)            = 0;
+    virtual void      initAudioDevice(void)                                                                                           = 0;
+    virtual void      closeAudioDevice(void)                                                                                          = 0;
+    virtual Sound     loadSound(std::string fileName)                                                                                 = 0;
+    virtual void      playSound(Sound sound)                                                                                          = 0;
+    virtual Music     loadMusicStream(std::string fileName)                                                                           = 0;
+    virtual void      unloadMusicStream(Music music)                                                                                  = 0;
+    virtual void      updateMusicStream(Music music)                                                                                  = 0;
+    virtual void      playMusicStream(Music music)                                                                                    = 0;
 };
 
 #endif // RAYLIBINTERFACE_H

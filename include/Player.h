@@ -23,12 +23,13 @@ private:
     void input(void);
     void move(void);
 
-    Vector2                      m_direction = {0, 0};
-    float                        m_speed     = 0;
-    float                        m_radius    = 0;
+    Vector2 m_direction = {0, 0};
+    float   m_speed     = 0;
+    float   m_radius    = 0;
+    float   m_maxXPos   = 0.0;
+    float   m_maxYPos   = 0.0;
+
     std::function<void(Vector2)> m_shootLaser;
-    float                        m_maxXPos = 0.0;
-    float                        m_maxYPos = 0.0;
 };
 
 #endif // PLAYER_H

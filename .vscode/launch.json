@@ -1,7 +1,33 @@
 {
     "configurations": [
         {
-            "name": "C/C++: g++.exe build and debug active file",
+            "name": "C/C++: make test and debug active test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\asteroidsTest.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\w64devkit\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "buildtestall"
+        },
+        {
+            "name": "C/C++: make build and debug active project",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}\\asteroids.exe",

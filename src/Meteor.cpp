@@ -20,7 +20,6 @@ Meteor::Meteor(std::shared_ptr<RaylibInterface> raylibPtr)
     m_position  = {(float)distX(gen), (float)distY(gen)};
     m_speed     = distSpeed(gen);
     m_direction = {distDirection(gen), 1};
-    m_scale     = 1;
 }
 
 void Meteor::move(void)

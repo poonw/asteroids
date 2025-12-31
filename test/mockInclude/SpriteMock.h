@@ -1,14 +1,14 @@
-#ifndef LASERMOCK_H
-#define LASERMOCK_H
+#ifndef SPRITEMOCK_H
+#define SPRITEMOCK_H
 
 #include "Sprite.h"
 #include "gmock/gmock.h"
 
-class LaserMock : public Sprite
+class SpriteMock : public Sprite
 {
 public:
-    LaserMock(void);
-    virtual ~LaserMock(void);
+    SpriteMock(void);
+    virtual ~SpriteMock(void);
 
     MOCK_METHOD(void, update, (), (override));
     MOCK_METHOD(void, draw, (), (override));
@@ -18,4 +18,4 @@ public:
     MOCK_METHOD(void, setTextures, (std::vector<Texture2D> textures), (override));
 };
 
-#endif // LASERMOCK_H
+#endif // SPRITEMOCK_H

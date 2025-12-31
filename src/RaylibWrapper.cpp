@@ -105,3 +105,43 @@ void RaylibWrapper::drawTextEx(Font font, std::string text, Vector2 position, fl
     const char* charText = text.c_str();
     DrawTextEx(font, charText, position, fontSize, spacing, tint);
 }
+
+void RaylibWrapper::initAudioDevice(void)
+{
+    InitAudioDevice();
+}
+
+void RaylibWrapper::closeAudioDevice(void)
+{
+    CloseAudioDevice();
+}
+
+Sound RaylibWrapper::loadSound(std::string fileName)
+{
+    return (LoadSound(fileName.c_str()));
+}
+
+Music RaylibWrapper::loadMusicStream(std::string fileName)
+{
+    return (LoadMusicStream(fileName.c_str()));
+}
+
+void RaylibWrapper::unloadMusicStream(Music music)
+{
+    UnloadMusicStream(music);
+}
+
+void RaylibWrapper::updateMusicStream(Music music)
+{
+    UpdateMusicStream(music);
+}
+
+void RaylibWrapper::playSound(Sound sound)
+{
+    PlaySound(sound);
+}
+
+void RaylibWrapper::playMusicStream(Music music)
+{
+    PlayMusicStream(music);
+}
