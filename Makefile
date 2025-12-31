@@ -3,10 +3,10 @@ ifndef config
 endif
 
 ifeq ($(config),debug)
-  compile_config := debug
+  COMPILECONFIG := -O0
 
 else ifeq ($(config),release)
-  compile_config := release
+  COMPILECONFIG := -O3
 
 else
   $(error "invalid configuration $(config)")
@@ -25,7 +25,7 @@ endif
 
 DEFINEFLAGS := $(DFLAGS:%=-D%)
 CXX := g++
-CXXFLAGS := -g -std=c++20 -Wall -Wextra -Werror -O0 -pthread $(DEFINEFLAGS)
+CXXFLAGS := -g -std=c++20 -Wall -Wextra -Werror $(COMPILECONFIG) -pthread $(DEFINEFLAGS)
 TESTFLAGS := -g -std=c++20 -Wextra -Werror -O0 -pthread $(DEFINEFLAGS)
 TESTCOVERAGEFLAGS := $(TESTFLAGS) -fprofile-arcs -ftest-coverage
 
@@ -68,8 +68,6 @@ TESTOBJS := $(patsubst $(CXXSRC)/%.cpp, $(TESTOBJDIR)/%.o, $(CXXSRCS))
 TESTSRCOBJS := $(patsubst $(TESTSRC)/%.cpp, $(TESTOBJDIR)/%.o, $(TESTSRCS))
 MOCKOBJS := $(patsubst $(MOCKSRC)/%.cpp, $(TESTOBJDIR)/%.o, $(MOCKSRCS))
 
-FORMAT := format
-
 #parallel compilation
 MAKEFLAGS += -j$(nproc)
 
@@ -77,11 +75,6 @@ MAKEFLAGS += -j$(nproc)
 all: $(OBJDIR) $(OBJS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(OBJS) main.cpp -o $(TARGET) $(LIBS)
 	@echo make all successful
-
-# $(FORMAT):
-# 	@echo "Formatting..."
-# 	style_formatter.bat
-# 	@echo "Formatting complete"
 
 $(OBJDIR):
 	@echo Creating $(OBJDIR)
@@ -91,7 +84,7 @@ $(OBJDIR)/%.o : $(CXXSRC)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 testall: $(GOOGLETESTBIN) $(TESTOBJDIR) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS)
-	$(CXX) $(INCLUDE) $(TESTINCLUDE) $(CXXFLAGS) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS) -o $(TESTTARGET) $(TESTLIBS) $(LIBS)
+	$(CXX) $(INCLUDE) $(TESTINCLUDE) $(TESTFLAGS) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS) -o $(TESTTARGET) $(TESTLIBS) $(LIBS)
 	@echo make testall successful
 
 $(GOOGLETESTBIN):
