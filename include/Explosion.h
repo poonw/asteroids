@@ -8,7 +8,8 @@ class Explosion : public Sprite
 {
 public:
     Explosion(std::shared_ptr<RaylibInterface> raylibPtr,
-              Vector2                          position);
+              Vector2                          position,
+              float                            scale);
     ~Explosion(void) = default;
 
     void      update(void) override;
@@ -20,6 +21,7 @@ public:
 
 private:
     uint32_t m_index = 0;
+    float    m_scale = 0;
 };
 
 #endif // EXPLOSION_H

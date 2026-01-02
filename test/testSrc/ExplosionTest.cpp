@@ -27,7 +27,7 @@ public:
         Vector2 startPos = {0, WINDOW_HEIGHT};
         EXPECT_CALL((*m_raylibMock), isWindowReady()).WillOnce(Return(true));
 
-        m_Explosion = std::make_shared<Explosion>(m_raylibMock, startPos);
+        m_Explosion = std::make_shared<Explosion>(m_raylibMock, startPos, 1);
         ASSERT_TRUE(m_Explosion != nullptr);
     }
 
@@ -70,7 +70,7 @@ TEST_F(ExplosionTest, draw)
     std::vector<Texture2D> fakeTextures = {fakeTexture, fakeTexture};
     m_Explosion->setTextures(fakeTextures);
 
-    EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(255, 255, 255, 255)))
+    EXPECT_CALL((*m_raylibMock), drawTextureEx(A<Texture2D>(), A<Vector2>(), 0, 1, FieldsAre(255, 255, 255, 255)))
         .Times(Exactly(1));
     m_Explosion->draw();
 }

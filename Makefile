@@ -71,7 +71,7 @@ MOCKOBJS := $(patsubst $(MOCKSRC)/%.cpp, $(TESTOBJDIR)/%.o, $(MOCKSRCS))
 #parallel compilation
 MAKEFLAGS += -j$(nproc)
 
-.PHONY: all testall clean help
+.PHONY: all test clean help
 all: $(OBJDIR) $(OBJS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(OBJS) main.cpp -o $(TARGET) $(LIBS)
 	@echo make all successful
@@ -83,9 +83,9 @@ $(OBJDIR):
 $(OBJDIR)/%.o : $(CXXSRC)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
-testall: $(GOOGLETESTBIN) $(TESTOBJDIR) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS)
+test: $(GOOGLETESTBIN) $(TESTOBJDIR) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS)
 	$(CXX) $(INCLUDE) $(TESTINCLUDE) $(TESTFLAGS) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS) -o $(TESTTARGET) $(TESTLIBS) $(LIBS)
-	@echo make testall successful
+	@echo make test successful
 
 $(GOOGLETESTBIN):
 	@if [ ! -d $(GOOGLETESTBIN) ]; then \
@@ -139,6 +139,6 @@ help:
 	@echo ""
 	@echo "TARGETS:"
 	@echo "   all (default)"
-	@echo "   testall"
+	@echo "   test"
 	@echo "   clean"
 	@echo ""

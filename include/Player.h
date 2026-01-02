@@ -5,6 +5,8 @@
 #include "RaylibInterface.h"
 #include "Sprite.h"
 
+class Timer;
+
 class Player : public Sprite
 {
 public:
@@ -19,17 +21,33 @@ public:
     Rectangle getRect(void) override;
     void      setTextures(std::vector<Texture2D> textures) override;
 
+    enum STATE
+    {
+        PLAYABLE = 0,
+        INVISIBLE,
+        VISIBLE,
+        INVINCIBLE
+    };
+
 private:
     void input(void);
     void move(void);
+    void moveIntoWindow(void);
+    void renderVisible(void);
+    void renderPlayable(void);
 
     Vector2 m_direction = {0, 0};
     float   m_speed     = 0;
     float   m_radius    = 0;
     float   m_maxXPos   = 0.0;
     float   m_maxYPos   = 0.0;
+    float   m_startXPos = 0.0;
+    float   m_startYPos = 0.0;
+    STATE   m_state     = PLAYABLE;
 
     std::function<void(Vector2)> m_shootLaser;
+    std::shared_ptr<Timer>       m_invisibleTimer  = nullptr;
+    std::shared_ptr<Timer>       m_invincibleTimer = nullptr;
 };
 
 #endif // PLAYER_H

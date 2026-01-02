@@ -35,9 +35,21 @@ public:
     }
 };
 
-TEST_F(StarTest, update)
+TEST_F(StarTest, updateWithoutTextures_death)
 {
     EXPECT_DEATH(m_Star->update(), "Assertion failed");
+}
+
+TEST_F(StarTest, update)
+{
+    Texture2D fakeTexture = {0, 0, 0, 0, 0};
+    m_Star->setTextures({fakeTexture});
+
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(0.001));
+    m_Star->update();
+
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(10));
+    m_Star->update();
 }
 
 TEST_F(StarTest, draw)

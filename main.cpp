@@ -21,9 +21,10 @@ std::shared_ptr<Sprite> createMeteor(std::shared_ptr<RaylibInterface> raylibPtr)
 }
 
 std::shared_ptr<Sprite> explodeMeteor(std::shared_ptr<RaylibInterface> raylibPtr,
-                                      Vector2                          position)
+                                      Vector2                          position,
+                                      float                            scale)
 {
-    return (std::make_shared<Explosion>(raylibPtr, position));
+    return (std::make_shared<Explosion>(raylibPtr, position, scale));
 }
 
 int main(void)
@@ -43,7 +44,8 @@ int main(void)
 
     std::function<std::shared_ptr<Sprite>(
         std::shared_ptr<RaylibInterface> raylibPtr,
-        Vector2                          position)>
+        Vector2                          position,
+        float                            scale)>
         explodeMeteorWrapper = explodeMeteor;
 
     std::shared_ptr<Game> m_game = std::make_shared<Game>(raylibPtr,
