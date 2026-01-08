@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cassert>
 #include "GameSettings.h"
+#include "Timer.h"
 
 Player::Player(std::shared_ptr<RaylibInterface> raylibPtr,
                std::function<void(Vector2)>     shootLaser)
@@ -11,6 +12,15 @@ Player::Player(std::shared_ptr<RaylibInterface> raylibPtr,
     m_raylibPtr  = raylibPtr;
     m_shootLaser = shootLaser;
     m_speed      = PLAYER_SPEED;
+
+    std::function<void(void)> renderVisibleCallback  = std::bind(&Player::renderVisible, this);
+    std::function<void(void)> renderVincibleCallback = std::bind(&Player::renderPlayable, this);
+
+    m_invisibleTimer  = std::make_shared<Timer>(m_raylibPtr, 1, false, false, renderVisibleCallback);
+    m_invincibleTimer = std::make_shared<Timer>(m_raylibPtr, 4, false, false, renderVincibleCallback);
+
+    m_state   = PLAYABLE;
+    m_discard = true;
 }
 
 void Player::input(void)
@@ -39,14 +49,70 @@ void Player::move(void)
 void Player::update(void)
 {
     assert(m_textures.size() == 1);
-    input();
-    move();
+
+    switch (m_state)
+    {
+        case PLAYABLE:
+        {
+            if (m_discard)
+            {
+                m_state      = INVISIBLE;
+                m_position.x = m_startXPos;
+                m_position.y = WINDOW_HEIGHT + 100;
+                m_invisibleTimer->activate();
+            }
+            else
+            {
+                input();
+                move();
+            }
+            break;
+        }
+
+        case INVISIBLE:
+            m_invisibleTimer->update();
+            break;
+
+        case VISIBLE:
+            moveIntoWindow();
+            break;
+
+        case INVINCIBLE:
+        {
+            input();
+            move();
+            m_invincibleTimer->update();
+            break;
+        }
+
+        default:
+            assert(false);
+            break;
+    }
 }
 
 void Player::draw(void)
 {
     assert(m_textures.size() == 1);
-    m_raylibPtr->drawTextureV(m_textures[0], m_position, WHITE);
+
+    switch (m_state)
+    {
+        case PLAYABLE:
+            m_raylibPtr->drawTextureV(m_textures[0], m_position, WHITE);
+            break;
+
+        case INVISIBLE:
+            break;
+
+        case VISIBLE:
+        case INVINCIBLE:
+            m_raylibPtr->drawTextureV(m_textures[0], m_position, DARKGRAY);
+            break;
+
+        default:
+            assert(false);
+            break;
+    }
 }
 
 Vector2 Player::getCenter(void)
@@ -71,12 +137,40 @@ Rectangle Player::getRect(void)
 void Player::setTextures(std::vector<Texture2D> textures)
 {
     assert(textures.size() == 1);
-    m_textures = textures;
-    m_maxXPos  = (float)(WINDOW_WIDTH - m_textures[0].width);
-    m_maxYPos  = (float)(WINDOW_HEIGHT - m_textures[0].height);
+    m_textures  = textures;
+    m_maxXPos   = (float)(WINDOW_WIDTH - m_textures[0].width);
+    m_maxYPos   = (float)(WINDOW_HEIGHT - m_textures[0].height);
+    m_startXPos = (m_maxXPos / 2);
+    m_startYPos = (m_maxYPos - 100);
 
-    m_position.x = (m_maxXPos / 2);
-    m_position.y = (m_maxYPos - 10);
+    m_position.x = m_startXPos;
+    m_position.y = m_startYPos;
 
     m_radius = (float)(std::min(m_textures[0].width, m_textures[0].height)) / 2;
+}
+
+void Player::moveIntoWindow(void)
+{
+    assert(m_state == VISIBLE);
+    float dt      = m_raylibPtr->getFrameTime();
+    m_position.y += (-1) * m_speed * dt;
+
+    if (m_position.y <= m_startYPos)
+    {
+        m_state = INVINCIBLE;
+    }
+}
+
+void Player::renderVisible(void)
+{
+    assert(m_state == INVISIBLE);
+    m_state = VISIBLE;
+    m_invincibleTimer->activate();
+}
+
+void Player::renderPlayable(void)
+{
+    assert(m_state == INVINCIBLE);
+    m_state   = PLAYABLE;
+    m_discard = false;
 }

@@ -43,7 +43,8 @@ public:
     }
 
     std::shared_ptr<SpriteMock> explodeMeteor(std::shared_ptr<RaylibInterface> raylibPtr,
-                                              Vector2                          position)
+                                              Vector2                          position,
+                                              float                            scale)
     {
         m_explosionMock = std::make_shared<NiceMock<SpriteMock>>();
         return (std::dynamic_pointer_cast<SpriteMock>(m_explosionMock));
@@ -102,8 +103,9 @@ public:
 
         std::function<std::shared_ptr<SpriteMock>(
             std::shared_ptr<RaylibInterface> raylibPtr,
-            Vector2                          position)>
-            f_explodeMeteor = std::bind(&GameTest::explodeMeteor, this, std::placeholders::_1, std::placeholders::_2);
+            Vector2                          position,
+            float                            scale)>
+            f_explodeMeteor = std::bind(&GameTest::explodeMeteor, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
         m_Game = std::make_shared<Game>(m_raylibMock, f_createLaser, f_createMeteor, f_explodeMeteor);
         ASSERT_TRUE(m_Game != nullptr);
@@ -153,6 +155,10 @@ TEST_F(GameTest, loopWithOnlyPlayerAndStars)
         .WillOnce(Return(false));
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
@@ -160,9 +166,17 @@ TEST_F(GameTest, loopWithOnlyPlayerAndStars)
     {
         EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
     }
+
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            "0",
-                                            FieldsAre(50, 50),
+                                            "lives:     3",
+                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FONT_SIZE,
+                                            0,
+                                            FieldsAre(255, 255, 255, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "score:    0",
+                                            FieldsAre((WINDOW_WIDTH - 150), (30 + FONT_SIZE)),
                                             FONT_SIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -196,6 +210,10 @@ TEST_F(GameTest, playerMeteorNoCollisionTest)
 
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
     EXPECT_CALL((*m_meteorMock), update()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
@@ -205,9 +223,17 @@ TEST_F(GameTest, playerMeteorNoCollisionTest)
     {
         EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
     }
+
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            "0",
-                                            FieldsAre(50, 50),
+                                            "lives:     3",
+                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FONT_SIZE,
+                                            0,
+                                            FieldsAre(255, 255, 255, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "score:    0",
+                                            FieldsAre((WINDOW_WIDTH - 150), (30 + FONT_SIZE)),
                                             FONT_SIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -249,6 +275,10 @@ TEST_F(GameTest, playerMeteorCollisionTest)
 
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
     EXPECT_CALL((*m_meteorMock), update()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
@@ -258,9 +288,17 @@ TEST_F(GameTest, playerMeteorCollisionTest)
     {
         EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
     }
+
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            "0",
-                                            FieldsAre(50, 50),
+                                            "lives:     3",
+                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FONT_SIZE,
+                                            0,
+                                            FieldsAre(255, 255, 255, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "score:    0",
+                                            FieldsAre((WINDOW_WIDTH - 150), (30 + FONT_SIZE)),
                                             FONT_SIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -276,8 +314,9 @@ TEST_F(GameTest, playerMeteorCollisionTest)
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(true));
+    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
 
-    EXPECT_CALL((*m_raylibMock), closeWindow()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .InSequence(seq)
         .WillOnce(Return(true));
@@ -309,6 +348,10 @@ TEST_F(GameTest, meteorLaserNoCollisionTest)
 
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
     EXPECT_CALL((*m_laserMock), update()).InSequence(seq);
     EXPECT_CALL((*m_meteorMock), update()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
@@ -319,9 +362,17 @@ TEST_F(GameTest, meteorLaserNoCollisionTest)
     {
         EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
     }
+
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            "0",
-                                            FieldsAre(50, 50),
+                                            "lives:     3",
+                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FONT_SIZE,
+                                            0,
+                                            FieldsAre(255, 255, 255, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "score:    0",
+                                            FieldsAre((WINDOW_WIDTH - 150), (30 + FONT_SIZE)),
                                             FONT_SIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -375,6 +426,10 @@ TEST_F(GameTest, meteorLaserCollisionTest)
 
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
     EXPECT_CALL((*m_laserMock), update()).InSequence(seq);
     EXPECT_CALL((*m_meteorMock), update()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
@@ -385,9 +440,17 @@ TEST_F(GameTest, meteorLaserCollisionTest)
     {
         EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
     }
+
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            "0",
-                                            FieldsAre(50, 50),
+                                            "lives:     3",
+                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FONT_SIZE,
+                                            0,
+                                            FieldsAre(255, 255, 255, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "score:    0",
+                                            FieldsAre((WINDOW_WIDTH - 150), (30 + FONT_SIZE)),
                                             FONT_SIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))

@@ -45,10 +45,11 @@ TEST_F(PlayerTest, updateWithoutTextures_death)
     EXPECT_DEATH(m_Player->update(), "Assertion failed");
 }
 
-TEST_F(PlayerTest, updateWithoutSpaceKeyPressed)
+TEST_F(PlayerTest, updatePlayableWithoutSpaceKeyPressed)
 {
     Texture2D fakeTexture = {0, 0, 0, 0, 0};
     m_Player->setTextures({fakeTexture});
+    m_Player->m_discard = false;
 
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_RIGHT)).Times(Exactly(1));
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_LEFT)).Times(Exactly(1));
@@ -60,10 +61,11 @@ TEST_F(PlayerTest, updateWithoutSpaceKeyPressed)
     m_Player->update();
 }
 
-TEST_F(PlayerTest, updateWithSpaceKeyPressed)
+TEST_F(PlayerTest, updatePlayableWithSpaceKeyPressed)
 {
     Texture2D fakeTexture = {0, 0, 0, 0, 0};
     m_Player->setTextures({fakeTexture});
+    m_Player->m_discard = false;
 
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_RIGHT)).Times(Exactly(1));
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_LEFT)).Times(Exactly(1));
@@ -107,7 +109,7 @@ TEST_F(PlayerTest, getCenter_getRadius)
     m_Player->setTextures({fakeTexture});
 
     EXPECT_EQ(m_Player->getRadius(), 3);
-    EXPECT_THAT(m_Player->getCenter(), FieldsAre(800, 885));
+    EXPECT_THAT(m_Player->getCenter(), FieldsAre(800, 795));
 }
 
 TEST_F(PlayerTest, getRect_death)
@@ -120,6 +122,60 @@ TEST_F(PlayerTest, setTextures_death)
     Texture2D              fakeTexture  = {0, 0, 0, 0, 0};
     std::vector<Texture2D> fakeTextures = {fakeTexture, fakeTexture};
     EXPECT_DEATH(m_Player->setTextures(fakeTextures), "Assertion failed");
+}
+
+TEST_F(PlayerTest, stateMachine)
+{
+    Texture2D fakeTexture = {0, 0, 0, 0, 0};
+    m_Player->setTextures({fakeTexture});
+
+    EXPECT_TRUE(m_Player->m_discard);
+
+    // PLAYABLE --> INVISIBLE
+    EXPECT_CALL((*m_raylibMock), getTime()).WillOnce(Return(1));
+    m_Player->update();
+    m_Player->draw();
+    EXPECT_TRUE(m_Player->m_discard);
+
+    // INVISIBLE --> VISIBLE
+    EXPECT_CALL((*m_raylibMock), getTime())
+        .WillOnce(Return(2))
+        .WillOnce(Return(2));
+    EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(80, 80, 80, 255)))
+        .Times(Exactly(1));
+    m_Player->update();
+    m_Player->draw();
+    EXPECT_TRUE(m_Player->m_discard);
+
+    // VISIBLE
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(0.1));
+    EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(80, 80, 80, 255)))
+        .Times(Exactly(1));
+    m_Player->update();
+    m_Player->draw();
+    EXPECT_TRUE(m_Player->m_discard);
+
+    // VISIBLE --> INVINCIBLE
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(1));
+    EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(80, 80, 80, 255)))
+        .Times(Exactly(1));
+    m_Player->update();
+    m_Player->draw();
+    EXPECT_TRUE(m_Player->m_discard);
+
+    // INVINCIBLE --> PLAYABLE
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_RIGHT)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_LEFT)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_DOWN)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_UP)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyPressed(KEY_SPACE)).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(1));
+    EXPECT_CALL((*m_raylibMock), getTime()).WillOnce(Return(6));
+    EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(255, 255, 255, 255)))
+        .Times(Exactly(1));
+    m_Player->update();
+    m_Player->draw();
+    EXPECT_FALSE(m_Player->m_discard);
 }
 
 } // namespace PlayerTest

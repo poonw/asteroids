@@ -16,8 +16,8 @@
         },
         {
             "type": "cppbuild",
-            "label": "make testall",
-            "command": "make testall",
+            "label": "make test",
+            "command": "make test",
             "args": [],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -44,7 +44,7 @@
         },
         {
             "label": "buildtestall",
-            "dependsOn": ["format", "make testall"],
+            "dependsOn": ["format", "make test"],
             "dependsOrder": "sequence"
         }
     ],

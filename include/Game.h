@@ -26,7 +26,8 @@ public:
              createMeteorWrapper,
          std::function<std::shared_ptr<Sprite>(
              std::shared_ptr<RaylibInterface> raylibPtr,
-             Vector2                          position)>
+             Vector2                          position,
+             float                            scale)>
              explodeMeteorWrapper);
     ~Game(void);
 
@@ -42,7 +43,7 @@ private:
     void drawStars(void);
     void discardSprites(void);
     void checkCollisions(void);
-    void drawScore(void);
+    void drawStats(void);
     void loadResources(void);
 
     const std::filesystem::path      m_resourcePath = "resources";
@@ -61,7 +62,9 @@ private:
     Sound                                                   m_laserSound;
     Music                                                   m_backGroundMusic;
 
-    uint32_t m_score = 0;
+    uint32_t m_score      = 0;
+    uint32_t m_lives      = MAX_LIVES;
+    bool     m_invincible = false;
 
     std::function<std::shared_ptr<Sprite>(
         std::shared_ptr<RaylibInterface> raylibPtr,
@@ -72,7 +75,8 @@ private:
         m_createMeteor;
     std::function<std::shared_ptr<Sprite>(
         std::shared_ptr<RaylibInterface> raylibPtr,
-        Vector2                          position)>
+        Vector2                          position,
+        float                            scale)>
         m_explodeMeteor;
 };
 

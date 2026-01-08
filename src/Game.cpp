@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <algorithm>
 #include <cassert>
+#include <format>
 #include "GameSettings.h"
 #include "Sprite.h"
 #include "Timer.h"
@@ -15,7 +16,8 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr,
                createMeteorWrapper,
            std::function<std::shared_ptr<Sprite>(
                std::shared_ptr<RaylibInterface> raylibPtr,
-               Vector2                          position)>
+               Vector2                          position,
+               float                            scale)>
                explodeMeteorWrapper)
 {
     assert(raylibPtr != nullptr);
@@ -33,7 +35,6 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr,
     }
 
     std::function<void(void)> createMeteorCallback = std::bind(&Game::createMeteor, this);
-
     m_raylibPtr->initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
     m_meteorTimer = std::make_shared<Timer>(m_raylibPtr, METEOR_TIMER_DURATION, true, true, createMeteorCallback);
     m_raylibPtr->initAudioDevice();
@@ -99,6 +100,10 @@ void Game::update(void)
 {
     m_meteorTimer->update();
     m_player->update();
+    for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
+    {
+        m_starsList[index]->update();
+    }
     for (uint32_t index = 0; index < m_lasersList.size(); index++)
     {
         m_lasersList[index]->update();
@@ -120,7 +125,7 @@ void Game::draw(void)
 
     m_raylibPtr->clearBackground(BLACK);
     drawStars();
-    drawScore();
+    drawStats();
     m_player->draw();
     for (uint32_t index = 0; index < m_lasersList.size(); index++)
     {
@@ -196,7 +201,7 @@ void Game::checkCollisions(void)
                 m_lasersList[ilaser]->m_discard   = true;
                 m_meteorsList[imeteor]->m_discard = true;
 
-                std::shared_ptr<Sprite> explosion = m_explodeMeteor(m_raylibPtr, m_meteorsList[imeteor]->getCenter());
+                std::shared_ptr<Sprite> explosion = m_explodeMeteor(m_raylibPtr, m_meteorsList[imeteor]->getCenter(), 2);
                 explosion->setTextures(m_texturesMap["explosion"]);
                 m_explosionsList.push_back(explosion);
                 m_raylibPtr->playSound(m_explosionSound);
@@ -206,21 +211,50 @@ void Game::checkCollisions(void)
         }
     }
 
-    for (uint32_t index = 0; index < m_meteorsList.size(); index++)
+    if (!(m_player->m_discard))
     {
-        if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
-                                               m_player->getRadius(),
-                                               m_meteorsList[index]->getCenter(),
-                                               m_meteorsList[index]->getRadius()))
+        for (uint32_t index = 0; index < m_meteorsList.size(); index++)
         {
-            m_raylibPtr->closeWindow();
+            if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
+                                                   m_player->getRadius(),
+                                                   m_meteorsList[index]->getCenter(),
+                                                   m_meteorsList[index]->getRadius()))
+            {
+                m_lives--;
+                if (m_lives == 0)
+                {
+                    m_raylibPtr->closeWindow();
+                }
+                else
+                {
+                    m_meteorsList[index]->m_discard = true;
+                    m_player->m_discard             = true;
+
+                    std::shared_ptr<Sprite> explosion = m_explodeMeteor(m_raylibPtr, m_player->getCenter(), 3);
+                    explosion->setTextures(m_texturesMap["explosion"]);
+                    m_explosionsList.push_back(explosion);
+                    m_raylibPtr->playSound(m_explosionSound);
+                }
+            }
         }
     }
 }
 
-void Game::drawScore(void)
+void Game::drawStats(void)
 {
-    m_raylibPtr->drawTextEx(m_fontType, std::to_string(m_score), Vector2(50, 50), FONT_SIZE, 0, WHITE);
+    m_raylibPtr->drawTextEx(m_fontType,
+                            "lives: " + std::format("{:>5}", std::to_string(m_lives)),
+                            Vector2((WINDOW_WIDTH - 150), 30),
+                            FONT_SIZE,
+                            0,
+                            WHITE);
+
+    m_raylibPtr->drawTextEx(m_fontType,
+                            "score: " + std::format("{:>4}", std::to_string(m_score)),
+                            Vector2((WINDOW_WIDTH - 150), (30 + FONT_SIZE)),
+                            FONT_SIZE,
+                            0,
+                            WHITE);
 }
 
 void Game::loadResources(void)
