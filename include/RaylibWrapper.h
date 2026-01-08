@@ -13,6 +13,7 @@ public:
     void      initWindow(int width, int height, std::string title) override;
     void      closeWindow(void) override;
     Texture2D loadTexture(std::string filename) override;
+    void      unloadTexture(Texture2D texture) override;
     bool      windowShouldClose(void) override;
     float     getFrameTime(void) override;
     void      beginDrawing(void) override;
@@ -28,14 +29,20 @@ public:
     void      drawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint) override;
     Font      loadFontEx(std::string fileName, int fontSize, int* codepoints, int codepointCount) override;
     void      drawTextEx(Font font, std::string text, Vector2 position, float fontSize, float spacing, Color tint) override;
+    void      unloadFont(Font font) override;
     void      initAudioDevice(void) override;
     void      closeAudioDevice(void) override;
     Sound     loadSound(std::string fileName) override;
+    void      unloadSound(Sound sound) override;
     Music     loadMusicStream(std::string fileName) override;
     void      unloadMusicStream(Music music) override;
     void      updateMusicStream(Music music) override;
     void      playSound(Sound sound) override;
     void      playMusicStream(Music music) override;
+    void      drawRectangleRounded(Rectangle rec, float roundness, int segments, Color color) override;
+    Vector2   getMousePosition(void) override;
+    bool      checkCollisionPointRec(Vector2 point, Rectangle rec) override;
+    bool      isMouseButtonPressed(int button) override;
 };
 
 #endif // RAYLIBWRAPPER_H

@@ -3,7 +3,7 @@ ifndef config
 endif
 
 ifeq ($(config),debug)
-  COMPILECONFIG := -O0
+  COMPILECONFIG := -O0 -DDEBUG_
 
 else ifeq ($(config),release)
   COMPILECONFIG := -O3
@@ -26,7 +26,7 @@ endif
 DEFINEFLAGS := $(DFLAGS:%=-D%)
 CXX := g++
 CXXFLAGS := -g -std=c++20 -Wall -Wextra -Werror $(COMPILECONFIG) -pthread $(DEFINEFLAGS)
-TESTFLAGS := -g -std=c++20 -Wextra -Werror -O0 -pthread $(DEFINEFLAGS)
+TESTFLAGS := -g -std=c++20 -Wextra -Werror $(COMPILECONFIG) -pthread $(DEFINEFLAGS)
 TESTCOVERAGEFLAGS := $(TESTFLAGS) -fprofile-arcs -ftest-coverage
 
 CC := gcc

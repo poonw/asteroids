@@ -16,6 +16,15 @@ class Timer;
 class Game
 {
 public:
+    typedef enum STATE_e
+    {
+        WELCOME = 0,
+        PLAYING,
+        SETTINGS,
+        GAME_OVER,
+        EXIT_GAME
+    } STATE_t;
+
     Game(std::shared_ptr<RaylibInterface> raylibPtr,
          std::function<std::shared_ptr<Sprite>(
              std::shared_ptr<RaylibInterface> raylibPtr,
@@ -36,19 +45,55 @@ public:
     void setStarsList(std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS>& starsList);
     void shootLaser(Vector2 position);
     void createMeteor(void);
+#ifdef DEBUG_
+    void setState(STATE_t state);
+#endif
 
 private:
+    typedef struct GameButton_s
+    {
+        Vector2     position;
+        Rectangle   selectArea;
+        Color       backgroundColor;
+        std::string displayText;
+        STATE_t     m_nextState;
+        bool        selectSoundPlayed;
+    } GameButton_t;
+
+    void loadResources(void);
+    void unloadResources(void);
     void update(void);
-    void draw(void);
+    void drawPlayingPage(void);
     void drawStars(void);
+    void drawSprites(void);
     void discardSprites(void);
     void checkCollisions(void);
     void drawStats(void);
-    void loadResources(void);
+    void checkButtonUpdate(GameButton_t& button);
+    void drawButton(GameButton_t button);
+    void drawSettingsText(void);
+    void refreshPlayingPage(void);
+    void refreshWelcomePage(void);
+    void refreshSettingsPage(void);
+
+    std::string m_gameName = "Asteroids";
+    STATE_t     m_state    = WELCOME;
+    uint32_t    m_score    = 0;
+    uint32_t    m_lives    = MAX_LIVES;
 
     const std::filesystem::path      m_resourcePath = "resources";
     std::shared_ptr<RaylibInterface> m_raylibPtr    = nullptr;
     std::shared_ptr<Timer>           m_meteorTimer  = nullptr;
+
+    // welcome page
+    Vector2      m_titlePosition;
+    GameButton_t m_startButton;
+    GameButton_t m_settingsButton;
+    GameButton_t m_quitButton;
+
+    // settings page
+    GameButton_t m_backButton;
+    Rectangle    m_settingsPageBackground;
 
     std::shared_ptr<Sprite>                              m_player = nullptr;
     std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starsList;
@@ -60,11 +105,8 @@ private:
     Font                                                    m_fontType;
     Sound                                                   m_explosionSound;
     Sound                                                   m_laserSound;
+    Sound                                                   m_selectSound;
     Music                                                   m_backGroundMusic;
-
-    uint32_t m_score      = 0;
-    uint32_t m_lives      = MAX_LIVES;
-    bool     m_invincible = false;
 
     std::function<std::shared_ptr<Sprite>(
         std::shared_ptr<RaylibInterface> raylibPtr,

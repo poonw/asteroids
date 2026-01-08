@@ -34,18 +34,54 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr,
         m_starsList[n] = nullptr;
     }
 
-    std::function<void(void)> createMeteorCallback = std::bind(&Game::createMeteor, this);
-    m_raylibPtr->initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game");
-    m_meteorTimer = std::make_shared<Timer>(m_raylibPtr, METEOR_TIMER_DURATION, true, true, createMeteorCallback);
+    m_titlePosition.x = ((WINDOW_WIDTH - ((m_gameName.length() / 2) * GAME_TITLE_SIZE)) / 3);
+    m_titlePosition.y = ((WINDOW_HEIGHT / 2) - 200);
+
+    m_startButton.selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) - 30), 280, 60};
+    m_startButton.position          = {m_startButton.selectArea.x + 10, m_startButton.selectArea.y + 10};
+    m_startButton.backgroundColor   = BLANK;
+    m_startButton.displayText       = "Start";
+    m_startButton.m_nextState       = PLAYING;
+    m_startButton.selectSoundPlayed = false;
+
+    m_settingsButton.selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) + 50), 280, 60};
+    m_settingsButton.position          = {m_settingsButton.selectArea.x + 10, m_settingsButton.selectArea.y + 10};
+    m_settingsButton.backgroundColor   = BLANK;
+    m_settingsButton.displayText       = "Settings";
+    m_settingsButton.m_nextState       = SETTINGS;
+    m_settingsButton.selectSoundPlayed = false;
+
+    m_quitButton.selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) + 130), 280, 60};
+    m_quitButton.position          = {m_quitButton.selectArea.x + 10, m_quitButton.selectArea.y + 10};
+    m_quitButton.backgroundColor   = BLANK;
+    m_quitButton.displayText       = "Quit";
+    m_quitButton.m_nextState       = EXIT_GAME;
+    m_quitButton.selectSoundPlayed = false;
+
+    m_backButton.selectArea        = {(WINDOW_WIDTH - 300), (WINDOW_HEIGHT - 200), 110, 60};
+    m_backButton.position          = {m_backButton.selectArea.x + 10, m_backButton.selectArea.y + 10};
+    m_backButton.backgroundColor   = BLANK;
+    m_backButton.displayText       = "Back";
+    m_backButton.m_nextState       = WELCOME;
+    m_backButton.selectSoundPlayed = false;
+
+    m_settingsPageBackground = {100, 100, (WINDOW_WIDTH - (2 * 100)), (WINDOW_HEIGHT - (2 * 100))};
+
+    m_meteorTimer = std::make_shared<Timer>(m_raylibPtr,
+                                            METEOR_TIMER_DURATION,
+                                            true,
+                                            true,
+                                            std::bind(&Game::createMeteor, this));
+
+    m_raylibPtr->initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, m_gameName);
     m_raylibPtr->initAudioDevice();
     loadResources();
-    m_raylibPtr->playMusicStream(m_backGroundMusic);
 }
 
 Game::~Game(void)
 {
+    unloadResources();
     m_raylibPtr->closeAudioDevice();
-    m_raylibPtr->unloadMusicStream(m_backGroundMusic);
     m_raylibPtr->closeWindow();
 }
 
@@ -59,10 +95,31 @@ void Game::run(void)
 
     while (!m_raylibPtr->windowShouldClose())
     {
-        discardSprites();
-        update();
-        draw();
-        checkCollisions();
+        switch (m_state)
+        {
+            case WELCOME:
+                refreshWelcomePage();
+                break;
+
+            case SETTINGS:
+                refreshSettingsPage();
+                break;
+
+            case PLAYING:
+                refreshPlayingPage();
+                break;
+
+            case GAME_OVER:
+                break;
+
+            case EXIT_GAME:
+                m_raylibPtr->closeWindow();
+                break;
+
+            default:
+                assert(false);
+                break;
+        }
     }
 }
 
@@ -96,6 +153,60 @@ void Game::createMeteor(void)
     m_meteorsList.push_back(meteor);
 }
 
+#ifdef DEBUG_
+void Game::setState(STATE_t state)
+{
+    m_state = state;
+}
+#endif
+
+void Game::loadResources(void)
+{
+    std::filesystem::path audioPath  = m_resourcePath / "audio";
+    std::filesystem::path fontPath   = m_resourcePath / "font";
+    std::filesystem::path imagesPath = m_resourcePath / "images";
+
+    m_texturesMap["player"] = {m_raylibPtr->loadTexture((imagesPath / "spaceship.png").string())};
+    m_texturesMap["star"]   = {m_raylibPtr->loadTexture((imagesPath / "star.png").string())};
+    m_texturesMap["laser"]  = {m_raylibPtr->loadTexture((imagesPath / "laser.png").string())};
+    m_texturesMap["meteor"] = {m_raylibPtr->loadTexture((imagesPath / "meteor.png").string())};
+
+    uint32_t               numberOfExplosionTextures = 28;
+    std::vector<Texture2D> explosionTextures(numberOfExplosionTextures);
+    for (uint32_t index = 0; index < numberOfExplosionTextures; index++)
+    {
+        explosionTextures[index] = m_raylibPtr->loadTexture((imagesPath / "explosion" / (std::to_string(index + 1) + ".png")).string());
+    }
+    m_texturesMap["explosion"] = explosionTextures;
+
+    m_fontType        = m_raylibPtr->loadFontEx((fontPath / "Stormfaze.otf").string(), GAME_TITLE_SIZE, NULL, 0);
+    m_explosionSound  = m_raylibPtr->loadSound((audioPath / "explosion.wav").string());
+    m_laserSound      = m_raylibPtr->loadSound((audioPath / "laser.wav").string());
+    m_selectSound     = m_raylibPtr->loadSound((audioPath / "select.mp3").string());
+    m_backGroundMusic = m_raylibPtr->loadMusicStream((audioPath / "music.wav").string());
+
+    m_raylibPtr->playMusicStream(m_backGroundMusic);
+}
+
+void Game::unloadResources(void)
+{
+    m_raylibPtr->unloadMusicStream(m_backGroundMusic);
+    m_raylibPtr->unloadSound(m_selectSound);
+    m_raylibPtr->unloadSound(m_laserSound);
+    m_raylibPtr->unloadSound(m_explosionSound);
+    m_raylibPtr->unloadFont(m_fontType);
+
+    for (uint32_t index = 0; index < m_texturesMap["explosion"].size(); index++)
+    {
+        m_raylibPtr->unloadTexture(m_texturesMap["explosion"][index]);
+    }
+
+    m_raylibPtr->unloadTexture(m_texturesMap["meteor"][0]);
+    m_raylibPtr->unloadTexture(m_texturesMap["laser"][0]);
+    m_raylibPtr->unloadTexture(m_texturesMap["star"][0]);
+    m_raylibPtr->unloadTexture(m_texturesMap["player"][0]);
+}
+
 void Game::update(void)
 {
     m_meteorTimer->update();
@@ -119,14 +230,29 @@ void Game::update(void)
     m_raylibPtr->updateMusicStream(m_backGroundMusic);
 }
 
-void Game::draw(void)
+void Game::drawPlayingPage(void)
 {
     m_raylibPtr->beginDrawing();
 
     m_raylibPtr->clearBackground(BLACK);
     drawStars();
-    drawStats();
     m_player->draw();
+    drawSprites();
+    drawStats();
+
+    m_raylibPtr->endDrawing();
+}
+
+void Game::drawStars(void)
+{
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        m_starsList[n]->draw();
+    }
+}
+
+void Game::drawSprites(void)
+{
     for (uint32_t index = 0; index < m_lasersList.size(); index++)
     {
         m_lasersList[index]->draw();
@@ -138,16 +264,6 @@ void Game::draw(void)
     for (uint32_t index = 0; index < m_explosionsList.size(); index++)
     {
         m_explosionsList[index]->draw();
-    }
-
-    m_raylibPtr->endDrawing();
-}
-
-void Game::drawStars(void)
-{
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        m_starsList[n]->draw();
     }
 }
 
@@ -223,7 +339,7 @@ void Game::checkCollisions(void)
                 m_lives--;
                 if (m_lives == 0)
                 {
-                    m_raylibPtr->closeWindow();
+                    m_state = EXIT_GAME;
                 }
                 else
                 {
@@ -245,39 +361,116 @@ void Game::drawStats(void)
     m_raylibPtr->drawTextEx(m_fontType,
                             "lives: " + std::format("{:>5}", std::to_string(m_lives)),
                             Vector2((WINDOW_WIDTH - 150), 30),
-                            FONT_SIZE,
+                            STAT_SIZE,
                             0,
                             WHITE);
 
     m_raylibPtr->drawTextEx(m_fontType,
                             "score: " + std::format("{:>4}", std::to_string(m_score)),
-                            Vector2((WINDOW_WIDTH - 150), (30 + FONT_SIZE)),
-                            FONT_SIZE,
+                            Vector2((WINDOW_WIDTH - 150), (30 + STAT_SIZE)),
+                            STAT_SIZE,
                             0,
                             WHITE);
 }
 
-void Game::loadResources(void)
+void Game::checkButtonUpdate(GameButton_t& button)
 {
-    std::filesystem::path audioPath  = m_resourcePath / "audio";
-    std::filesystem::path fontPath   = m_resourcePath / "font";
-    std::filesystem::path imagesPath = m_resourcePath / "images";
+    Vector2 mousePosition = m_raylibPtr->getMousePosition();
 
-    m_texturesMap["player"] = {m_raylibPtr->loadTexture((imagesPath / "spaceship.png").string())};
-    m_texturesMap["star"]   = {m_raylibPtr->loadTexture((imagesPath / "star.png").string())};
-    m_texturesMap["laser"]  = {m_raylibPtr->loadTexture((imagesPath / "laser.png").string())};
-    m_texturesMap["meteor"] = {m_raylibPtr->loadTexture((imagesPath / "meteor.png").string())};
-
-    uint32_t               numberOfExplosionTextures = 28;
-    std::vector<Texture2D> explosionTextures(numberOfExplosionTextures);
-    for (uint32_t index = 0; index < numberOfExplosionTextures; index++)
+    if (m_raylibPtr->checkCollisionPointRec(mousePosition, button.selectArea))
     {
-        explosionTextures[index] = m_raylibPtr->loadTexture((imagesPath / "explosion" / (std::to_string(index + 1) + ".png")).string());
-    }
-    m_texturesMap["explosion"] = explosionTextures;
+        button.backgroundColor = DARKGRAY;
 
-    m_fontType        = m_raylibPtr->loadFontEx((fontPath / "Stormfaze.otf").string(), FONT_SIZE, NULL, 0);
-    m_explosionSound  = m_raylibPtr->loadSound((audioPath / "explosion.wav").string());
-    m_laserSound      = m_raylibPtr->loadSound((audioPath / "laser.wav").string());
-    m_backGroundMusic = m_raylibPtr->loadMusicStream((audioPath / "music.wav").string());
+        if (m_raylibPtr->isMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            m_state = button.m_nextState;
+        }
+
+        if (!(button.selectSoundPlayed))
+        {
+            m_raylibPtr->playSound(m_selectSound);
+            button.selectSoundPlayed = true;
+        }
+    }
+    else
+    {
+        button.backgroundColor = BLANK;
+
+        if (button.selectSoundPlayed)
+        {
+            button.selectSoundPlayed = false;
+        }
+    }
+}
+
+void Game::drawButton(GameButton_t button)
+{
+    m_raylibPtr->drawRectangleRounded(button.selectArea, 0.2, 0, button.backgroundColor);
+    m_raylibPtr->drawTextEx(m_fontType, button.displayText, button.position, MENU_ITEM_SIZE, 0, LIGHTGRAY);
+}
+
+void Game::drawSettingsText(void)
+{
+    std::string row1col1 = "Spacebar";
+    std::string row1col2 = "- shoot laser";
+    std::string row2col1 = "Arrow keys";
+    std::string row2col2 = "- move the spaceship";
+
+    m_raylibPtr->drawTextEx(m_fontType, row1col1, Vector2(150, 180), MENU_ITEM_SIZE + 10, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, row1col2, Vector2(480, 180), MENU_ITEM_SIZE + 10, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, row2col1, Vector2(150, 240), MENU_ITEM_SIZE + 10, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, row2col2, Vector2(480, 240), MENU_ITEM_SIZE + 10, 0, RAYWHITE);
+}
+
+void Game::refreshPlayingPage(void)
+{
+    discardSprites();
+    update();
+    drawPlayingPage();
+    checkCollisions();
+}
+
+void Game::refreshWelcomePage(void)
+{
+    for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
+    {
+        m_starsList[index]->update();
+    }
+
+    checkButtonUpdate(m_startButton);
+    checkButtonUpdate(m_settingsButton);
+    checkButtonUpdate(m_quitButton);
+
+    m_raylibPtr->updateMusicStream(m_backGroundMusic);
+
+    m_raylibPtr->beginDrawing();
+
+    m_raylibPtr->clearBackground(BLACK);
+    drawStars();
+    m_raylibPtr->drawTextEx(m_fontType, m_gameName, m_titlePosition, GAME_TITLE_SIZE, 0, GOLD);
+    drawButton(m_startButton);
+    drawButton(m_settingsButton);
+    drawButton(m_quitButton);
+
+    m_raylibPtr->endDrawing();
+}
+
+void Game::refreshSettingsPage(void)
+{
+    for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
+    {
+        m_starsList[index]->update();
+    }
+
+    checkButtonUpdate(m_backButton);
+    m_raylibPtr->updateMusicStream(m_backGroundMusic);
+
+    m_raylibPtr->beginDrawing();
+
+    m_raylibPtr->clearBackground(BLACK);
+    drawStars();
+    m_raylibPtr->drawRectangleRounded(m_settingsPageBackground, 0.05, 0, {30, 30, 30, 200});
+    drawSettingsText();
+    drawButton(m_backButton);
+    m_raylibPtr->endDrawing();
 }
