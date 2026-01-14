@@ -29,6 +29,11 @@ Texture2D RaylibWrapper::loadTexture(std::string filename)
     return LoadTexture(filefullpath);
 }
 
+void RaylibWrapper::unloadTexture(Texture2D texture)
+{
+    UnloadTexture(texture);
+}
+
 bool RaylibWrapper::windowShouldClose(void)
 {
     return WindowShouldClose();
@@ -106,6 +111,11 @@ void RaylibWrapper::drawTextEx(Font font, std::string text, Vector2 position, fl
     DrawTextEx(font, charText, position, fontSize, spacing, tint);
 }
 
+void RaylibWrapper::unloadFont(Font font)
+{
+    UnloadFont(font);
+}
+
 void RaylibWrapper::initAudioDevice(void)
 {
     InitAudioDevice();
@@ -119,6 +129,11 @@ void RaylibWrapper::closeAudioDevice(void)
 Sound RaylibWrapper::loadSound(std::string fileName)
 {
     return (LoadSound(fileName.c_str()));
+}
+
+void RaylibWrapper::unloadSound(Sound sound)
+{
+    UnloadSound(sound);
 }
 
 Music RaylibWrapper::loadMusicStream(std::string fileName)
@@ -144,4 +159,24 @@ void RaylibWrapper::playSound(Sound sound)
 void RaylibWrapper::playMusicStream(Music music)
 {
     PlayMusicStream(music);
+}
+
+void RaylibWrapper::drawRectangleRounded(Rectangle rec, float roundness, int segments, Color color)
+{
+    DrawRectangleRounded(rec, roundness, segments, color);
+}
+
+Vector2 RaylibWrapper::getMousePosition(void)
+{
+    return (GetMousePosition());
+}
+
+bool RaylibWrapper::checkCollisionPointRec(Vector2 point, Rectangle rec)
+{
+    return (CheckCollisionPointRec(point, rec));
+}
+
+bool RaylibWrapper::isMouseButtonPressed(int button)
+{
+    return (IsMouseButtonPressed(button));
 }

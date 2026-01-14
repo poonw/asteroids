@@ -21,20 +21,20 @@ public:
     Rectangle getRect(void) override;
     void      setTextures(std::vector<Texture2D> textures) override;
 
-    enum STATE
-    {
-        PLAYABLE = 0,
-        INVISIBLE,
-        VISIBLE,
-        INVINCIBLE
-    };
-
 private:
     void input(void);
     void move(void);
     void moveIntoWindow(void);
     void renderVisible(void);
     void renderPlayable(void);
+
+    typedef enum STATE_s
+    {
+        PLAYABLE = 0,
+        INVISIBLE,
+        VISIBLE,
+        INVINCIBLE
+    } STATE_t;
 
     Vector2 m_direction = {0, 0};
     float   m_speed     = 0;
@@ -43,7 +43,7 @@ private:
     float   m_maxYPos   = 0.0;
     float   m_startXPos = 0.0;
     float   m_startYPos = 0.0;
-    STATE   m_state     = PLAYABLE;
+    STATE_t m_state     = PLAYABLE;
 
     std::function<void(Vector2)> m_shootLaser;
     std::shared_ptr<Timer>       m_invisibleTimer  = nullptr;
