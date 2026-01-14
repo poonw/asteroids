@@ -42,6 +42,7 @@ public:
     virtual Vector2   getMousePosition(void)                                                                                          = 0;
     virtual bool      checkCollisionPointRec(Vector2 point, Rectangle rec)                                                            = 0;
     virtual bool      isMouseButtonPressed(int button)                                                                                = 0;
+    virtual Vector2   measureTextEx(Font font, std::string text, float fontSize, float spacing)                                       = 0;
 };
 
 #endif // RAYLIBINTERFACE_H

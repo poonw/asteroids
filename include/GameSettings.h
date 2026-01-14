@@ -4,9 +4,10 @@
 #define LASER_SPEED           600
 #define STAR_SPEED            100
 #define METEOR_TIMER_DURATION 0.4
-#define STAT_SIZE             30
-#define GAME_TITLE_SIZE       120
-#define MENU_ITEM_SIZE        40
+#define STAT_FONTSIZE         30
+#define GAME_TITLE_FONTSIZE   120
+#define MENU_ITEM_FONTSIZE    40
+#define GAME_OVER_FONTSIZE    200
 #define NUMBER_OF_STARS       50
 #define MAX_LIVES             3
 #define MAX_SCORE             9999

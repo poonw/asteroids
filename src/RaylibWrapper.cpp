@@ -180,3 +180,8 @@ bool RaylibWrapper::isMouseButtonPressed(int button)
 {
     return (IsMouseButtonPressed(button));
 }
+
+Vector2 RaylibWrapper::measureTextEx(Font font, std::string text, float fontSize, float spacing)
+{
+    return (MeasureTextEx(font, text.c_str(), fontSize, spacing));
+}

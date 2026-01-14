@@ -63,8 +63,6 @@ public:
             ASSERT_TRUE(m_starMocksList[n] != nullptr);
         }
 
-        EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-
         EXPECT_CALL((*m_raylibMock), initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Asteroids"))
             .Times(Exactly(1))
             .InSequence(seq);
@@ -92,6 +90,13 @@ public:
         EXPECT_CALL((*m_raylibMock), playMusicStream(A<Music>()))
             .Times(Exactly(1))
             .InSequence(seq);
+
+        EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Back", (MENU_ITEM_FONTSIZE + 10), 0)).InSequence(seq);
+        EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Game Over", GAME_OVER_FONTSIZE, 0)).InSequence(seq);
+        EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Retry", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
+        EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Quit", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
+
+        EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
 
         std::function<std::shared_ptr<SpriteMock>(
             std::shared_ptr<RaylibInterface> raylibPtr)>
@@ -178,14 +183,14 @@ TEST_F(GameTest, loopWithOnlyPlayerAndStars)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
-                                            STAT_SIZE,
+                                            STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_SIZE)),
-                                            STAT_SIZE,
+                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
@@ -233,14 +238,14 @@ TEST_F(GameTest, playerMeteorNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
-                                            STAT_SIZE,
+                                            STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_SIZE)),
-                                            STAT_SIZE,
+                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
@@ -294,14 +299,14 @@ TEST_F(GameTest, playerMeteorCollisionTest)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
-                                            STAT_SIZE,
+                                            STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_SIZE)),
-                                            STAT_SIZE,
+                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
@@ -365,14 +370,14 @@ TEST_F(GameTest, meteorLaserNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
-                                            STAT_SIZE,
+                                            STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_SIZE)),
-                                            STAT_SIZE,
+                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
@@ -439,14 +444,14 @@ TEST_F(GameTest, meteorLaserCollisionTest)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
-                                            STAT_SIZE,
+                                            STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_SIZE)),
-                                            STAT_SIZE,
+                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
@@ -508,28 +513,28 @@ TEST_F(GameTest, settingsPage_mouseNotPointingToBackButton)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
@@ -538,7 +543,7 @@ TEST_F(GameTest, settingsPage_mouseNotPointingToBackButton)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Back",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -589,28 +594,28 @@ TEST_F(GameTest, settingsPage_mousePointingToBackButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
@@ -619,7 +624,7 @@ TEST_F(GameTest, settingsPage_mousePointingToBackButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Back",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -670,28 +675,28 @@ TEST_F(GameTest, settingsPage_mousePointingToBackButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             A<std::string>(),
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE + 10,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
@@ -700,7 +705,7 @@ TEST_F(GameTest, settingsPage_mousePointingToBackButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Back",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -750,7 +755,7 @@ TEST_F(GameTest, welcomePage_mousePointingToNothing)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
                                             A<Vector2>(),
-                                            GAME_TITLE_SIZE,
+                                            GAME_TITLE_FONTSIZE,
                                             0,
                                             FieldsAre(255, 203, 0, 255)))
         .InSequence(seq);
@@ -759,7 +764,7 @@ TEST_F(GameTest, welcomePage_mousePointingToNothing)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Start",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -767,7 +772,7 @@ TEST_F(GameTest, welcomePage_mousePointingToNothing)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -775,7 +780,7 @@ TEST_F(GameTest, welcomePage_mousePointingToNothing)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Quit",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -827,7 +832,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
                                             A<Vector2>(),
-                                            GAME_TITLE_SIZE,
+                                            GAME_TITLE_FONTSIZE,
                                             0,
                                             FieldsAre(255, 203, 0, 255)))
         .InSequence(seq);
@@ -836,7 +841,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Start",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -844,7 +849,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -852,7 +857,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Quit",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -904,7 +909,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
                                             A<Vector2>(),
-                                            GAME_TITLE_SIZE,
+                                            GAME_TITLE_FONTSIZE,
                                             0,
                                             FieldsAre(255, 203, 0, 255)))
         .InSequence(seq);
@@ -913,7 +918,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Start",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -921,7 +926,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -929,7 +934,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Quit",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -981,7 +986,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
                                             A<Vector2>(),
-                                            GAME_TITLE_SIZE,
+                                            GAME_TITLE_FONTSIZE,
                                             0,
                                             FieldsAre(255, 203, 0, 255)))
         .InSequence(seq);
@@ -990,7 +995,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Start",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -999,7 +1004,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -1008,7 +1013,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Quit",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -1060,7 +1065,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
                                             A<Vector2>(),
-                                            GAME_TITLE_SIZE,
+                                            GAME_TITLE_FONTSIZE,
                                             0,
                                             FieldsAre(255, 203, 0, 255)))
         .InSequence(seq);
@@ -1069,7 +1074,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Start",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -1078,7 +1083,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -1087,7 +1092,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Quit",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -1139,7 +1144,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
                                             A<Vector2>(),
-                                            GAME_TITLE_SIZE,
+                                            GAME_TITLE_FONTSIZE,
                                             0,
                                             FieldsAre(255, 203, 0, 255)))
         .InSequence(seq);
@@ -1148,7 +1153,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Start",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -1157,7 +1162,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -1166,7 +1171,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Quit",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -1219,7 +1224,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
                                             A<Vector2>(),
-                                            GAME_TITLE_SIZE,
+                                            GAME_TITLE_FONTSIZE,
                                             0,
                                             FieldsAre(255, 203, 0, 255)))
         .InSequence(seq);
@@ -1228,7 +1233,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Start",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -1237,7 +1242,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
@@ -1246,13 +1251,436 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonAndClick)
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Quit",
                                             A<Vector2>(),
-                                            MENU_ITEM_SIZE,
+                                            MENU_ITEM_FONTSIZE,
                                             0,
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
 
     EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), closeWindow()).InSequence(seq);
+
+    m_Game->run();
+}
+
+TEST_F(GameTest, gameoverPage_mousePointingToNothing)
+{
+    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
+    }
+
+    m_Game->setState(Game::GAME_OVER);
+    m_Game->setPlayer(m_playerMock);
+    m_Game->setStarsList(m_starMocksList);
+
+    EXPECT_CALL((*m_raylibMock), windowShouldClose())
+        .WillOnce(Return(false))
+        .WillOnce(Return(false))
+        .WillOnce(Return(true));
+
+    //loop 1
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
+    EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Game Over",
+                                            A<Vector2>(),
+                                            GAME_OVER_FONTSIZE,
+                                            0,
+                                            FieldsAre(230, 41, 55, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
+
+    //loop 2
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Game Over",
+                                            A<Vector2>(),
+                                            GAME_OVER_FONTSIZE,
+                                            0,
+                                            FieldsAre(230, 41, 55, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Retry",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE + 30,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Quit",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE + 30,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
+
+    m_Game->run();
+}
+
+TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonButNotClick)
+{
+    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
+    }
+
+    m_Game->setState(Game::GAME_OVER);
+    m_Game->setPlayer(m_playerMock);
+    m_Game->setStarsList(m_starMocksList);
+
+    EXPECT_CALL((*m_raylibMock), windowShouldClose())
+        .WillOnce(Return(false))
+        .WillOnce(Return(false))
+        .WillOnce(Return(true));
+
+    //loop 1
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
+    EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Game Over",
+                                            A<Vector2>(),
+                                            GAME_OVER_FONTSIZE,
+                                            0,
+                                            FieldsAre(230, 41, 55, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
+
+    //loop 2
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(true));
+    EXPECT_CALL((*m_raylibMock), isMouseButtonPressed(MOUSE_BUTTON_LEFT)).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Game Over",
+                                            A<Vector2>(),
+                                            GAME_OVER_FONTSIZE,
+                                            0,
+                                            FieldsAre(230, 41, 55, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(80, 80, 80, 255))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Retry",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE + 30,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Quit",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE + 30,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
+
+    m_Game->run();
+}
+
+TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonAndClick)
+{
+    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
+    }
+
+    m_Game->setState(Game::GAME_OVER);
+    m_Game->setPlayer(m_playerMock);
+    m_Game->setStarsList(m_starMocksList);
+
+    EXPECT_CALL((*m_raylibMock), windowShouldClose())
+        .WillOnce(Return(false))
+        .WillOnce(Return(false))
+        .WillOnce(Return(true));
+
+    //loop 1
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
+    EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Game Over",
+                                            A<Vector2>(),
+                                            GAME_OVER_FONTSIZE,
+                                            0,
+                                            FieldsAre(230, 41, 55, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
+
+    //loop 2
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(true));
+    EXPECT_CALL((*m_raylibMock), isMouseButtonPressed(MOUSE_BUTTON_LEFT)).InSequence(seq).WillOnce(Return(true));
+    EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Game Over",
+                                            A<Vector2>(),
+                                            GAME_OVER_FONTSIZE,
+                                            0,
+                                            FieldsAre(230, 41, 55, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(80, 80, 80, 255))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Retry",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE + 30,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Quit",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE + 30,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
+
+    m_Game->run();
+}
+
+TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonButNotClick)
+{
+    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
+    }
+
+    m_Game->setState(Game::GAME_OVER);
+    m_Game->setPlayer(m_playerMock);
+    m_Game->setStarsList(m_starMocksList);
+
+    EXPECT_CALL((*m_raylibMock), windowShouldClose())
+        .WillOnce(Return(false))
+        .WillOnce(Return(false))
+        .WillOnce(Return(true));
+
+    //loop 1
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
+    EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Game Over",
+                                            A<Vector2>(),
+                                            GAME_OVER_FONTSIZE,
+                                            0,
+                                            FieldsAre(230, 41, 55, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
+
+    //loop 2
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(true));
+    EXPECT_CALL((*m_raylibMock), isMouseButtonPressed(MOUSE_BUTTON_LEFT)).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Game Over",
+                                            A<Vector2>(),
+                                            GAME_OVER_FONTSIZE,
+                                            0,
+                                            FieldsAre(230, 41, 55, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Retry",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE + 30,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(80, 80, 80, 255))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Quit",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE + 30,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
+
+    m_Game->run();
+}
+
+TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonAndClick)
+{
+    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
+    }
+
+    m_Game->setState(Game::GAME_OVER);
+    m_Game->setPlayer(m_playerMock);
+    m_Game->setStarsList(m_starMocksList);
+
+    EXPECT_CALL((*m_raylibMock), windowShouldClose())
+        .WillOnce(Return(false))
+        .WillOnce(Return(false))
+        .WillOnce(Return(true));
+
+    //loop 1
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
+    EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Game Over",
+                                            A<Vector2>(),
+                                            GAME_OVER_FONTSIZE,
+                                            0,
+                                            FieldsAre(230, 41, 55, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
+
+    //loop 2
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(true));
+    EXPECT_CALL((*m_raylibMock), isMouseButtonPressed(MOUSE_BUTTON_LEFT)).InSequence(seq).WillOnce(Return(true));
+    EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
+    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
+    {
+        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+    }
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Game Over",
+                                            A<Vector2>(),
+                                            GAME_OVER_FONTSIZE,
+                                            0,
+                                            FieldsAre(230, 41, 55, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Retry",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE + 30,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(80, 80, 80, 255))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Quit",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE + 30,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
 
     m_Game->run();
 }

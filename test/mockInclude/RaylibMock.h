@@ -44,6 +44,7 @@ public:
     MOCK_METHOD(Vector2, getMousePosition, (), (override));
     MOCK_METHOD(bool, checkCollisionPointRec, (Vector2 point, Rectangle rec), (override));
     MOCK_METHOD(bool, isMouseButtonPressed, (int button), (override));
+    MOCK_METHOD(Vector2, measureTextEx, (Font font, std::string text, float fontSize, float spacing), (override));
 };
 
 #endif // RAYLIBMOCK_H
