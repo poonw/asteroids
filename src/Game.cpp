@@ -34,48 +34,109 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr,
         m_starsList[n] = nullptr;
     }
 
-    m_titlePosition.x = ((WINDOW_WIDTH - ((m_gameName.length() / 2) * GAME_TITLE_SIZE)) / 3);
-    m_titlePosition.y = ((WINDOW_HEIGHT / 2) - 200);
+    ////// raylib init //////
+    m_state = WELCOME;
+    m_raylibPtr->initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, m_gameName);
+    m_raylibPtr->initAudioDevice();
+    loadResources();
 
-    m_startButton.selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) - 30), 280, 60};
-    m_startButton.position          = {m_startButton.selectArea.x + 10, m_startButton.selectArea.y + 10};
-    m_startButton.backgroundColor   = BLANK;
-    m_startButton.displayText       = "Start";
-    m_startButton.m_nextState       = PLAYING;
-    m_startButton.selectSoundPlayed = false;
+    Vector2 textsize;
 
-    m_settingsButton.selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) + 50), 280, 60};
-    m_settingsButton.position          = {m_settingsButton.selectArea.x + 10, m_settingsButton.selectArea.y + 10};
-    m_settingsButton.backgroundColor   = BLANK;
-    m_settingsButton.displayText       = "Settings";
-    m_settingsButton.m_nextState       = SETTINGS;
-    m_settingsButton.selectSoundPlayed = false;
+    ////// welcome page //////
+    Vector2 welcomeMenuSize = {280, 60};
+    m_titlePosition.x       = ((WINDOW_WIDTH - ((m_gameName.length() / 2) * GAME_TITLE_FONTSIZE)) / 3);
+    m_titlePosition.y       = ((WINDOW_HEIGHT / 2) - 200);
 
-    m_quitButton.selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) + 130), 280, 60};
-    m_quitButton.position          = {m_quitButton.selectArea.x + 10, m_quitButton.selectArea.y + 10};
-    m_quitButton.backgroundColor   = BLANK;
-    m_quitButton.displayText       = "Quit";
-    m_quitButton.m_nextState       = EXIT_GAME;
-    m_quitButton.selectSoundPlayed = false;
+    m_startButton.m_selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) - 30), welcomeMenuSize.x, welcomeMenuSize.y};
+    m_startButton.m_position          = {m_startButton.m_selectArea.x + 10, m_startButton.m_selectArea.y + 10};
+    m_startButton.m_backgroundColor   = BLANK;
+    m_startButton.m_textSize          = MENU_ITEM_FONTSIZE;
+    m_startButton.m_displayText       = "Start";
+    m_startButton.m_nextState         = PLAYING;
+    m_startButton.m_selectSoundPlayed = false;
 
-    m_backButton.selectArea        = {(WINDOW_WIDTH - 300), (WINDOW_HEIGHT - 200), 110, 60};
-    m_backButton.position          = {m_backButton.selectArea.x + 10, m_backButton.selectArea.y + 10};
-    m_backButton.backgroundColor   = BLANK;
-    m_backButton.displayText       = "Back";
-    m_backButton.m_nextState       = WELCOME;
-    m_backButton.selectSoundPlayed = false;
+    m_settingsButton.m_selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) + 50), welcomeMenuSize.x, welcomeMenuSize.y};
+    m_settingsButton.m_position          = {m_settingsButton.m_selectArea.x + 10, m_settingsButton.m_selectArea.y + 10};
+    m_settingsButton.m_backgroundColor   = BLANK;
+    m_settingsButton.m_textSize          = MENU_ITEM_FONTSIZE;
+    m_settingsButton.m_displayText       = "Settings";
+    m_settingsButton.m_nextState         = SETTINGS;
+    m_settingsButton.m_selectSoundPlayed = false;
 
-    m_settingsPageBackground = {100, 100, (WINDOW_WIDTH - (2 * 100)), (WINDOW_HEIGHT - (2 * 100))};
+    m_quitButton.m_selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) + 130), welcomeMenuSize.x, welcomeMenuSize.y};
+    m_quitButton.m_position          = {m_quitButton.m_selectArea.x + 10, m_quitButton.m_selectArea.y + 10};
+    m_quitButton.m_backgroundColor   = BLANK;
+    m_quitButton.m_textSize          = MENU_ITEM_FONTSIZE;
+    m_quitButton.m_displayText       = "Quit";
+    m_quitButton.m_nextState         = EXIT_GAME;
+    m_quitButton.m_selectSoundPlayed = false;
 
+    ////// settings page //////
+    float settingsMargin     = 100;
+    m_settingsPageBackground = {settingsMargin, settingsMargin, (WINDOW_WIDTH - (2 * settingsMargin)), (WINDOW_HEIGHT - (2 * settingsMargin))};
+
+    m_backButton.m_selectArea        = {(WINDOW_WIDTH - 300), (WINDOW_HEIGHT - 200), 150, 80};
+    m_backButton.m_backgroundColor   = BLANK;
+    m_backButton.m_textSize          = MENU_ITEM_FONTSIZE + 10;
+    m_backButton.m_displayText       = "Back";
+    m_backButton.m_nextState         = WELCOME;
+    m_backButton.m_selectSoundPlayed = false;
+
+    textsize                  = m_raylibPtr->measureTextEx(m_fontType, m_backButton.m_displayText, m_backButton.m_textSize, 0);
+    m_backButton.m_position.x = (m_backButton.m_selectArea.x + ((m_backButton.m_selectArea.width - textsize.x) / 2));
+    m_backButton.m_position.y = (m_backButton.m_selectArea.y + ((m_backButton.m_selectArea.height - textsize.y) / 2));
+
+    ////// game over page //////
+    textsize                 = m_raylibPtr->measureTextEx(m_fontType, m_gameoverText, GAME_OVER_FONTSIZE, 0);
+    m_gameoverTextPosition.x = (WINDOW_WIDTH - textsize.x) / 2;
+    m_gameoverTextPosition.y = WINDOW_HEIGHT;
+    m_gameoverTextMaxHeight  = (WINDOW_HEIGHT - textsize.y) / 2;
+
+    Vector2  gameoverMenuSize     = {240, 120};
+    float    verticalOffset       = 100;
+    float    buttonMargin         = 10;
+    uint32_t gameoverMenuFontSize = MENU_ITEM_FONTSIZE + 30;
+
+    m_newgameButton.m_selectArea        = {((WINDOW_WIDTH / 2) - gameoverMenuSize.x - buttonMargin),
+                                           ((WINDOW_HEIGHT / 2) + verticalOffset),
+                                           gameoverMenuSize.x,
+                                           gameoverMenuSize.y};
+    m_newgameButton.m_backgroundColor   = BLANK;
+    m_newgameButton.m_textSize          = gameoverMenuFontSize;
+    m_newgameButton.m_displayText       = "Retry";
+    m_newgameButton.m_nextState         = WELCOME;
+    m_newgameButton.m_selectSoundPlayed = false;
+
+    textsize                     = m_raylibPtr->measureTextEx(m_fontType, m_newgameButton.m_displayText, m_newgameButton.m_textSize, 0);
+    m_newgameButton.m_position.x = (m_newgameButton.m_selectArea.x + ((m_newgameButton.m_selectArea.width - textsize.x) / 2));
+    m_newgameButton.m_position.y = (m_newgameButton.m_selectArea.y + ((m_newgameButton.m_selectArea.height - textsize.y) / 2));
+
+    m_gameoverQuitButton.m_selectArea        = {((WINDOW_WIDTH / 2) + buttonMargin),
+                                                ((WINDOW_HEIGHT / 2) + verticalOffset),
+                                                gameoverMenuSize.x,
+                                                gameoverMenuSize.y};
+    m_gameoverQuitButton.m_backgroundColor   = BLANK;
+    m_gameoverQuitButton.m_textSize          = gameoverMenuFontSize;
+    m_gameoverQuitButton.m_displayText       = "Quit";
+    m_gameoverQuitButton.m_nextState         = EXIT_GAME;
+    m_gameoverQuitButton.m_selectSoundPlayed = false;
+
+    textsize                          = m_raylibPtr->measureTextEx(m_fontType, m_gameoverQuitButton.m_displayText, m_gameoverQuitButton.m_textSize, 0);
+    m_gameoverQuitButton.m_position.x = (m_gameoverQuitButton.m_selectArea.x + ((m_gameoverQuitButton.m_selectArea.width - textsize.x) / 2));
+    m_gameoverQuitButton.m_position.y = (m_gameoverQuitButton.m_selectArea.y + ((m_gameoverQuitButton.m_selectArea.height - textsize.y) / 2));
+
+    ////// playing page //////
     m_meteorTimer = std::make_shared<Timer>(m_raylibPtr,
                                             METEOR_TIMER_DURATION,
                                             true,
                                             true,
                                             std::bind(&Game::createMeteor, this));
 
-    m_raylibPtr->initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, m_gameName);
-    m_raylibPtr->initAudioDevice();
-    loadResources();
+    m_rampdownTimer = std::make_shared<Timer>(m_raylibPtr,
+                                              1,
+                                              false,
+                                              false,
+                                              std::bind(&Game::gameoverReset, this));
 }
 
 Game::~Game(void)
@@ -110,6 +171,7 @@ void Game::run(void)
                 break;
 
             case GAME_OVER:
+                refreshGameOverPage();
                 break;
 
             case EXIT_GAME:
@@ -179,7 +241,7 @@ void Game::loadResources(void)
     }
     m_texturesMap["explosion"] = explosionTextures;
 
-    m_fontType        = m_raylibPtr->loadFontEx((fontPath / "Stormfaze.otf").string(), GAME_TITLE_SIZE, NULL, 0);
+    m_fontType        = m_raylibPtr->loadFontEx((fontPath / "Stormfaze.otf").string(), GAME_OVER_FONTSIZE, NULL, 0);
     m_explosionSound  = m_raylibPtr->loadSound((audioPath / "explosion.wav").string());
     m_laserSound      = m_raylibPtr->loadSound((audioPath / "laser.wav").string());
     m_selectSound     = m_raylibPtr->loadSound((audioPath / "select.mp3").string());
@@ -210,6 +272,7 @@ void Game::unloadResources(void)
 void Game::update(void)
 {
     m_meteorTimer->update();
+    m_rampdownTimer->update();
     m_player->update();
     for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
     {
@@ -339,18 +402,15 @@ void Game::checkCollisions(void)
                 m_lives--;
                 if (m_lives == 0)
                 {
-                    m_state = EXIT_GAME;
+                    m_rampdownTimer->activate();
                 }
-                else
-                {
-                    m_meteorsList[index]->m_discard = true;
-                    m_player->m_discard             = true;
+                m_meteorsList[index]->m_discard = true;
+                m_player->m_discard             = true;
 
-                    std::shared_ptr<Sprite> explosion = m_explodeMeteor(m_raylibPtr, m_player->getCenter(), 3);
-                    explosion->setTextures(m_texturesMap["explosion"]);
-                    m_explosionsList.push_back(explosion);
-                    m_raylibPtr->playSound(m_explosionSound);
-                }
+                std::shared_ptr<Sprite> explosion = m_explodeMeteor(m_raylibPtr, m_player->getCenter(), 3);
+                explosion->setTextures(m_texturesMap["explosion"]);
+                m_explosionsList.push_back(explosion);
+                m_raylibPtr->playSound(m_explosionSound);
             }
         }
     }
@@ -361,14 +421,14 @@ void Game::drawStats(void)
     m_raylibPtr->drawTextEx(m_fontType,
                             "lives: " + std::format("{:>5}", std::to_string(m_lives)),
                             Vector2((WINDOW_WIDTH - 150), 30),
-                            STAT_SIZE,
+                            STAT_FONTSIZE,
                             0,
                             WHITE);
 
     m_raylibPtr->drawTextEx(m_fontType,
                             "score: " + std::format("{:>4}", std::to_string(m_score)),
-                            Vector2((WINDOW_WIDTH - 150), (30 + STAT_SIZE)),
-                            STAT_SIZE,
+                            Vector2((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                            STAT_FONTSIZE,
                             0,
                             WHITE);
 }
@@ -377,36 +437,36 @@ void Game::checkButtonUpdate(GameButton_t& button)
 {
     Vector2 mousePosition = m_raylibPtr->getMousePosition();
 
-    if (m_raylibPtr->checkCollisionPointRec(mousePosition, button.selectArea))
+    if (m_raylibPtr->checkCollisionPointRec(mousePosition, button.m_selectArea))
     {
-        button.backgroundColor = DARKGRAY;
+        button.m_backgroundColor = DARKGRAY;
 
         if (m_raylibPtr->isMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             m_state = button.m_nextState;
         }
 
-        if (!(button.selectSoundPlayed))
+        if (!(button.m_selectSoundPlayed))
         {
             m_raylibPtr->playSound(m_selectSound);
-            button.selectSoundPlayed = true;
+            button.m_selectSoundPlayed = true;
         }
     }
     else
     {
-        button.backgroundColor = BLANK;
+        button.m_backgroundColor = BLANK;
 
-        if (button.selectSoundPlayed)
+        if (button.m_selectSoundPlayed)
         {
-            button.selectSoundPlayed = false;
+            button.m_selectSoundPlayed = false;
         }
     }
 }
 
 void Game::drawButton(GameButton_t button)
 {
-    m_raylibPtr->drawRectangleRounded(button.selectArea, 0.2, 0, button.backgroundColor);
-    m_raylibPtr->drawTextEx(m_fontType, button.displayText, button.position, MENU_ITEM_SIZE, 0, LIGHTGRAY);
+    m_raylibPtr->drawRectangleRounded(button.m_selectArea, 0.2, 0, button.m_backgroundColor);
+    m_raylibPtr->drawTextEx(m_fontType, button.m_displayText, button.m_position, button.m_textSize, 0, LIGHTGRAY);
 }
 
 void Game::drawSettingsText(void)
@@ -416,10 +476,18 @@ void Game::drawSettingsText(void)
     std::string row2col1 = "Arrow keys";
     std::string row2col2 = "- move the spaceship";
 
-    m_raylibPtr->drawTextEx(m_fontType, row1col1, Vector2(150, 180), MENU_ITEM_SIZE + 10, 0, RAYWHITE);
-    m_raylibPtr->drawTextEx(m_fontType, row1col2, Vector2(480, 180), MENU_ITEM_SIZE + 10, 0, RAYWHITE);
-    m_raylibPtr->drawTextEx(m_fontType, row2col1, Vector2(150, 240), MENU_ITEM_SIZE + 10, 0, RAYWHITE);
-    m_raylibPtr->drawTextEx(m_fontType, row2col2, Vector2(480, 240), MENU_ITEM_SIZE + 10, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, row1col1, Vector2(150, 180), MENU_ITEM_FONTSIZE + 10, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, row1col2, Vector2(480, 180), MENU_ITEM_FONTSIZE + 10, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, row2col1, Vector2(150, 240), MENU_ITEM_FONTSIZE + 10, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, row2col2, Vector2(480, 240), MENU_ITEM_FONTSIZE + 10, 0, RAYWHITE);
+}
+
+void Game::gameoverReset(void)
+{
+    m_gameoverTextPosition.y = WINDOW_HEIGHT;
+    m_lives                  = MAX_LIVES;
+    m_score                  = 0;
+    m_state                  = GAME_OVER;
 }
 
 void Game::refreshPlayingPage(void)
@@ -447,7 +515,7 @@ void Game::refreshWelcomePage(void)
 
     m_raylibPtr->clearBackground(BLACK);
     drawStars();
-    m_raylibPtr->drawTextEx(m_fontType, m_gameName, m_titlePosition, GAME_TITLE_SIZE, 0, GOLD);
+    m_raylibPtr->drawTextEx(m_fontType, m_gameName, m_titlePosition, GAME_TITLE_FONTSIZE, 0, GOLD);
     drawButton(m_startButton);
     drawButton(m_settingsButton);
     drawButton(m_quitButton);
@@ -472,5 +540,38 @@ void Game::refreshSettingsPage(void)
     m_raylibPtr->drawRectangleRounded(m_settingsPageBackground, 0.05, 0, {30, 30, 30, 200});
     drawSettingsText();
     drawButton(m_backButton);
+    m_raylibPtr->endDrawing();
+}
+
+void Game::refreshGameOverPage(void)
+{
+    for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
+    {
+        m_starsList[index]->update();
+    }
+
+    if (m_gameoverTextPosition.y > m_gameoverTextMaxHeight)
+    {
+        m_gameoverTextPosition.y += (-1) * 100 * m_raylibPtr->getFrameTime();
+    }
+    else
+    {
+        m_gameoverTextPosition.y = m_gameoverTextMaxHeight;
+        checkButtonUpdate(m_newgameButton);
+        checkButtonUpdate(m_gameoverQuitButton);
+    }
+
+    m_raylibPtr->updateMusicStream(m_backGroundMusic);
+
+    m_raylibPtr->beginDrawing();
+
+    m_raylibPtr->clearBackground(BLACK);
+    drawStars();
+    m_raylibPtr->drawTextEx(m_fontType, m_gameoverText, m_gameoverTextPosition, GAME_OVER_FONTSIZE, 0, RED);
+    if (m_gameoverTextPosition.y == m_gameoverTextMaxHeight)
+    {
+        drawButton(m_newgameButton);
+        drawButton(m_gameoverQuitButton);
+    }
     m_raylibPtr->endDrawing();
 }

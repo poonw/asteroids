@@ -52,12 +52,13 @@ public:
 private:
     typedef struct GameButton_s
     {
-        Vector2     position;
-        Rectangle   selectArea;
-        Color       backgroundColor;
-        std::string displayText;
+        Vector2     m_position;
+        Rectangle   m_selectArea;
+        Color       m_backgroundColor;
+        uint32_t    m_textSize;
+        std::string m_displayText;
         STATE_t     m_nextState;
-        bool        selectSoundPlayed;
+        bool        m_selectSoundPlayed;
     } GameButton_t;
 
     void loadResources(void);
@@ -72,41 +73,24 @@ private:
     void checkButtonUpdate(GameButton_t& button);
     void drawButton(GameButton_t button);
     void drawSettingsText(void);
+    void gameoverReset(void);
     void refreshPlayingPage(void);
     void refreshWelcomePage(void);
     void refreshSettingsPage(void);
+    void refreshGameOverPage(void);
 
-    std::string m_gameName = "Asteroids";
-    STATE_t     m_state    = WELCOME;
-    uint32_t    m_score    = 0;
-    uint32_t    m_lives    = MAX_LIVES;
-
+    std::string                      m_gameName     = "Asteroids";
+    STATE_t                          m_state        = EXIT_GAME;
     const std::filesystem::path      m_resourcePath = "resources";
     std::shared_ptr<RaylibInterface> m_raylibPtr    = nullptr;
-    std::shared_ptr<Timer>           m_meteorTimer  = nullptr;
-
-    // welcome page
-    Vector2      m_titlePosition;
-    GameButton_t m_startButton;
-    GameButton_t m_settingsButton;
-    GameButton_t m_quitButton;
-
-    // settings page
-    GameButton_t m_backButton;
-    Rectangle    m_settingsPageBackground;
-
-    std::shared_ptr<Sprite>                              m_player = nullptr;
-    std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starsList;
-    std::vector<std::shared_ptr<Sprite>>                 m_lasersList;
-    std::vector<std::shared_ptr<Sprite>>                 m_meteorsList;
-    std::vector<std::shared_ptr<Sprite>>                 m_explosionsList;
 
     std::unordered_map<std::string, std::vector<Texture2D>> m_texturesMap;
-    Font                                                    m_fontType;
-    Sound                                                   m_explosionSound;
-    Sound                                                   m_laserSound;
-    Sound                                                   m_selectSound;
-    Music                                                   m_backGroundMusic;
+
+    Font  m_fontType;
+    Sound m_explosionSound;
+    Sound m_laserSound;
+    Sound m_selectSound;
+    Music m_backGroundMusic;
 
     std::function<std::shared_ptr<Sprite>(
         std::shared_ptr<RaylibInterface> raylibPtr,
@@ -120,6 +104,34 @@ private:
         Vector2                          position,
         float                            scale)>
         m_explodeMeteor;
+
+    // welcome page
+    Vector2      m_titlePosition;
+    GameButton_t m_startButton;
+    GameButton_t m_settingsButton;
+    GameButton_t m_quitButton;
+
+    // settings page
+    GameButton_t m_backButton;
+    Rectangle    m_settingsPageBackground;
+
+    // game over page
+    GameButton_t m_newgameButton;
+    GameButton_t m_gameoverQuitButton;
+    std::string  m_gameoverText = "Game Over";
+    Vector2      m_gameoverTextPosition;
+    float        m_gameoverTextMaxHeight = 0;
+
+    // playing page
+    uint32_t                                             m_score         = 0;
+    uint32_t                                             m_lives         = MAX_LIVES;
+    std::shared_ptr<Timer>                               m_meteorTimer   = nullptr;
+    std::shared_ptr<Timer>                               m_rampdownTimer = nullptr;
+    std::shared_ptr<Sprite>                              m_player        = nullptr;
+    std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starsList;
+    std::vector<std::shared_ptr<Sprite>>                 m_lasersList;
+    std::vector<std::shared_ptr<Sprite>>                 m_meteorsList;
+    std::vector<std::shared_ptr<Sprite>>                 m_explosionsList;
 };
 
 #endif // GAME_H

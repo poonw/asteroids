@@ -43,6 +43,7 @@ public:
     Vector2   getMousePosition(void) override;
     bool      checkCollisionPointRec(Vector2 point, Rectangle rec) override;
     bool      isMouseButtonPressed(int button) override;
+    Vector2   measureTextEx(Font font, std::string text, float fontSize, float spacing) override;
 };
 
 #endif // RAYLIBWRAPPER_H
