@@ -18,7 +18,7 @@ public:
     std::shared_ptr<Player>     m_Player     = nullptr;
     std::shared_ptr<RaylibMock> m_raylibMock = nullptr;
 
-    void shootLaser(Vector2 vec)
+    void shootLaser(Sprite::SpriteAttr_t attr)
     {
     }
 
@@ -29,8 +29,8 @@ public:
 
         EXPECT_CALL((*m_raylibMock), isWindowReady()).WillOnce(Return(true));
 
-        std::function<void(Vector2)> f_shootLaser = std::bind(&PlayerTest::shootLaser, this, std::placeholders::_1);
-        m_Player                                  = std::make_shared<Player>(m_raylibMock, f_shootLaser);
+        std::function<void(Sprite::SpriteAttr_t)> f_shootLaser = std::bind(&PlayerTest::shootLaser, this, std::placeholders::_1);
+        m_Player                                               = std::make_shared<Player>(m_raylibMock, f_shootLaser);
         ASSERT_TRUE(m_Player != nullptr);
     }
 

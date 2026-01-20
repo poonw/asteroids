@@ -24,10 +24,13 @@ public:
         m_raylibMock = std::make_shared<RaylibMock>();
         ASSERT_TRUE(m_raylibMock != nullptr);
 
-        Vector2 startPos = {0, WINDOW_HEIGHT};
+        Vector2 startPos  = {0, WINDOW_HEIGHT};
+        Vector2 direction = {0, -1};
+        float   rotation  = 180;
+        Color   color     = WHITE;
         EXPECT_CALL((*m_raylibMock), isWindowReady()).WillOnce(Return(true));
 
-        m_Laser = std::make_shared<Laser>(m_raylibMock, startPos);
+        m_Laser = std::make_shared<Laser>(m_raylibMock, startPos, direction, rotation, color);
         ASSERT_TRUE(m_Laser != nullptr);
     }
 
@@ -70,7 +73,7 @@ TEST_F(LaserTest, draw)
     Texture2D fakeTexture = {0, 0, 0, 0, 0};
     m_Laser->setTextures({fakeTexture});
 
-    EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(255, 255, 255, 255)))
+    EXPECT_CALL((*m_raylibMock), drawTextureEx(A<Texture2D>(), A<Vector2>(), 180, 1, FieldsAre(255, 255, 255, 255)))
         .Times(Exactly(1));
     m_Laser->draw();
 }
@@ -95,7 +98,7 @@ TEST_F(LaserTest, getRect)
     Texture2D fakeTexture = {0, 5, 15, 0, 0};
     m_Laser->setTextures({fakeTexture});
 
-    EXPECT_THAT(m_Laser->getRect(), FieldsAre(0, WINDOW_HEIGHT, 5, 15));
+    EXPECT_THAT(m_Laser->getRect(), FieldsAre(5, (WINDOW_HEIGHT + 15), 5, 15));
 }
 
 TEST_F(LaserTest, setTextures_death)

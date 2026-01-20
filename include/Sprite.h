@@ -8,6 +8,15 @@
 class Sprite
 {
 public:
+    typedef struct SpriteAttr_s
+    {
+        Vector2 m_position  = {0, 0};
+        Vector2 m_direction = {0, 0};
+        float   m_scale     = 0.0;
+        float   m_rotation  = 0.0;
+        Color   m_color     = WHITE;
+    } SpriteAttr_t;
+
     Sprite(void);
     virtual ~Sprite(void);
 

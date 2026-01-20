@@ -3,6 +3,7 @@
 #define PLAYER_SPEED          500
 #define LASER_SPEED           600
 #define STAR_SPEED            100
+#define OPPONENT_SPEED        200
 #define METEOR_TIMER_DURATION 0.4
 #define STAT_FONTSIZE         30
 #define GAME_TITLE_FONTSIZE   120

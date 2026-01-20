@@ -1,14 +1,20 @@
 #include "Laser.h"
 #include <cassert>
+#include <math.h>
 #include "GameSettings.h"
 
 Laser::Laser(std::shared_ptr<RaylibInterface> raylibPtr,
-             Vector2                          position)
+             Vector2                          position,
+             Vector2                          direction,
+             float                            rotation,
+             Color                            color)
 {
     assert(raylibPtr->isWindowReady());
     m_raylibPtr = raylibPtr;
     m_position  = position;
-    m_direction = {0, -1};
+    m_direction = direction;
+    m_rotation  = rotation;
+    m_color     = color;
     m_speed     = LASER_SPEED;
 }
 
@@ -33,7 +39,7 @@ void Laser::update(void)
 void Laser::draw(void)
 {
     assert(m_textures.size() == 1);
-    m_raylibPtr->drawTextureV(m_textures[0], m_position, WHITE);
+    m_raylibPtr->drawTextureEx(m_textures[0], m_position, m_rotation, 1, m_color);
 }
 
 Vector2 Laser::getCenter(void)
@@ -58,4 +64,5 @@ void Laser::setTextures(std::vector<Texture2D> textures)
 {
     assert(textures.size() == 1);
     m_textures = textures;
+    m_position = {m_position.x + m_textures[0].width, m_position.y + m_textures[0].height};
 }

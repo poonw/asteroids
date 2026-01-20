@@ -4,35 +4,15 @@
 #include <format>
 #include "GameSettings.h"
 #include "Sprite.h"
+#include "SpriteFactory.h"
 #include "Timer.h"
 
-Game::Game(std::shared_ptr<RaylibInterface> raylibPtr,
-           std::function<std::shared_ptr<Sprite>(
-               std::shared_ptr<RaylibInterface> raylibPtr,
-               Vector2                          position)>
-               createLaserWrapper,
-           std::function<std::shared_ptr<Sprite>(
-               std::shared_ptr<RaylibInterface> raylibPtr)>
-               createMeteorWrapper,
-           std::function<std::shared_ptr<Sprite>(
-               std::shared_ptr<RaylibInterface> raylibPtr,
-               Vector2                          position,
-               float                            scale)>
-               explodeMeteorWrapper)
+Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFactory> factoryPtr)
 {
     assert(raylibPtr != nullptr);
-    assert(createLaserWrapper);
-    assert(createMeteorWrapper);
-    assert(explodeMeteorWrapper);
-    m_raylibPtr     = raylibPtr;
-    m_createLaser   = createLaserWrapper;
-    m_createMeteor  = createMeteorWrapper;
-    m_explodeMeteor = explodeMeteorWrapper;
-
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        m_starsList[n] = nullptr;
-    }
+    assert(factoryPtr != nullptr);
+    m_raylibPtr = raylibPtr;
+    m_factory   = factoryPtr;
 
     ////// raylib init //////
     m_state = WELCOME;
@@ -137,23 +117,32 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr,
                                               false,
                                               false,
                                               std::bind(&Game::gameoverReset, this));
+
+    m_opponentTimer = std::make_shared<Timer>(m_raylibPtr,
+                                              2,
+                                              true,
+                                              true,
+                                              std::bind(&Game::createOpponent, this));
+
+    Sprite::SpriteAttr_t attr;
+    m_player = m_factory->getSprite(SpriteFactory::PLAYER, m_raylibPtr, attr, std::bind(&Game::playerShootLaser, this, std::placeholders::_1));
+    m_player->setTextures(m_texturesMap["player"]);
+
+    for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
+    {
+        m_starsList[index] = m_factory->getSprite(SpriteFactory::STAR, m_raylibPtr, attr);
+        m_starsList[index]->setTextures(m_texturesMap["star"]);
+    }
 }
 
 Game::~Game(void)
 {
     unloadResources();
     m_raylibPtr->closeAudioDevice();
-    m_raylibPtr->closeWindow();
 }
 
 void Game::run(void)
 {
-    assert(m_player != nullptr);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        assert(m_starsList[n] != nullptr);
-    }
-
     while (!m_raylibPtr->windowShouldClose())
     {
         switch (m_state)
@@ -185,36 +174,40 @@ void Game::run(void)
     }
 }
 
-void Game::setPlayer(std::shared_ptr<Sprite> player)
+void Game::playerShootLaser(Sprite::SpriteAttr_t attr)
 {
-    m_player = player;
-    m_player->setTextures(m_texturesMap["player"]);
-}
+    std::shared_ptr<Sprite> laserM = m_factory->getSprite(SpriteFactory::LASER, m_raylibPtr, attr);
+    laserM->setTextures(m_texturesMap["laser"]);
+    m_playerLasersList.push_back(laserM);
 
-void Game::setStarsList(std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS>& starsList)
-{
-    m_starsList = starsList;
-    for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
-    {
-        m_starsList[index]->setTextures(m_texturesMap["star"]);
-    }
-}
-
-void Game::shootLaser(Vector2 position)
-{
-    std::shared_ptr<Sprite> laser = m_createLaser(m_raylibPtr, position);
-    laser->setTextures(m_texturesMap["laser"]);
-    m_lasersList.push_back(laser);
     m_raylibPtr->playSound(m_laserSound);
+}
+
+void Game::opponentShootLaser(Sprite::SpriteAttr_t attr)
+{
+    std::shared_ptr<Sprite> laserM = m_factory->getSprite(SpriteFactory::LASER, m_raylibPtr, attr);
+    laserM->setTextures(m_texturesMap["laser"]);
+    m_opponentLasersList.push_back(laserM);
 }
 
 void Game::createMeteor(void)
 {
-    std::shared_ptr<Sprite> meteor = m_createMeteor(m_raylibPtr);
+    Sprite::SpriteAttr_t    attr;
+    std::shared_ptr<Sprite> meteor = m_factory->getSprite(SpriteFactory::METEOR, m_raylibPtr, attr);
     meteor->setTextures(m_texturesMap["meteor"]);
     m_meteorsList.push_back(meteor);
 }
 
+void Game::createOpponent(void)
+{
+    Sprite::SpriteAttr_t    attr;
+    std::shared_ptr<Sprite> opponent = m_factory->getSprite(SpriteFactory::OPPONENT,
+                                                            m_raylibPtr,
+                                                            attr,
+                                                            std::bind(&Game::opponentShootLaser, this, std::placeholders::_1));
+    opponent->setTextures(m_texturesMap["player"]);
+    m_opponentsList.push_back(opponent);
+}
 #ifdef DEBUG_
 void Game::setState(STATE_t state)
 {
@@ -269,18 +262,19 @@ void Game::unloadResources(void)
     m_raylibPtr->unloadTexture(m_texturesMap["player"][0]);
 }
 
-void Game::update(void)
+void Game::updatePlayingPage(void)
 {
     m_meteorTimer->update();
+    m_opponentTimer->update();
     m_rampdownTimer->update();
     m_player->update();
     for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
     {
         m_starsList[index]->update();
     }
-    for (uint32_t index = 0; index < m_lasersList.size(); index++)
+    for (uint32_t index = 0; index < m_playerLasersList.size(); index++)
     {
-        m_lasersList[index]->update();
+        m_playerLasersList[index]->update();
     }
     for (uint32_t index = 0; index < m_meteorsList.size(); index++)
     {
@@ -289,6 +283,14 @@ void Game::update(void)
     for (uint32_t index = 0; index < m_explosionsList.size(); index++)
     {
         m_explosionsList[index]->update();
+    }
+    for (uint32_t index = 0; index < m_opponentsList.size(); index++)
+    {
+        m_opponentsList[index]->update();
+    }
+    for (uint32_t index = 0; index < m_opponentLasersList.size(); index++)
+    {
+        m_opponentLasersList[index]->update();
     }
     m_raylibPtr->updateMusicStream(m_backGroundMusic);
 }
@@ -316,9 +318,9 @@ void Game::drawStars(void)
 
 void Game::drawSprites(void)
 {
-    for (uint32_t index = 0; index < m_lasersList.size(); index++)
+    for (uint32_t index = 0; index < m_playerLasersList.size(); index++)
     {
-        m_lasersList[index]->draw();
+        m_playerLasersList[index]->draw();
     }
     for (uint32_t index = 0; index < m_meteorsList.size(); index++)
     {
@@ -328,15 +330,23 @@ void Game::drawSprites(void)
     {
         m_explosionsList[index]->draw();
     }
+    for (uint32_t index = 0; index < m_opponentsList.size(); index++)
+    {
+        m_opponentsList[index]->draw();
+    }
+    for (uint32_t index = 0; index < m_opponentLasersList.size(); index++)
+    {
+        m_opponentLasersList[index]->draw();
+    }
 }
 
 void Game::discardSprites(void)
 {
-    for (auto it = m_lasersList.begin(); it != m_lasersList.end();)
+    for (auto it = m_playerLasersList.begin(); it != m_playerLasersList.end();)
     {
         if ((*(*it)).m_discard)
         {
-            it = m_lasersList.erase(it);
+            it = m_playerLasersList.erase(it);
         }
         else
         {
@@ -365,27 +375,73 @@ void Game::discardSprites(void)
             ++it;
         }
     }
+    for (auto it = m_opponentsList.begin(); it != m_opponentsList.end();)
+    {
+        if ((*(*it)).m_discard)
+        {
+            it = m_opponentsList.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+    for (auto it = m_opponentLasersList.begin(); it != m_opponentLasersList.end();)
+    {
+        if ((*(*it)).m_discard)
+        {
+            it = m_opponentLasersList.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 void Game::checkCollisions(void)
 {
-    for (uint32_t ilaser = 0; ilaser < m_lasersList.size(); ilaser++)
+    for (uint32_t ilaser = 0; ilaser < m_playerLasersList.size(); ilaser++)
     {
         for (uint32_t imeteor = 0; imeteor < m_meteorsList.size(); imeteor++)
         {
             if (m_raylibPtr->checkCollisionCircleRec(m_meteorsList[imeteor]->getCenter(),
                                                      m_meteorsList[imeteor]->getRadius(),
-                                                     m_lasersList[ilaser]->getRect()))
+                                                     m_playerLasersList[ilaser]->getRect()))
             {
-                m_lasersList[ilaser]->m_discard   = true;
-                m_meteorsList[imeteor]->m_discard = true;
+                m_playerLasersList[ilaser]->m_discard = true;
+                m_meteorsList[imeteor]->m_discard     = true;
 
-                std::shared_ptr<Sprite> explosion = m_explodeMeteor(m_raylibPtr, m_meteorsList[imeteor]->getCenter(), 2);
+                Sprite::SpriteAttr_t attr;
+                attr.m_position                   = m_meteorsList[imeteor]->getCenter();
+                attr.m_scale                      = 2;
+                std::shared_ptr<Sprite> explosion = m_factory->getSprite(SpriteFactory::EXPLOSION, m_raylibPtr, attr);
                 explosion->setTextures(m_texturesMap["explosion"]);
                 m_explosionsList.push_back(explosion);
                 m_raylibPtr->playSound(m_explosionSound);
 
                 m_score++;
+            }
+        }
+
+        for (uint32_t ioppo = 0; ioppo < m_opponentsList.size(); ioppo++)
+        {
+            if (m_raylibPtr->checkCollisionCircleRec(m_opponentsList[ioppo]->getCenter(),
+                                                     m_opponentsList[ioppo]->getRadius(),
+                                                     m_playerLasersList[ilaser]->getRect()))
+            {
+                m_playerLasersList[ilaser]->m_discard = true;
+                m_opponentsList[ioppo]->m_discard     = true;
+
+                Sprite::SpriteAttr_t attr;
+                attr.m_position                   = m_opponentsList[ioppo]->getCenter();
+                attr.m_scale                      = 3;
+                std::shared_ptr<Sprite> explosion = m_factory->getSprite(SpriteFactory::EXPLOSION, m_raylibPtr, attr);
+                explosion->setTextures(m_texturesMap["explosion"]);
+                m_explosionsList.push_back(explosion);
+                m_raylibPtr->playSound(m_explosionSound);
+
+                m_score += 10;
             }
         }
     }
@@ -407,7 +463,59 @@ void Game::checkCollisions(void)
                 m_meteorsList[index]->m_discard = true;
                 m_player->m_discard             = true;
 
-                std::shared_ptr<Sprite> explosion = m_explodeMeteor(m_raylibPtr, m_player->getCenter(), 3);
+                Sprite::SpriteAttr_t attr;
+                attr.m_position                   = m_player->getCenter();
+                attr.m_scale                      = 3;
+                std::shared_ptr<Sprite> explosion = m_factory->getSprite(SpriteFactory::EXPLOSION, m_raylibPtr, attr);
+                explosion->setTextures(m_texturesMap["explosion"]);
+                m_explosionsList.push_back(explosion);
+                m_raylibPtr->playSound(m_explosionSound);
+            }
+        }
+
+        for (uint32_t ilaser = 0; ilaser < m_opponentLasersList.size(); ilaser++)
+        {
+            if (m_raylibPtr->checkCollisionCircleRec(m_player->getCenter(),
+                                                     m_player->getRadius(),
+                                                     m_opponentLasersList[ilaser]->getRect()))
+            {
+                m_lives--;
+                if (m_lives == 0)
+                {
+                    m_rampdownTimer->activate();
+                }
+                m_opponentLasersList[ilaser]->m_discard = true;
+                m_player->m_discard                     = true;
+
+                Sprite::SpriteAttr_t attr;
+                attr.m_position                   = m_player->getCenter();
+                attr.m_scale                      = 3;
+                std::shared_ptr<Sprite> explosion = m_factory->getSprite(SpriteFactory::EXPLOSION, m_raylibPtr, attr);
+                explosion->setTextures(m_texturesMap["explosion"]);
+                m_explosionsList.push_back(explosion);
+                m_raylibPtr->playSound(m_explosionSound);
+            }
+        }
+
+        for (uint32_t index = 0; index < m_opponentsList.size(); index++)
+        {
+            if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
+                                                   m_player->getRadius(),
+                                                   m_opponentsList[index]->getCenter(),
+                                                   m_opponentsList[index]->getRadius()))
+            {
+                m_lives--;
+                if (m_lives == 0)
+                {
+                    m_rampdownTimer->activate();
+                }
+                m_opponentsList[index]->m_discard = true;
+                m_player->m_discard               = true;
+
+                Sprite::SpriteAttr_t attr;
+                attr.m_position                   = m_player->getCenter();
+                attr.m_scale                      = 3;
+                std::shared_ptr<Sprite> explosion = m_factory->getSprite(SpriteFactory::EXPLOSION, m_raylibPtr, attr);
                 explosion->setTextures(m_texturesMap["explosion"]);
                 m_explosionsList.push_back(explosion);
                 m_raylibPtr->playSound(m_explosionSound);
@@ -493,7 +601,7 @@ void Game::gameoverReset(void)
 void Game::refreshPlayingPage(void)
 {
     discardSprites();
-    update();
+    updatePlayingPage();
     drawPlayingPage();
     checkCollisions();
 }

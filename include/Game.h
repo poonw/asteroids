@@ -9,8 +9,9 @@
 #include <vector>
 #include "GameSettings.h"
 #include "RaylibInterface.h"
+#include "Sprite.h"
 
-class Sprite;
+class SpriteFactory;
 class Timer;
 
 class Game
@@ -25,26 +26,14 @@ public:
         EXIT_GAME
     } STATE_t;
 
-    Game(std::shared_ptr<RaylibInterface> raylibPtr,
-         std::function<std::shared_ptr<Sprite>(
-             std::shared_ptr<RaylibInterface> raylibPtr,
-             Vector2                          position)>
-             createLaserWrapper,
-         std::function<std::shared_ptr<Sprite>(
-             std::shared_ptr<RaylibInterface> raylibPtr)>
-             createMeteorWrapper,
-         std::function<std::shared_ptr<Sprite>(
-             std::shared_ptr<RaylibInterface> raylibPtr,
-             Vector2                          position,
-             float                            scale)>
-             explodeMeteorWrapper);
+    Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFactory> factoryPtr);
     ~Game(void);
 
     void run(void);
-    void setPlayer(std::shared_ptr<Sprite> player);
-    void setStarsList(std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS>& starsList);
-    void shootLaser(Vector2 position);
+    void playerShootLaser(Sprite::SpriteAttr_t attr);
+    void opponentShootLaser(Sprite::SpriteAttr_t attr);
     void createMeteor(void);
+    void createOpponent(void);
 #ifdef DEBUG_
     void setState(STATE_t state);
 #endif
@@ -63,7 +52,7 @@ private:
 
     void loadResources(void);
     void unloadResources(void);
-    void update(void);
+    void updatePlayingPage(void);
     void drawPlayingPage(void);
     void drawStars(void);
     void drawSprites(void);
@@ -83,6 +72,7 @@ private:
     STATE_t                          m_state        = EXIT_GAME;
     const std::filesystem::path      m_resourcePath = "resources";
     std::shared_ptr<RaylibInterface> m_raylibPtr    = nullptr;
+    std::shared_ptr<SpriteFactory>   m_factory      = nullptr;
 
     std::unordered_map<std::string, std::vector<Texture2D>> m_texturesMap;
 
@@ -91,19 +81,6 @@ private:
     Sound m_laserSound;
     Sound m_selectSound;
     Music m_backGroundMusic;
-
-    std::function<std::shared_ptr<Sprite>(
-        std::shared_ptr<RaylibInterface> raylibPtr,
-        Vector2                          position)>
-        m_createLaser;
-    std::function<std::shared_ptr<Sprite>(
-        std::shared_ptr<RaylibInterface> raylibPtr)>
-        m_createMeteor;
-    std::function<std::shared_ptr<Sprite>(
-        std::shared_ptr<RaylibInterface> raylibPtr,
-        Vector2                          position,
-        float                            scale)>
-        m_explodeMeteor;
 
     // welcome page
     Vector2      m_titlePosition;
@@ -127,11 +104,14 @@ private:
     uint32_t                                             m_lives         = MAX_LIVES;
     std::shared_ptr<Timer>                               m_meteorTimer   = nullptr;
     std::shared_ptr<Timer>                               m_rampdownTimer = nullptr;
+    std::shared_ptr<Timer>                               m_opponentTimer = nullptr;
     std::shared_ptr<Sprite>                              m_player        = nullptr;
     std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starsList;
-    std::vector<std::shared_ptr<Sprite>>                 m_lasersList;
+    std::vector<std::shared_ptr<Sprite>>                 m_playerLasersList;
     std::vector<std::shared_ptr<Sprite>>                 m_meteorsList;
     std::vector<std::shared_ptr<Sprite>>                 m_explosionsList;
+    std::vector<std::shared_ptr<Sprite>>                 m_opponentsList;
+    std::vector<std::shared_ptr<Sprite>>                 m_opponentLasersList;
 };
 
 #endif // GAME_H

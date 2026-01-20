@@ -8,7 +8,10 @@ class Laser : public Sprite
 {
 public:
     Laser(std::shared_ptr<RaylibInterface> raylibPtr,
-          Vector2                          position);
+          Vector2                          position,
+          Vector2                          direction,
+          float                            rotation,
+          Color                            color);
     ~Laser(void) = default;
 
     void      update(void) override;
@@ -23,6 +26,8 @@ private:
 
     Vector2 m_direction = {0, 0};
     float   m_speed     = 0;
+    float   m_rotation  = 0;
+    Color   m_color     = WHITE;
 };
 
 #endif // LASER_H
