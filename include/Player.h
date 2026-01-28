@@ -10,8 +10,8 @@ class Timer;
 class Player : public Sprite
 {
 public:
-    Player(std::shared_ptr<RaylibInterface> raylibPtr,
-           std::function<void(Vector2)>     shootLaser);
+    Player(std::shared_ptr<RaylibInterface>          raylibPtr,
+           std::function<void(Sprite::SpriteAttr_t)> shootLaser);
     ~Player(void) = default;
 
     void      update(void) override;
@@ -45,9 +45,9 @@ private:
     float   m_startYPos = 0.0;
     STATE_t m_state     = PLAYABLE;
 
-    std::function<void(Vector2)> m_shootLaser;
-    std::shared_ptr<Timer>       m_invisibleTimer  = nullptr;
-    std::shared_ptr<Timer>       m_invincibleTimer = nullptr;
+    std::function<void(Sprite::SpriteAttr_t)> m_shootLaser;
+    std::shared_ptr<Timer>                    m_invisibleTimer  = nullptr;
+    std::shared_ptr<Timer>                    m_invincibleTimer = nullptr;
 };
 
 #endif // PLAYER_H

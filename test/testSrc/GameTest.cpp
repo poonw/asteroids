@@ -4,6 +4,7 @@
 #include <memory>
 #include "GameSettings.h"
 #include "RaylibMock.h"
+#include "SpriteFactoryFake.h"
 #include "SpriteMock.h"
 
 using ::testing::_;
@@ -21,47 +22,17 @@ namespace GameTest
 class GameTest : public ::testing::Test
 {
 public:
-    std::shared_ptr<Game>                                m_Game       = nullptr;
-    std::shared_ptr<RaylibMock>                          m_raylibMock = nullptr;
-    std::shared_ptr<SpriteMock>                          m_playerMock = nullptr;
-    std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starMocksList;
-    std::shared_ptr<NiceMock<SpriteMock>>                m_laserMock     = nullptr;
-    std::shared_ptr<NiceMock<SpriteMock>>                m_meteorMock    = nullptr;
-    std::shared_ptr<NiceMock<SpriteMock>>                m_explosionMock = nullptr;
-
-    std::shared_ptr<SpriteMock> createLaser(std::shared_ptr<RaylibInterface> raylibPtr,
-                                            Vector2                          position)
-    {
-        m_laserMock = std::make_shared<NiceMock<SpriteMock>>();
-        return (std::dynamic_pointer_cast<SpriteMock>(m_laserMock));
-    }
-
-    std::shared_ptr<SpriteMock> createMeteor(std::shared_ptr<RaylibInterface> raylibPtr)
-    {
-        m_meteorMock = std::make_shared<NiceMock<SpriteMock>>();
-        return (std::dynamic_pointer_cast<SpriteMock>(m_meteorMock));
-    }
-
-    std::shared_ptr<SpriteMock> explodeMeteor(std::shared_ptr<RaylibInterface> raylibPtr,
-                                              Vector2                          position,
-                                              float                            scale)
-    {
-        m_explosionMock = std::make_shared<NiceMock<SpriteMock>>();
-        return (std::dynamic_pointer_cast<SpriteMock>(m_explosionMock));
-    }
+    std::shared_ptr<Game>              m_Game              = nullptr;
+    std::shared_ptr<RaylibMock>        m_raylibMock        = nullptr;
+    std::shared_ptr<SpriteFactoryFake> m_spriteFactoryFake = nullptr;
 
     void SetUp(void)
     {
-        m_raylibMock = std::make_shared<RaylibMock>();
-        m_playerMock = std::make_shared<SpriteMock>();
-        ASSERT_TRUE(m_raylibMock != nullptr);
-        ASSERT_TRUE(m_playerMock != nullptr);
+        m_raylibMock        = std::make_shared<RaylibMock>();
+        m_spriteFactoryFake = std::make_shared<SpriteFactoryFake>();
 
-        for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-        {
-            m_starMocksList[n] = std::make_shared<SpriteMock>();
-            ASSERT_TRUE(m_starMocksList[n] != nullptr);
-        }
+        ASSERT_TRUE(m_raylibMock != nullptr);
+        ASSERT_TRUE(m_spriteFactoryFake != nullptr);
 
         EXPECT_CALL((*m_raylibMock), initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Asteroids"))
             .Times(Exactly(1))
@@ -97,24 +68,13 @@ public:
         EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Quit", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
 
         EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
+        EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
 
-        std::function<std::shared_ptr<SpriteMock>(
-            std::shared_ptr<RaylibInterface> raylibPtr)>
-            f_createMeteor = std::bind(&GameTest::createMeteor, this, std::placeholders::_1);
+        m_Game = std::make_shared<Game>(m_raylibMock, m_spriteFactoryFake);
 
-        std::function<std::shared_ptr<SpriteMock>(
-            std::shared_ptr<RaylibInterface> raylibPtr,
-            Vector2                          position)>
-            f_createLaser = std::bind(&GameTest::createLaser, this, std::placeholders::_1, std::placeholders::_2);
-
-        std::function<std::shared_ptr<SpriteMock>(
-            std::shared_ptr<RaylibInterface> raylibPtr,
-            Vector2                          position,
-            float                            scale)>
-            f_explodeMeteor = std::bind(&GameTest::explodeMeteor, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-
-        m_Game = std::make_shared<Game>(m_raylibMock, f_createLaser, f_createMeteor, f_explodeMeteor);
         ASSERT_TRUE(m_Game != nullptr);
+        ASSERT_TRUE(m_spriteFactoryFake->m_playerMocksList.size() == 1);
+        ASSERT_TRUE(m_spriteFactoryFake->m_starMocksList.size() == NUMBER_OF_STARS);
     }
 
     void TearDown(void)
@@ -124,52 +84,25 @@ public:
         EXPECT_CALL((*m_raylibMock), unloadFont(A<Font>())).Times(Exactly(1)).InSequence(seq);
         EXPECT_CALL((*m_raylibMock), unloadTexture(A<Texture2D>())).Times(Exactly(32)).InSequence(seq);
         EXPECT_CALL((*m_raylibMock), closeAudioDevice()).Times(Exactly(1)).InSequence(seq);
-        EXPECT_CALL((*m_raylibMock), closeWindow()).Times(Exactly(1)).InSequence(seq);
 
         Mock::VerifyAndClearExpectations(&m_raylibMock);
     }
 };
 
-TEST_F(GameTest, playerIsNotSet)
-{
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
-    m_Game->setStarsList(m_starMocksList);
-    EXPECT_DEATH(m_Game->run(), "Assertion failed");
-}
-
-TEST_F(GameTest, starsAreNotSet)
-{
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-
-    m_Game->setPlayer(m_playerMock);
-    EXPECT_DEATH(m_Game->run(), "Assertion failed");
-}
-
 TEST_F(GameTest, loopWithOnlyPlayerAndStars)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::PLAYING);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
 
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
@@ -177,9 +110,9 @@ TEST_F(GameTest, loopWithOnlyPlayerAndStars)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -201,40 +134,33 @@ TEST_F(GameTest, loopWithOnlyPlayerAndStars)
 
 TEST_F(GameTest, playerMeteorNoCollisionTest)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::PLAYING);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
     m_Game->createMeteor();
 
-    EXPECT_NE(m_meteorMock, nullptr);
+    EXPECT_TRUE(m_spriteFactoryFake->m_meteorMocksList.size() == 1);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
 
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
-    EXPECT_CALL((*m_meteorMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), update()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
-    EXPECT_CALL((*m_meteorMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -251,10 +177,10 @@ TEST_F(GameTest, playerMeteorNoCollisionTest)
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
 
-    EXPECT_CALL((*m_meteorMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_meteorMock), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(false));
@@ -264,38 +190,33 @@ TEST_F(GameTest, playerMeteorNoCollisionTest)
 
 TEST_F(GameTest, playerMeteorCollisionTest)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::PLAYING);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
     m_Game->createMeteor();
+
+    EXPECT_TRUE(m_spriteFactoryFake->m_meteorMocksList.size() == 1);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
 
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
-    EXPECT_CALL((*m_meteorMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), update()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
-    EXPECT_CALL((*m_meteorMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -312,14 +233,14 @@ TEST_F(GameTest, playerMeteorCollisionTest)
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
 
-    EXPECT_CALL((*m_meteorMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_meteorMock), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(true));
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
 
     m_Game->run();
@@ -327,46 +248,38 @@ TEST_F(GameTest, playerMeteorCollisionTest)
 
 TEST_F(GameTest, meteorLaserNoCollisionTest)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-    EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
-
     m_Game->setState(Game::PLAYING);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
     m_Game->createMeteor();
-    Vector2 dummyPosition(0, 0);
-    m_Game->shootLaser(dummyPosition);
+    Sprite::SpriteAttr_t attr;
+    m_Game->playerShootLaser(attr);
 
-    EXPECT_NE(m_meteorMock, nullptr);
-    EXPECT_NE(m_laserMock, nullptr);
+    EXPECT_TRUE(m_spriteFactoryFake->m_meteorMocksList.size() == 1);
+    EXPECT_TRUE(m_spriteFactoryFake->m_playerLaserMocksList.size() == 1);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
 
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
-    EXPECT_CALL((*m_laserMock), update()).InSequence(seq);
-    EXPECT_CALL((*m_meteorMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerLaserMocksList[0])), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), update()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
-    EXPECT_CALL((*m_laserMock), draw()).InSequence(seq);
-    EXPECT_CALL((*m_meteorMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerLaserMocksList[0])), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -386,61 +299,53 @@ TEST_F(GameTest, meteorLaserNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), checkCollisionCircleRec(A<Vector2>(), A<float>(), A<Rectangle>()))
         .InSequence(seq)
         .WillOnce(Return(false));
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(false));
 
     m_Game->run();
 
-    EXPECT_FALSE(m_laserMock->m_discard);
-    EXPECT_FALSE(m_meteorMock->m_discard);
-    EXPECT_EQ(m_explosionMock, nullptr);
+    EXPECT_FALSE((m_spriteFactoryFake->m_playerLaserMocksList[0])->m_discard);
+    EXPECT_FALSE((m_spriteFactoryFake->m_meteorMocksList[0])->m_discard);
+    EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 0);
 }
 
 TEST_F(GameTest, meteorLaserCollisionTest)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-    EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
-
     m_Game->setState(Game::PLAYING);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
     m_Game->createMeteor();
-    Vector2 dummyPosition(0, 0);
-    m_Game->shootLaser(dummyPosition);
+    Sprite::SpriteAttr_t attr;
+    m_Game->playerShootLaser(attr);
 
-    EXPECT_NE(m_meteorMock, nullptr);
-    EXPECT_NE(m_laserMock, nullptr);
+    EXPECT_TRUE(m_spriteFactoryFake->m_meteorMocksList.size() == 1);
+    EXPECT_TRUE(m_spriteFactoryFake->m_playerLaserMocksList.size() == 1);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
 
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
-    EXPECT_CALL((*m_laserMock), update()).InSequence(seq);
-    EXPECT_CALL((*m_meteorMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerLaserMocksList[0])), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), update()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
-    EXPECT_CALL((*m_laserMock), draw()).InSequence(seq);
-    EXPECT_CALL((*m_meteorMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerLaserMocksList[0])), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -461,30 +366,22 @@ TEST_F(GameTest, meteorLaserCollisionTest)
         .InSequence(seq)
         .WillOnce(Return(true));
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMocksList[0])), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(false));
 
     m_Game->run();
 
-    EXPECT_TRUE(m_laserMock->m_discard);
-    EXPECT_TRUE(m_meteorMock->m_discard);
-    EXPECT_NE(m_explosionMock, nullptr);
+    EXPECT_TRUE((m_spriteFactoryFake->m_playerLaserMocksList[0])->m_discard);
+    EXPECT_TRUE((m_spriteFactoryFake->m_meteorMocksList[0])->m_discard);
+    EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 1);
 }
 
 TEST_F(GameTest, settingsPage_mouseNotPointingToBackButton)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::SETTINGS);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -492,7 +389,7 @@ TEST_F(GameTest, settingsPage_mouseNotPointingToBackButton)
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -505,7 +402,7 @@ TEST_F(GameTest, settingsPage_mouseNotPointingToBackButton)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), A<float>(), A<int>(), A<Color>())).InSequence(seq);
@@ -555,15 +452,7 @@ TEST_F(GameTest, settingsPage_mouseNotPointingToBackButton)
 
 TEST_F(GameTest, settingsPage_mousePointingToBackButtonButNotClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::SETTINGS);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -571,7 +460,7 @@ TEST_F(GameTest, settingsPage_mousePointingToBackButtonButNotClick)
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -586,7 +475,7 @@ TEST_F(GameTest, settingsPage_mousePointingToBackButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), A<float>(), A<int>(), A<Color>())).InSequence(seq);
@@ -636,15 +525,7 @@ TEST_F(GameTest, settingsPage_mousePointingToBackButtonButNotClick)
 
 TEST_F(GameTest, settingsPage_mousePointingToBackButtonAndClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::SETTINGS);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -652,7 +533,7 @@ TEST_F(GameTest, settingsPage_mousePointingToBackButtonAndClick)
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -667,7 +548,7 @@ TEST_F(GameTest, settingsPage_mousePointingToBackButtonAndClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), A<float>(), A<int>(), A<Color>())).InSequence(seq);
@@ -717,15 +598,7 @@ TEST_F(GameTest, settingsPage_mousePointingToBackButtonAndClick)
 
 TEST_F(GameTest, welcomePage_mousePointingToNothing)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::WELCOME);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -733,7 +606,7 @@ TEST_F(GameTest, welcomePage_mousePointingToNothing)
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -750,7 +623,7 @@ TEST_F(GameTest, welcomePage_mousePointingToNothing)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
@@ -792,15 +665,7 @@ TEST_F(GameTest, welcomePage_mousePointingToNothing)
 
 TEST_F(GameTest, welcomePage_mousePointingToStartButtonButNotClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::WELCOME);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -808,7 +673,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonButNotClick)
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -827,7 +692,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
@@ -869,15 +734,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonButNotClick)
 
 TEST_F(GameTest, welcomePage_mousePointingToStartButtonAndClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::WELCOME);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -885,7 +742,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonAndClick)
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -904,7 +761,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonAndClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
@@ -946,15 +803,7 @@ TEST_F(GameTest, welcomePage_mousePointingToStartButtonAndClick)
 
 TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonButNotClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::WELCOME);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -962,7 +811,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonButNotClick)
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -981,7 +830,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
@@ -1025,15 +874,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonButNotClick)
 
 TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonAndClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::WELCOME);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -1041,7 +882,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonAndClick)
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -1060,7 +901,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonAndClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
@@ -1104,15 +945,7 @@ TEST_F(GameTest, welcomePage_mousePointingToSettingsButtonAndClick)
 
 TEST_F(GameTest, welcomePage_mousePointingToQuitButtonButNotClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::WELCOME);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -1120,7 +953,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonButNotClick)
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -1139,7 +972,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
@@ -1183,15 +1016,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonButNotClick)
 
 TEST_F(GameTest, welcomePage_mousePointingToQuitButtonAndClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::WELCOME);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -1200,7 +1025,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonAndClick)
 
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -1219,7 +1044,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonAndClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Asteroids",
@@ -1264,15 +1089,7 @@ TEST_F(GameTest, welcomePage_mousePointingToQuitButtonAndClick)
 
 TEST_F(GameTest, gameoverPage_mousePointingToNothing)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::GAME_OVER);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -1282,7 +1099,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToNothing)
     //loop 1
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
@@ -1290,7 +1107,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToNothing)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Game Over",
@@ -1304,7 +1121,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToNothing)
     //loop 2
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
@@ -1315,7 +1132,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToNothing)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Game Over",
@@ -1347,15 +1164,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToNothing)
 
 TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonButNotClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::GAME_OVER);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -1365,7 +1174,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonButNotClick)
     //loop 1
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
@@ -1373,7 +1182,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Game Over",
@@ -1387,7 +1196,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonButNotClick)
     //loop 2
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(true));
@@ -1400,7 +1209,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Game Over",
@@ -1432,15 +1241,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonButNotClick)
 
 TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonAndClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::GAME_OVER);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -1450,7 +1251,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonAndClick)
     //loop 1
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
@@ -1458,7 +1259,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonAndClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Game Over",
@@ -1472,7 +1273,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonAndClick)
     //loop 2
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(true));
@@ -1485,7 +1286,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonAndClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Game Over",
@@ -1517,15 +1318,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToRetryButtonAndClick)
 
 TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonButNotClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::GAME_OVER);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -1535,7 +1328,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonButNotClick)
     //loop 1
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
@@ -1543,7 +1336,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Game Over",
@@ -1557,7 +1350,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonButNotClick)
     //loop 2
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
@@ -1570,7 +1363,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Game Over",
@@ -1602,15 +1395,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonButNotClick)
 
 TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonAndClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(_)).InSequence(seq);
-    for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
-    {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), setTextures(_)).InSequence(seq);
-    }
-
     m_Game->setState(Game::GAME_OVER);
-    m_Game->setPlayer(m_playerMock);
-    m_Game->setStarsList(m_starMocksList);
 
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
@@ -1620,7 +1405,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonAndClick)
     //loop 1
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
@@ -1628,7 +1413,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonAndClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Game Over",
@@ -1642,7 +1427,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonAndClick)
     //loop 2
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), update()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
@@ -1655,7 +1440,7 @@ TEST_F(GameTest, gameoverPage_mousePointingToQuitButtonAndClick)
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
-        EXPECT_CALL((*(std::dynamic_pointer_cast<SpriteMock>(m_starMocksList[n]))), draw()).InSequence(seq);
+        EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Game Over",

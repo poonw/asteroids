@@ -4,8 +4,8 @@
 #include "GameSettings.h"
 #include "Timer.h"
 
-Player::Player(std::shared_ptr<RaylibInterface> raylibPtr,
-               std::function<void(Vector2)>     shootLaser)
+Player::Player(std::shared_ptr<RaylibInterface>          raylibPtr,
+               std::function<void(Sprite::SpriteAttr_t)> shootLaser)
 {
     assert(raylibPtr->isWindowReady());
     assert(shootLaser);
@@ -30,10 +30,13 @@ void Player::input(void)
 
     if (m_raylibPtr->isKeyPressed(KEY_SPACE))
     {
-        Vector2 laserPos;
-        laserPos.x = m_position.x + (m_textures[0].width / 2);
-        laserPos.y = m_position.y - (m_textures[0].height / 2);
-        m_shootLaser(laserPos);
+        Sprite::SpriteAttr_t laserAttr;
+        laserAttr.m_position.x = m_position.x + (m_textures[0].width / 2);
+        laserAttr.m_position.y = m_position.y - (m_textures[0].height / 2);
+        laserAttr.m_direction  = {0, -1};
+        laserAttr.m_rotation   = 180;
+        laserAttr.m_color      = WHITE;
+        m_shootLaser(laserAttr);
     }
 }
 

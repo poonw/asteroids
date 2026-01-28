@@ -6,7 +6,7 @@ ifeq ($(config),debug)
   COMPILECONFIG := -O0 -DDEBUG_
 
 else ifeq ($(config),release)
-  COMPILECONFIG := -O3
+  COMPILECONFIG := -O3 -Wall
 
 else
   $(error "invalid configuration $(config)")
@@ -25,9 +25,8 @@ endif
 
 DEFINEFLAGS := $(DFLAGS:%=-D%)
 CXX := g++
-CXXFLAGS := -g -std=c++20 -Wall -Wextra -Werror $(COMPILECONFIG) -pthread $(DEFINEFLAGS)
-TESTFLAGS := -g -std=c++20 -Wextra -Werror $(COMPILECONFIG) -pthread $(DEFINEFLAGS)
-TESTCOVERAGEFLAGS := $(TESTFLAGS) -fprofile-arcs -ftest-coverage
+CXXFLAGS := -g -std=c++20 -Wextra -Werror $(COMPILECONFIG) -pthread $(DEFINEFLAGS)
+TESTCOVERAGEFLAGS := $(CXXFLAGS) -fprofile-arcs -ftest-coverage
 
 CC := gcc
 CCFLAGS := -g $(DEFINEFLAGS)
@@ -84,7 +83,7 @@ $(OBJDIR)/%.o : $(CXXSRC)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 test: $(GOOGLETESTBIN) $(TESTOBJDIR) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS)
-	$(CXX) $(INCLUDE) $(TESTINCLUDE) $(TESTFLAGS) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS) -o $(TESTTARGET) $(TESTLIBS) $(LIBS)
+	$(CXX) $(INCLUDE) $(TESTINCLUDE) $(CXXFLAGS) $(TESTOBJS) $(TESTSRCOBJS) $(MOCKOBJS) -o $(TESTTARGET) $(TESTLIBS) $(LIBS)
 	@echo make test successful
 
 $(GOOGLETESTBIN):
@@ -116,13 +115,13 @@ $(TESTOBJDIR):
 	mkdir -p $(TESTOBJDIR)
 
 $(TESTOBJDIR)/%.o : $(CXXSRC)/%.cpp
-	$(CXX) $(TESTFLAGS) $(INCLUDE) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 $(TESTOBJDIR)/%.o : $(TESTSRC)/%.cpp
-	$(CXX) $(TESTFLAGS) $(INCLUDE) $(TESTINCLUDE) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(TESTINCLUDE) -c $< -o $@
 
 $(TESTOBJDIR)/%.o : $(MOCKSRC)/%.cpp
-	$(CXX) $(TESTFLAGS) $(INCLUDE) $(TESTINCLUDE) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(TESTINCLUDE) -c $< -o $@
 
 clean:
 	rm -f $(TARGET)
