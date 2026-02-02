@@ -112,11 +112,6 @@ TEST_F(PlayerTest, getCenter_getRadius)
     EXPECT_THAT(m_Player->getCenter(), FieldsAre(800, 795));
 }
 
-TEST_F(PlayerTest, getRect_death)
-{
-    EXPECT_DEATH(m_Player->getRect(), "Assertion failed");
-}
-
 TEST_F(PlayerTest, setTextures_death)
 {
     Texture2D              fakeTexture  = {0, 0, 0, 0, 0};

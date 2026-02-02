@@ -12,10 +12,10 @@ public:
     enum SpriteType
     {
         EXPLOSION,
-        LASER,
+        RED_LASER,
+        YELLOW_LASER,
         METEOR,
         OPPONENT,
-        PLAYER,
         STAR,
         UNDEFINED
     };

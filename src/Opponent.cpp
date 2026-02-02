@@ -2,7 +2,6 @@
 #include <cassert>
 #include <random>
 #include "GameSettings.h"
-#include "Timer.h"
 
 Opponent::Opponent(std::shared_ptr<RaylibInterface>          raylibPtr,
                    std::function<void(Sprite::SpriteAttr_t)> shootLaser)
@@ -38,7 +37,6 @@ void Opponent::move(void)
         Sprite::SpriteAttr_t laserAttr;
         laserAttr.m_position.x = m_position.x - (m_textures[0].width * 0.66);
         laserAttr.m_position.y = m_position.y - (m_textures[0].height * 0.66);
-        laserAttr.m_color      = YELLOW;
 
         laserAttr.m_direction = {0, 1};
         laserAttr.m_rotation  = 0;

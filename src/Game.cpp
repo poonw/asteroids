@@ -2,8 +2,7 @@
 #include <algorithm>
 #include <cassert>
 #include <format>
-#include "GameSettings.h"
-#include "Sprite.h"
+#include "PlayerInterface.h"
 #include "SpriteFactory.h"
 #include "Timer.h"
 
@@ -125,9 +124,6 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
                                               std::bind(&Game::createOpponent, this));
 
     Sprite::SpriteAttr_t attr;
-    m_player = m_factory->getSprite(SpriteFactory::PLAYER, m_raylibPtr, attr, std::bind(&Game::playerShootLaser, this, std::placeholders::_1));
-    m_player->setTextures(m_texturesMap["player"]);
-
     for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
     {
         m_starsList[index] = m_factory->getSprite(SpriteFactory::STAR, m_raylibPtr, attr);
@@ -143,6 +139,7 @@ Game::~Game(void)
 
 void Game::run(void)
 {
+    assert(m_player != nullptr);
     while (!m_raylibPtr->windowShouldClose())
     {
         switch (m_state)
@@ -174,9 +171,16 @@ void Game::run(void)
     }
 }
 
+void Game::setPlayer(std::shared_ptr<PlayerInterface> player)
+{
+    m_player = player;
+    m_player->setTextures(m_texturesMap["player"]);
+}
+
 void Game::playerShootLaser(Sprite::SpriteAttr_t attr)
 {
-    std::shared_ptr<Sprite> laserM = m_factory->getSprite(SpriteFactory::LASER, m_raylibPtr, attr);
+    assert(m_state == PLAYING);
+    std::shared_ptr<Sprite> laserM = m_factory->getSprite(SpriteFactory::RED_LASER, m_raylibPtr, attr);
     laserM->setTextures(m_texturesMap["laser"]);
     m_playerLasersList.push_back(laserM);
 
@@ -185,13 +189,15 @@ void Game::playerShootLaser(Sprite::SpriteAttr_t attr)
 
 void Game::opponentShootLaser(Sprite::SpriteAttr_t attr)
 {
-    std::shared_ptr<Sprite> laserM = m_factory->getSprite(SpriteFactory::LASER, m_raylibPtr, attr);
+    assert(m_state == PLAYING);
+    std::shared_ptr<Sprite> laserM = m_factory->getSprite(SpriteFactory::YELLOW_LASER, m_raylibPtr, attr);
     laserM->setTextures(m_texturesMap["laser"]);
     m_opponentLasersList.push_back(laserM);
 }
 
 void Game::createMeteor(void)
 {
+    assert(m_state == PLAYING);
     Sprite::SpriteAttr_t    attr;
     std::shared_ptr<Sprite> meteor = m_factory->getSprite(SpriteFactory::METEOR, m_raylibPtr, attr);
     meteor->setTextures(m_texturesMap["meteor"]);
@@ -200,6 +206,7 @@ void Game::createMeteor(void)
 
 void Game::createOpponent(void)
 {
+    assert(m_state == PLAYING);
     Sprite::SpriteAttr_t    attr;
     std::shared_ptr<Sprite> opponent = m_factory->getSprite(SpriteFactory::OPPONENT,
                                                             m_raylibPtr,
@@ -399,6 +406,30 @@ void Game::discardSprites(void)
     }
 }
 
+void Game::discardAllSprites(void)
+{
+    for (auto it = m_playerLasersList.begin(); it != m_playerLasersList.end();)
+    {
+        it = m_playerLasersList.erase(it);
+    }
+    for (auto it = m_meteorsList.begin(); it != m_meteorsList.end();)
+    {
+        it = m_meteorsList.erase(it);
+    }
+    for (auto it = m_explosionsList.begin(); it != m_explosionsList.end();)
+    {
+        it = m_explosionsList.erase(it);
+    }
+    for (auto it = m_opponentsList.begin(); it != m_opponentsList.end();)
+    {
+        it = m_opponentsList.erase(it);
+    }
+    for (auto it = m_opponentLasersList.begin(); it != m_opponentLasersList.end();)
+    {
+        it = m_opponentLasersList.erase(it);
+    }
+}
+
 void Game::checkCollisions(void)
 {
     for (uint32_t ilaser = 0; ilaser < m_playerLasersList.size(); ilaser++)
@@ -592,6 +623,7 @@ void Game::drawSettingsText(void)
 
 void Game::gameoverReset(void)
 {
+    discardAllSprites();
     m_gameoverTextPosition.y = WINDOW_HEIGHT;
     m_lives                  = MAX_LIVES;
     m_score                  = 0;

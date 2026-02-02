@@ -4,7 +4,6 @@
 #include "Laser.h"
 #include "Meteor.h"
 #include "Opponent.h"
-#include "Player.h"
 #include "Star.h"
 
 SpriteFactory::SpriteFactory(void)
@@ -28,12 +27,20 @@ std::shared_ptr<Sprite> SpriteFactory::getSprite(SpriteType                     
             ret = std::make_shared<Explosion>(raylibPtr, attr.m_position, attr.m_scale);
             break;
 
-        case LASER:
+        case RED_LASER:
             ret = std::make_shared<Laser>(raylibPtr,
                                           attr.m_position,
                                           attr.m_direction,
                                           attr.m_rotation,
-                                          attr.m_color);
+                                          WHITE);
+            break;
+
+        case YELLOW_LASER:
+            ret = std::make_shared<Laser>(raylibPtr,
+                                          attr.m_position,
+                                          attr.m_direction,
+                                          attr.m_rotation,
+                                          YELLOW);
             break;
 
         case METEOR:
@@ -42,11 +49,6 @@ std::shared_ptr<Sprite> SpriteFactory::getSprite(SpriteType                     
 
         case OPPONENT:
             ret = std::make_shared<Opponent>(raylibPtr, shootLaser);
-            break;
-
-        case PLAYER:
-            assert(shootLaser != nullptr);
-            ret = std::make_shared<Player>(raylibPtr, shootLaser);
             break;
 
         case STAR:
