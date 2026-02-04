@@ -5,8 +5,6 @@
 #include "RaylibInterface.h"
 #include "Sprite.h"
 
-class Timer;
-
 class Opponent : public Sprite
 {
 public:
@@ -25,7 +23,6 @@ private:
     void move(void);
 
     std::function<void(Sprite::SpriteAttr_t)> m_shootLaser;
-    std::shared_ptr<Timer>                    m_shootingTimer   = nullptr;
     Vector2                                   m_direction       = {0, 0};
     float                                     m_speed           = 0;
     float                                     m_radius          = 0;

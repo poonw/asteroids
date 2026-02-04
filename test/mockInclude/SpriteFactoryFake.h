@@ -19,7 +19,6 @@ public:
                                       Sprite::SpriteAttr_t                      attr,
                                       std::function<void(Sprite::SpriteAttr_t)> shootLaser = nullptr);
 
-    std::vector<std::shared_ptr<NiceMock<SpriteMock>>> m_playerMocksList;
     std::vector<std::shared_ptr<NiceMock<SpriteMock>>> m_starMocksList;
     std::vector<std::shared_ptr<NiceMock<SpriteMock>>> m_playerLaserMocksList;
     std::vector<std::shared_ptr<NiceMock<SpriteMock>>> m_meteorMocksList;

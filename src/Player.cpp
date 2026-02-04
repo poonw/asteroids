@@ -13,11 +13,12 @@ Player::Player(std::shared_ptr<RaylibInterface>          raylibPtr,
     m_shootLaser = shootLaser;
     m_speed      = PLAYER_SPEED;
 
-    std::function<void(void)> renderVisibleCallback  = std::bind(&Player::renderVisible, this);
+    std::function<void(void)> renderWarmupCallback   = std::bind(&Player::renderWarmup, this);
     std::function<void(void)> renderVincibleCallback = std::bind(&Player::renderPlayable, this);
 
-    m_invisibleTimer  = std::make_shared<Timer>(m_raylibPtr, 1, false, false, renderVisibleCallback);
-    m_invincibleTimer = std::make_shared<Timer>(m_raylibPtr, 4, false, false, renderVincibleCallback);
+    m_invisibleTimer  = std::make_shared<Timer>(m_raylibPtr, 1, false, false, renderWarmupCallback);
+    m_warmupTimer     = std::make_shared<Timer>(m_raylibPtr, 4, false, false, renderVincibleCallback);
+    m_invincibleTimer = std::make_shared<Timer>(m_raylibPtr, 10, false, false, renderVincibleCallback);
 
     m_state   = PLAYABLE;
     m_discard = true;
@@ -35,7 +36,6 @@ void Player::input(void)
         laserAttr.m_position.y = m_position.y - (m_textures[0].height / 2);
         laserAttr.m_direction  = {0, -1};
         laserAttr.m_rotation   = 180;
-        laserAttr.m_color      = WHITE;
         m_shootLaser(laserAttr);
     }
 }
@@ -76,18 +76,19 @@ void Player::update(void)
             m_invisibleTimer->update();
             break;
 
-        case VISIBLE:
+        case MOVE_IN:
             moveIntoWindow();
             break;
 
-        case INVINCIBLE:
+        case WARMUP:
         {
             input();
             move();
-            m_invincibleTimer->update();
+            m_warmupTimer->update();
             break;
         }
 
+        case INVINCIBLE:
         default:
             assert(false);
             break;
@@ -107,7 +108,8 @@ void Player::draw(void)
         case INVISIBLE:
             break;
 
-        case VISIBLE:
+        case MOVE_IN:
+        case WARMUP:
         case INVINCIBLE:
             m_raylibPtr->drawTextureV(m_textures[0], m_position, DARKGRAY);
             break;
@@ -131,12 +133,6 @@ float Player::getRadius(void)
     return m_radius;
 }
 
-Rectangle Player::getRect(void)
-{
-    assert(false);
-    return (Rectangle(0, 0, 0, 0));
-}
-
 void Player::setTextures(std::vector<Texture2D> textures)
 {
     assert(textures.size() == 1);
@@ -152,28 +148,39 @@ void Player::setTextures(std::vector<Texture2D> textures)
     m_radius = (float)(std::min(m_textures[0].width, m_textures[0].height)) / 2;
 }
 
+void Player::setInvincible(void)
+{
+    m_invincible = true;
+    m_invincibleTimer->activate();
+}
+
+void Player::setDispersedlaser(void)
+{
+    m_dispersedLaser = true;
+}
+
 void Player::moveIntoWindow(void)
 {
-    assert(m_state == VISIBLE);
+    assert(m_state == MOVE_IN);
     float dt      = m_raylibPtr->getFrameTime();
     m_position.y += (-1) * m_speed * dt;
 
     if (m_position.y <= m_startYPos)
     {
-        m_state = INVINCIBLE;
+        m_state = WARMUP;
     }
 }
 
-void Player::renderVisible(void)
+void Player::renderWarmup(void)
 {
     assert(m_state == INVISIBLE);
-    m_state = VISIBLE;
-    m_invincibleTimer->activate();
+    m_state = MOVE_IN;
+    m_warmupTimer->activate();
 }
 
 void Player::renderPlayable(void)
 {
-    assert(m_state == INVINCIBLE);
+    assert(m_state == WARMUP);
     m_state   = PLAYABLE;
     m_discard = false;
 }

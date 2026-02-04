@@ -17,8 +17,8 @@ public:
         Color   m_color     = WHITE;
     } SpriteAttr_t;
 
-    Sprite(void);
-    virtual ~Sprite(void);
+    Sprite(void) {};
+    virtual ~Sprite(void) {};
 
     virtual void      update(void)                                 = 0;
     virtual void      draw(void)                                   = 0;

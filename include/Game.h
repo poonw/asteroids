@@ -11,6 +11,7 @@
 #include "RaylibInterface.h"
 #include "Sprite.h"
 
+class PlayerInterface;
 class SpriteFactory;
 class Timer;
 
@@ -30,6 +31,7 @@ public:
     ~Game(void);
 
     void run(void);
+    void setPlayer(std::shared_ptr<PlayerInterface> player);
     void playerShootLaser(Sprite::SpriteAttr_t attr);
     void opponentShootLaser(Sprite::SpriteAttr_t attr);
     void createMeteor(void);
@@ -57,6 +59,7 @@ private:
     void drawStars(void);
     void drawSprites(void);
     void discardSprites(void);
+    void discardAllSprites(void);
     void checkCollisions(void);
     void drawStats(void);
     void checkButtonUpdate(GameButton_t& button);
@@ -105,13 +108,16 @@ private:
     std::shared_ptr<Timer>                               m_meteorTimer   = nullptr;
     std::shared_ptr<Timer>                               m_rampdownTimer = nullptr;
     std::shared_ptr<Timer>                               m_opponentTimer = nullptr;
-    std::shared_ptr<Sprite>                              m_player        = nullptr;
+    std::shared_ptr<PlayerInterface>                     m_player        = nullptr;
     std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starsList;
     std::vector<std::shared_ptr<Sprite>>                 m_playerLasersList;
     std::vector<std::shared_ptr<Sprite>>                 m_meteorsList;
     std::vector<std::shared_ptr<Sprite>>                 m_explosionsList;
     std::vector<std::shared_ptr<Sprite>>                 m_opponentsList;
     std::vector<std::shared_ptr<Sprite>>                 m_opponentLasersList;
+    std::vector<std::shared_ptr<Sprite>>                 m_powerupExtralife;
+    std::vector<std::shared_ptr<Sprite>>                 m_powerupInvincibility;
+    std::vector<std::shared_ptr<Sprite>>                 m_powerupDispersedlaser;
 };
 
 #endif // GAME_H

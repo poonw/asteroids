@@ -22,8 +22,11 @@ std::shared_ptr<Sprite> SpriteFactoryFake::getSprite(SpriteType                 
             m_explosionMocksList.push_back(ret);
             break;
 
-        case LASER:
+        case RED_LASER:
             m_playerLaserMocksList.push_back(ret);
+            break;
+
+        case YELLOW_LASER:
             m_opponentLaserMocksList.push_back(ret);
             break;
 
@@ -33,10 +36,6 @@ std::shared_ptr<Sprite> SpriteFactoryFake::getSprite(SpriteType                 
 
         case OPPONENT:
             m_opponentMocksList.push_back(ret);
-            break;
-
-        case PLAYER:
-            m_playerMocksList.push_back(ret);
             break;
 
         case STAR:
