@@ -17,7 +17,7 @@ using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::Sequence;
 
-namespace GameGameoverStateTest
+namespace GameTest
 {
 class GameGameoverStateTest : public ::testing::Test
 {
@@ -470,4 +470,4 @@ TEST_F(GameGameoverStateTest, mousePointingToQuitButtonAndClickAndTransitionToQu
     m_Game->run();
 }
 
-} // namespace GameGameoverStateTest
+} // namespace GameTest

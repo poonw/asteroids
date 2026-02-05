@@ -17,7 +17,7 @@ using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::Sequence;
 
-namespace GamePlayingStateTest
+namespace GameTest
 {
 class GamePlayingStateTest : public ::testing::Test
 {
@@ -1198,4 +1198,4 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     m_Game->run();
 }
 
-} // namespace GamePlayingStateTest
+} // namespace GameTest

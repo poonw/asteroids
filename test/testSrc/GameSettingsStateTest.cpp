@@ -17,7 +17,7 @@ using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::Sequence;
 
-namespace GameSettingsStateTest
+namespace GameTest
 {
 class GameSettingsStateTest : public ::testing::Test
 {
@@ -308,4 +308,4 @@ TEST_F(GameSettingsStateTest, mousePointingToBackButtonAndClickAndTransitionToWe
     m_Game->run();
 }
 
-} // namespace GameSettingsStateTest
+} // namespace GameTest
