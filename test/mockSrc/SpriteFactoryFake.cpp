@@ -42,6 +42,10 @@ std::shared_ptr<Sprite> SpriteFactoryFake::getSprite(SpriteType                 
             m_starMocksList.push_back(ret);
             break;
 
+        case POWERUP:
+            m_dispersionMocksList.push_back(ret);
+            break;
+
         case UNDEFINED:
         default:
             break;

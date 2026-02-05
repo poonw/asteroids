@@ -4,6 +4,7 @@
 #include "Laser.h"
 #include "Meteor.h"
 #include "Opponent.h"
+#include "Powerup.h"
 #include "Star.h"
 
 SpriteFactory::SpriteFactory(void)
@@ -53,6 +54,10 @@ std::shared_ptr<Sprite> SpriteFactory::getSprite(SpriteType                     
 
         case STAR:
             ret = std::make_shared<Star>(raylibPtr);
+            break;
+
+        case POWERUP:
+            ret = std::make_shared<Powerup>(raylibPtr);
             break;
 
         case UNDEFINED:

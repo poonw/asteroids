@@ -17,83 +17,31 @@ using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::Sequence;
 
-namespace GameSettingsStateTest
+namespace GameTest
 {
+extern Sequence                           seq;
+extern std::shared_ptr<Game>              m_Game;
+extern std::shared_ptr<RaylibMock>        m_raylibMock;
+extern std::shared_ptr<SpriteFactoryFake> m_spriteFactoryFake;
+extern std::shared_ptr<PlayerMock>        m_playerMock;
+
+extern void gameCommonSetup(void);
+extern void gameCommonTeardown(void);
+
 class GameSettingsStateTest : public ::testing::Test
 {
 public:
-    Sequence                           seq;
-    std::shared_ptr<Game>              m_Game              = nullptr;
-    std::shared_ptr<RaylibMock>        m_raylibMock        = nullptr;
-    std::shared_ptr<SpriteFactoryFake> m_spriteFactoryFake = nullptr;
-    std::shared_ptr<PlayerMock>        m_playerMock        = nullptr;
-
     void SetUp(void)
     {
-        m_raylibMock        = std::make_shared<RaylibMock>();
-        m_spriteFactoryFake = std::make_shared<SpriteFactoryFake>();
-        m_playerMock        = std::make_shared<PlayerMock>();
-
-        ASSERT_TRUE(m_raylibMock != nullptr);
-        ASSERT_TRUE(m_spriteFactoryFake != nullptr);
-        ASSERT_TRUE(m_playerMock != nullptr);
-
-        EXPECT_CALL((*m_raylibMock), initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Asteroids"))
-            .Times(Exactly(1))
-            .InSequence(seq);
-
-        EXPECT_CALL((*m_raylibMock), initAudioDevice())
-            .Times(Exactly(1))
-            .InSequence(seq);
-
-        EXPECT_CALL((*m_raylibMock), loadTexture(A<std::string>()))
-            .Times(Exactly(32))
-            .InSequence(seq);
-
-        EXPECT_CALL((*m_raylibMock), loadFontEx(_, _, _, _))
-            .Times(Exactly(1))
-            .InSequence(seq);
-
-        EXPECT_CALL((*m_raylibMock), loadSound(A<std::string>()))
-            .Times(Exactly(3))
-            .InSequence(seq);
-
-        EXPECT_CALL((*m_raylibMock), loadMusicStream(A<std::string>()))
-            .Times(Exactly(1))
-            .InSequence(seq);
-
-        EXPECT_CALL((*m_raylibMock), playMusicStream(A<Music>()))
-            .Times(Exactly(1))
-            .InSequence(seq);
-
-        EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Back", (MENU_ITEM_FONTSIZE + 10), 0)).InSequence(seq);
-        EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Game Over", GAME_OVER_FONTSIZE, 0)).InSequence(seq);
-        EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Retry", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
-        EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Quit", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
-
-        EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-        EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-
-        m_Game = std::make_shared<Game>(m_raylibMock, m_spriteFactoryFake);
-
-        ASSERT_TRUE(m_Game != nullptr);
-        ASSERT_TRUE(m_spriteFactoryFake->m_starMocksList.size() == NUMBER_OF_STARS);
-
+        gameCommonSetup();
         m_Game->setState(Game::SETTINGS);
-
         EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
         m_Game->setPlayer(m_playerMock);
     }
 
     void TearDown(void)
     {
-        EXPECT_CALL((*m_raylibMock), unloadMusicStream(A<Music>())).Times(Exactly(1)).InSequence(seq);
-        EXPECT_CALL((*m_raylibMock), unloadSound(A<Sound>())).Times(Exactly(3)).InSequence(seq);
-        EXPECT_CALL((*m_raylibMock), unloadFont(A<Font>())).Times(Exactly(1)).InSequence(seq);
-        EXPECT_CALL((*m_raylibMock), unloadTexture(A<Texture2D>())).Times(Exactly(32)).InSequence(seq);
-        EXPECT_CALL((*m_raylibMock), closeAudioDevice()).Times(Exactly(1)).InSequence(seq);
-
-        Mock::VerifyAndClearExpectations(&m_raylibMock);
+        gameCommonTeardown();
     }
 };
 
@@ -308,4 +256,4 @@ TEST_F(GameSettingsStateTest, mousePointingToBackButtonAndClickAndTransitionToWe
     m_Game->run();
 }
 
-} // namespace GameSettingsStateTest
+} // namespace GameTest

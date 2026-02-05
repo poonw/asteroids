@@ -25,6 +25,7 @@ public:
     std::vector<std::shared_ptr<NiceMock<SpriteMock>>> m_explosionMocksList;
     std::vector<std::shared_ptr<NiceMock<SpriteMock>>> m_opponentMocksList;
     std::vector<std::shared_ptr<NiceMock<SpriteMock>>> m_opponentLaserMocksList;
+    std::vector<std::shared_ptr<NiceMock<SpriteMock>>> m_dispersionMocksList;
 };
 
 #endif // SPRITEFACTORYFAKE_H

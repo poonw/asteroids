@@ -17,6 +17,7 @@ public:
         METEOR,
         OPPONENT,
         STAR,
+        POWERUP,
         UNDEFINED
     };
 

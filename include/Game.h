@@ -36,6 +36,7 @@ public:
     void opponentShootLaser(Sprite::SpriteAttr_t attr);
     void createMeteor(void);
     void createOpponent(void);
+    void createPowerupDispersion(void);
 #ifdef DEBUG_
     void setState(STATE_t state);
 #endif
@@ -83,6 +84,9 @@ private:
     Sound m_explosionSound;
     Sound m_laserSound;
     Sound m_selectSound;
+    Sound m_dispersionSound;
+    Sound m_invincibilitySound;
+    Sound m_extralifeSound;
     Music m_backGroundMusic;
 
     // welcome page
@@ -103,21 +107,22 @@ private:
     float        m_gameoverTextMaxHeight = 0;
 
     // playing page
-    uint32_t                                             m_score         = 0;
-    uint32_t                                             m_lives         = MAX_LIVES;
-    std::shared_ptr<Timer>                               m_meteorTimer   = nullptr;
-    std::shared_ptr<Timer>                               m_rampdownTimer = nullptr;
-    std::shared_ptr<Timer>                               m_opponentTimer = nullptr;
-    std::shared_ptr<PlayerInterface>                     m_player        = nullptr;
+    uint32_t                                             m_score           = 0;
+    uint32_t                                             m_lives           = MAX_LIVES;
+    std::shared_ptr<PlayerInterface>                     m_player          = nullptr;
+    std::shared_ptr<Timer>                               m_meteorTimer     = nullptr;
+    std::shared_ptr<Timer>                               m_rampdownTimer   = nullptr;
+    std::shared_ptr<Timer>                               m_opponentTimer   = nullptr;
+    std::shared_ptr<Timer>                               m_dispersionTimer = nullptr;
     std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starsList;
     std::vector<std::shared_ptr<Sprite>>                 m_playerLasersList;
     std::vector<std::shared_ptr<Sprite>>                 m_meteorsList;
     std::vector<std::shared_ptr<Sprite>>                 m_explosionsList;
     std::vector<std::shared_ptr<Sprite>>                 m_opponentsList;
     std::vector<std::shared_ptr<Sprite>>                 m_opponentLasersList;
-    std::vector<std::shared_ptr<Sprite>>                 m_powerupExtralife;
-    std::vector<std::shared_ptr<Sprite>>                 m_powerupInvincibility;
-    std::vector<std::shared_ptr<Sprite>>                 m_powerupDispersedlaser;
+    std::vector<std::shared_ptr<Sprite>>                 m_dispersionsList;
+    std::vector<std::shared_ptr<Sprite>>                 m_invincibilitiesList;
+    std::vector<std::shared_ptr<Sprite>>                 m_extralifesList;
 };
 
 #endif // GAME_H

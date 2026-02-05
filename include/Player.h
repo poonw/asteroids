@@ -26,6 +26,7 @@ public:
 private:
     void input(void);
     void move(void);
+    void resetDispersedlaser(void);
     void moveIntoWindow(void);
     void renderWarmup(void);
     void renderPlayable(void);
@@ -46,9 +47,9 @@ private:
     STATE_t m_state     = PLAYABLE;
 
     std::function<void(Sprite::SpriteAttr_t)> m_shootLaser;
-    std::shared_ptr<Timer>                    m_invisibleTimer  = nullptr;
-    std::shared_ptr<Timer>                    m_warmupTimer     = nullptr;
-    std::shared_ptr<Timer>                    m_invincibleTimer = nullptr;
+    std::shared_ptr<Timer>                    m_invisibleTimer      = nullptr;
+    std::shared_ptr<Timer>                    m_warmupTimer         = nullptr;
+    std::shared_ptr<Timer>                    m_dispersedLaserTimer = nullptr;
 };
 
 #endif // PLAYER_H
