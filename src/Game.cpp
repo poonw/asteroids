@@ -118,10 +118,16 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
                                               std::bind(&Game::gameoverReset, this));
 
     m_opponentTimer = std::make_shared<Timer>(m_raylibPtr,
-                                              2,
+                                              OPPONENT_TIMER_DURATION,
                                               true,
                                               true,
                                               std::bind(&Game::createOpponent, this));
+
+    m_dispersionTimer = std::make_shared<Timer>(m_raylibPtr,
+                                                DISPERSION_TIMER_DURATION,
+                                                true,
+                                                true,
+                                                std::bind(&Game::createPowerupDispersion, this));
 
     Sprite::SpriteAttr_t attr;
     for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
@@ -215,6 +221,15 @@ void Game::createOpponent(void)
     opponent->setTextures(m_texturesMap["player"]);
     m_opponentsList.push_back(opponent);
 }
+
+void Game::createPowerupDispersion(void)
+{
+    assert(m_state == PLAYING);
+    Sprite::SpriteAttr_t    attr;
+    std::shared_ptr<Sprite> powerup = m_factory->getSprite(SpriteFactory::POWERUP, m_raylibPtr, attr);
+    powerup->setTextures(m_texturesMap["dispersion"]);
+    m_dispersionsList.push_back(powerup);
+}
 #ifdef DEBUG_
 void Game::setState(STATE_t state)
 {
@@ -228,10 +243,12 @@ void Game::loadResources(void)
     std::filesystem::path fontPath   = m_resourcePath / "font";
     std::filesystem::path imagesPath = m_resourcePath / "images";
 
-    m_texturesMap["player"] = {m_raylibPtr->loadTexture((imagesPath / "spaceship.png").string())};
-    m_texturesMap["star"]   = {m_raylibPtr->loadTexture((imagesPath / "star.png").string())};
-    m_texturesMap["laser"]  = {m_raylibPtr->loadTexture((imagesPath / "laser.png").string())};
-    m_texturesMap["meteor"] = {m_raylibPtr->loadTexture((imagesPath / "meteor.png").string())};
+    m_texturesMap["player"]        = {m_raylibPtr->loadTexture((imagesPath / "spaceship.png").string())};
+    m_texturesMap["star"]          = {m_raylibPtr->loadTexture((imagesPath / "star.png").string())};
+    m_texturesMap["laser"]         = {m_raylibPtr->loadTexture((imagesPath / "laser.png").string())};
+    m_texturesMap["meteor"]        = {m_raylibPtr->loadTexture((imagesPath / "meteor.png").string())};
+    m_texturesMap["dispersion"]    = {m_raylibPtr->loadTexture((imagesPath / "dispersion.png").string())};
+    m_texturesMap["invincibility"] = {m_raylibPtr->loadTexture((imagesPath / "invincibility.png").string())};
 
     uint32_t               numberOfExplosionTextures = 28;
     std::vector<Texture2D> explosionTextures(numberOfExplosionTextures);
@@ -241,11 +258,14 @@ void Game::loadResources(void)
     }
     m_texturesMap["explosion"] = explosionTextures;
 
-    m_fontType        = m_raylibPtr->loadFontEx((fontPath / "Stormfaze.otf").string(), GAME_OVER_FONTSIZE, NULL, 0);
-    m_explosionSound  = m_raylibPtr->loadSound((audioPath / "explosion.wav").string());
-    m_laserSound      = m_raylibPtr->loadSound((audioPath / "laser.wav").string());
-    m_selectSound     = m_raylibPtr->loadSound((audioPath / "select.mp3").string());
-    m_backGroundMusic = m_raylibPtr->loadMusicStream((audioPath / "music.wav").string());
+    m_fontType           = m_raylibPtr->loadFontEx((fontPath / "Stormfaze.otf").string(), GAME_OVER_FONTSIZE, NULL, 0);
+    m_explosionSound     = m_raylibPtr->loadSound((audioPath / "explosion.wav").string());
+    m_laserSound         = m_raylibPtr->loadSound((audioPath / "laser.wav").string());
+    m_selectSound        = m_raylibPtr->loadSound((audioPath / "select.mp3").string());
+    m_dispersionSound    = m_raylibPtr->loadSound((audioPath / "dispersion.mp3").string());
+    m_invincibilitySound = m_raylibPtr->loadSound((audioPath / "invincibility.mp3").string());
+    m_extralifeSound     = m_raylibPtr->loadSound((audioPath / "extralife.mp3").string());
+    m_backGroundMusic    = m_raylibPtr->loadMusicStream((audioPath / "music.wav").string());
 
     m_raylibPtr->playMusicStream(m_backGroundMusic);
 }
@@ -253,6 +273,9 @@ void Game::loadResources(void)
 void Game::unloadResources(void)
 {
     m_raylibPtr->unloadMusicStream(m_backGroundMusic);
+    m_raylibPtr->unloadSound(m_dispersionSound);
+    m_raylibPtr->unloadSound(m_invincibilitySound);
+    m_raylibPtr->unloadSound(m_extralifeSound);
     m_raylibPtr->unloadSound(m_selectSound);
     m_raylibPtr->unloadSound(m_laserSound);
     m_raylibPtr->unloadSound(m_explosionSound);
@@ -263,6 +286,8 @@ void Game::unloadResources(void)
         m_raylibPtr->unloadTexture(m_texturesMap["explosion"][index]);
     }
 
+    m_raylibPtr->unloadTexture(m_texturesMap["invincibility"][0]);
+    m_raylibPtr->unloadTexture(m_texturesMap["dispersion"][0]);
     m_raylibPtr->unloadTexture(m_texturesMap["meteor"][0]);
     m_raylibPtr->unloadTexture(m_texturesMap["laser"][0]);
     m_raylibPtr->unloadTexture(m_texturesMap["star"][0]);
@@ -272,6 +297,7 @@ void Game::unloadResources(void)
 void Game::updatePlayingPage(void)
 {
     m_meteorTimer->update();
+    m_dispersionTimer->update();
     m_opponentTimer->update();
     m_rampdownTimer->update();
     m_player->update();
@@ -298,6 +324,10 @@ void Game::updatePlayingPage(void)
     for (uint32_t index = 0; index < m_opponentLasersList.size(); index++)
     {
         m_opponentLasersList[index]->update();
+    }
+    for (uint32_t index = 0; index < m_dispersionsList.size(); index++)
+    {
+        m_dispersionsList[index]->update();
     }
     m_raylibPtr->updateMusicStream(m_backGroundMusic);
 }
@@ -344,6 +374,10 @@ void Game::drawSprites(void)
     for (uint32_t index = 0; index < m_opponentLasersList.size(); index++)
     {
         m_opponentLasersList[index]->draw();
+    }
+    for (uint32_t index = 0; index < m_dispersionsList.size(); index++)
+    {
+        m_dispersionsList[index]->draw();
     }
 }
 
@@ -404,6 +438,17 @@ void Game::discardSprites(void)
             ++it;
         }
     }
+    for (auto it = m_dispersionsList.begin(); it != m_dispersionsList.end();)
+    {
+        if ((*(*it)).m_discard)
+        {
+            it = m_dispersionsList.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 void Game::discardAllSprites(void)
@@ -427,6 +472,10 @@ void Game::discardAllSprites(void)
     for (auto it = m_opponentLasersList.begin(); it != m_opponentLasersList.end();)
     {
         it = m_opponentLasersList.erase(it);
+    }
+    for (auto it = m_dispersionsList.begin(); it != m_dispersionsList.end();)
+    {
+        it = m_dispersionsList.erase(it);
     }
 }
 
@@ -474,6 +523,19 @@ void Game::checkCollisions(void)
 
                 m_score += 10;
             }
+        }
+    }
+
+    for (uint32_t index = 0; index < m_dispersionsList.size(); index++)
+    {
+        if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
+                                               m_player->getRadius(),
+                                               m_dispersionsList[index]->getCenter(),
+                                               m_dispersionsList[index]->getRadius()))
+        {
+            m_dispersionsList[index]->m_discard = true;
+            m_player->setDispersedlaser();
+            m_raylibPtr->playSound(m_dispersionSound);
         }
     }
 

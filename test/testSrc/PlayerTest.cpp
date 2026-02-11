@@ -61,7 +61,7 @@ TEST_F(PlayerTest, updatePlayableWithoutSpaceKeyPressed)
     m_Player->update();
 }
 
-TEST_F(PlayerTest, updatePlayableWithSpaceKeyPressed)
+TEST_F(PlayerTest, updatePlayableWithSpaceKeyPressedNonDispersedLaser)
 {
     Texture2D fakeTexture = {0, 0, 0, 0, 0};
     m_Player->setTextures({fakeTexture});
@@ -127,45 +127,63 @@ TEST_F(PlayerTest, stateMachine)
     EXPECT_TRUE(m_Player->m_discard);
 
     // PLAYABLE --> INVISIBLE
-    EXPECT_CALL((*m_raylibMock), getTime()).WillOnce(Return(1));
+    EXPECT_CALL((*m_raylibMock), getTime()).WillOnce(Return(1)); //m_invisibleTimer activate
     m_Player->update();
     m_Player->draw();
+    m_Player->setDispersedlaser(); //no effect
     EXPECT_TRUE(m_Player->m_discard);
 
-    // INVISIBLE --> VISIBLE
+    // INVISIBLE --> MOVE_IN
     EXPECT_CALL((*m_raylibMock), getTime())
-        .WillOnce(Return(2))
-        .WillOnce(Return(2));
+        .WillOnce(Return(2))  //m_invisibleTimer timeout
+        .WillOnce(Return(2))  //m_warmupTimer activate
+        .WillOnce(Return(2)); //m_dispersedLaserTimer activate
+    EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(80, 80, 80, 255)))
+        .Times(Exactly(1));
+    m_Player->update();
+    m_Player->draw();
+    m_Player->setDispersedlaser();
+    EXPECT_TRUE(m_Player->m_discard);
+
+    // MOVE_IN
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(0.1)); //moveIntoWindow() call
     EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(80, 80, 80, 255)))
         .Times(Exactly(1));
     m_Player->update();
     m_Player->draw();
     EXPECT_TRUE(m_Player->m_discard);
 
-    // VISIBLE
-    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(0.1));
+    // MOVE_IN --> WARMUP
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(1)); //moveIntoWindow() reach the start position
     EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(80, 80, 80, 255)))
         .Times(Exactly(1));
     m_Player->update();
     m_Player->draw();
     EXPECT_TRUE(m_Player->m_discard);
 
-    // VISIBLE --> INVINCIBLE
-    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(1));
-    EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(80, 80, 80, 255)))
-        .Times(Exactly(1));
-    m_Player->update();
-    m_Player->draw();
-    EXPECT_TRUE(m_Player->m_discard);
-
-    // INVINCIBLE --> PLAYABLE
+    // WARMUP --> PLAYABLE (dispersed laser)
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_RIGHT)).Times(Exactly(1));
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_LEFT)).Times(Exactly(1));
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_DOWN)).Times(Exactly(1));
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_UP)).Times(Exactly(1));
-    EXPECT_CALL((*m_raylibMock), isKeyPressed(KEY_SPACE)).WillOnce(Return(false));
-    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(1));
-    EXPECT_CALL((*m_raylibMock), getTime()).WillOnce(Return(6));
+    EXPECT_CALL((*m_raylibMock), isKeyPressed(KEY_SPACE)).WillOnce(Return(true));
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(1)); //move() call
+    EXPECT_CALL((*m_raylibMock), getTime())
+        .WillOnce(Return(17)) //m_dispersedLaserTimer timeout
+        .WillOnce(Return(6)); //m_warmupTimer timeout
+    EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(255, 255, 255, 255)))
+        .Times(Exactly(1));
+    m_Player->update();
+    m_Player->draw();
+    EXPECT_FALSE(m_Player->m_discard);
+
+    // PLAYABLE (single laser)
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_RIGHT)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_LEFT)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_DOWN)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_UP)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyPressed(KEY_SPACE)).WillOnce(Return(true));
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(1)); //move() call
     EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(255, 255, 255, 255)))
         .Times(Exactly(1));
     m_Player->update();

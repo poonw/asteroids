@@ -13,12 +13,13 @@ Player::Player(std::shared_ptr<RaylibInterface>          raylibPtr,
     m_shootLaser = shootLaser;
     m_speed      = PLAYER_SPEED;
 
-    std::function<void(void)> renderWarmupCallback   = std::bind(&Player::renderWarmup, this);
-    std::function<void(void)> renderVincibleCallback = std::bind(&Player::renderPlayable, this);
+    std::function<void(void)> renderWarmupCallback        = std::bind(&Player::renderWarmup, this);
+    std::function<void(void)> renderVincibleCallback      = std::bind(&Player::renderPlayable, this);
+    std::function<void(void)> resetDispersedlaserCallback = std::bind(&Player::resetDispersedlaser, this);
 
-    m_invisibleTimer  = std::make_shared<Timer>(m_raylibPtr, 1, false, false, renderWarmupCallback);
-    m_warmupTimer     = std::make_shared<Timer>(m_raylibPtr, 4, false, false, renderVincibleCallback);
-    m_invincibleTimer = std::make_shared<Timer>(m_raylibPtr, 10, false, false, renderVincibleCallback);
+    m_invisibleTimer      = std::make_shared<Timer>(m_raylibPtr, 1, false, false, renderWarmupCallback);
+    m_warmupTimer         = std::make_shared<Timer>(m_raylibPtr, 4, false, false, renderVincibleCallback);
+    m_dispersedLaserTimer = std::make_shared<Timer>(m_raylibPtr, 15, false, false, resetDispersedlaserCallback);
 
     m_state   = PLAYABLE;
     m_discard = true;
@@ -37,6 +38,19 @@ void Player::input(void)
         laserAttr.m_direction  = {0, -1};
         laserAttr.m_rotation   = 180;
         m_shootLaser(laserAttr);
+
+        if (m_dispersedLaser)
+        {
+            m_dispersedLaserTimer->update();
+
+            laserAttr.m_direction = {-0.25, -1};
+            laserAttr.m_rotation  = 173.875;
+            m_shootLaser(laserAttr);
+
+            laserAttr.m_direction = {0.25, -1};
+            laserAttr.m_rotation  = 186.125;
+            m_shootLaser(laserAttr);
+        }
     }
 }
 
@@ -59,9 +73,10 @@ void Player::update(void)
         {
             if (m_discard)
             {
-                m_state      = INVISIBLE;
-                m_position.x = m_startXPos;
-                m_position.y = WINDOW_HEIGHT + 100;
+                m_state          = INVISIBLE;
+                m_dispersedLaser = false;
+                m_position.x     = m_startXPos;
+                m_position.y     = WINDOW_HEIGHT + 100;
                 m_invisibleTimer->activate();
             }
             else
@@ -151,12 +166,20 @@ void Player::setTextures(std::vector<Texture2D> textures)
 void Player::setInvincible(void)
 {
     m_invincible = true;
-    m_invincibleTimer->activate();
 }
 
 void Player::setDispersedlaser(void)
 {
-    m_dispersedLaser = true;
+    if (m_state != INVISIBLE)
+    {
+        m_dispersedLaser = true;
+        m_dispersedLaserTimer->activate();
+    }
+}
+
+void Player::resetDispersedlaser(void)
+{
+    m_dispersedLaser = false;
 }
 
 void Player::moveIntoWindow(void)
