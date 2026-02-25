@@ -23,9 +23,11 @@ else
 	TESTTARGET := $(TESTTARGETNAME)
 endif
 
+IGNOREWARNINGS := -Wno-missing-field-initializers -Wno-enum-compare -Wno-unused-parameter
+
 DEFINEFLAGS := $(DFLAGS:%=-D%)
 CXX := g++
-CXXFLAGS := -g -std=c++20 -Wextra -Werror $(COMPILECONFIG) -pthread $(DEFINEFLAGS)
+CXXFLAGS := -g -std=c++20 $(COMPILECONFIG) -Wextra -Werror -pthread $(DEFINEFLAGS)
 TESTCOVERAGEFLAGS := $(CXXFLAGS) -fprofile-arcs -ftest-coverage
 
 CC := gcc

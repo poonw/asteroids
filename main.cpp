@@ -5,6 +5,13 @@
 #include "Player.h"
 #include "RaylibWrapper.h"
 #include "SpriteFactory.h"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wenum-compare"
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
+#pragma GCC diagnostic pop
 
 int main(void)
 {
