@@ -2,9 +2,11 @@
 #include "gtest/gtest.h"
 #include "Game.h"
 #include <memory>
+#include "CircSpriteMock.h"
 #include "GameSettings.h"
 #include "PlayerMock.h"
 #include "RaylibMock.h"
+#include "RectSpriteMock.h"
 #include "SpriteFactoryFake.h"
 #include "SpriteMock.h"
 

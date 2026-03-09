@@ -2,9 +2,10 @@
 #define LASER_H
 
 #include "RaylibInterface.h"
+#include "RectFeature.h"
 #include "Sprite.h"
 
-class Laser : public Sprite
+class Laser : public Sprite, public RectFeature
 {
 public:
     Laser(std::shared_ptr<RaylibInterface> raylibPtr,
@@ -12,12 +13,10 @@ public:
           Vector2                          direction,
           float                            rotation,
           Color                            color);
-    ~Laser(void) = default;
+    ~Laser(void) override = default;
 
     void      update(void) override;
     void      draw(void) override;
-    Vector2   getCenter(void) override;
-    float     getRadius(void) override;
     Rectangle getRect(void) override;
     void      setTextures(std::vector<Texture2D> textures) override;
 

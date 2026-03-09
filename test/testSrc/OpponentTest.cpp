@@ -99,11 +99,6 @@ TEST_F(OpponentTest, getRadius)
     EXPECT_EQ(m_Opponent->getRadius(), 2);
 }
 
-TEST_F(OpponentTest, getRect_death)
-{
-    EXPECT_DEATH(m_Opponent->getRect(), "Assertion failed");
-}
-
 TEST_F(OpponentTest, setTextures_death)
 {
     Texture2D              fakeTexture  = {0, 0, 0, 0, 0};

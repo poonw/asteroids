@@ -6,8 +6,7 @@
 class RaylibWrapper : public RaylibInterface
 {
 public:
-    RaylibWrapper(void);
-    virtual ~RaylibWrapper(void);
+    ~RaylibWrapper(void) override = default;
 
     double    getTime(void) override;
     void      initWindow(int width, int height, std::string title) override;

@@ -58,12 +58,6 @@ float Powerup::getRadius(void)
     return m_radius;
 }
 
-Rectangle Powerup::getRect(void)
-{
-    assert(false);
-    return (Rectangle(0, 0, 0, 0));
-}
-
 void Powerup::setTextures(std::vector<Texture2D> textures)
 {
     assert(textures.size() == 1);

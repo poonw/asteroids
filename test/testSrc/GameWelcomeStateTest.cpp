@@ -85,6 +85,7 @@ void gameCommonTeardown(void)
     EXPECT_CALL((*m_raylibMock), unloadFont(A<Font>())).Times(Exactly(1)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), unloadTexture(A<Texture2D>())).Times(Exactly(34)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), closeAudioDevice()).Times(Exactly(1)).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), closeWindow()).Times(Exactly(1)).InSequence(seq);
 
     Mock::VerifyAndClearExpectations(&m_raylibMock);
     m_Game              = nullptr;

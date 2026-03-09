@@ -13,7 +13,6 @@ public:
           bool                             repeat,
           bool                             autostart,
           std::function<void(void)>        callBack);
-    ~Timer(void) = default;
 
     void update(void);
     void activate(void);

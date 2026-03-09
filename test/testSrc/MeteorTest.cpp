@@ -95,11 +95,6 @@ TEST_F(MeteorTest, getRadius)
     EXPECT_EQ(m_Meteor->getRadius(), 2);
 }
 
-TEST_F(MeteorTest, getRect_death)
-{
-    EXPECT_DEATH(m_Meteor->getRect(), "Assertion failed");
-}
-
 TEST_F(MeteorTest, setTextures_death)
 {
     Texture2D              fakeTexture  = {0, 0, 0, 0, 0};

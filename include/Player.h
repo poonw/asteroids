@@ -13,7 +13,7 @@ class Player : public PlayerInterface
 public:
     Player(std::shared_ptr<RaylibInterface>          raylibPtr,
            std::function<void(Sprite::SpriteAttr_t)> shootLaser);
-    ~Player(void) = default;
+    ~Player(void) override = default;
 
     void    update(void) override;
     void    draw(void) override;
@@ -36,8 +36,7 @@ private:
         PLAYABLE = 0,
         INVISIBLE,
         MOVE_IN,
-        WARMUP,
-        INVINCIBLE
+        WARMUP
     } STATE_t;
 
     float   m_maxXPos   = 0.0;

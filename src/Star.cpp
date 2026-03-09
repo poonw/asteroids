@@ -39,24 +39,6 @@ void Star::draw(void)
     m_raylibPtr->drawTextureEx(m_textures[0], m_position, 0, m_scale, WHITE);
 }
 
-Vector2 Star::getCenter(void)
-{
-    assert(false);
-    return {0, 0};
-}
-
-float Star::getRadius(void)
-{
-    assert(false);
-    return 0;
-}
-
-Rectangle Star::getRect(void)
-{
-    assert(false);
-    return (Rectangle(0, 0, 0, 0));
-}
-
 void Star::setTextures(std::vector<Texture2D> textures)
 {
     assert(textures.size() == 1);

@@ -1,13 +1,5 @@
 #include "RaylibWrapper.h"
 
-RaylibWrapper::RaylibWrapper(void)
-{
-}
-
-RaylibWrapper::~RaylibWrapper(void)
-{
-}
-
 double RaylibWrapper::getTime(void)
 {
     return GetTime();
