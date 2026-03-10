@@ -18,3 +18,8 @@ The following instructions are meant for development environment in Windows x64.
 
 ### init googletest repo
 - call git clone https://github.com/google/googletest.git in the same level directory where asteroids in initialized
+
+## Architecture
+### Game loop
+To use the raylib effectively, the order of following function calls must be respected:
+<img width="624" height="907" alt="image" src="https://github.com/user-attachments/assets/2b23ce86-4c81-48ae-a112-23e2191eefc5" />
