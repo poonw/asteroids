@@ -25,14 +25,15 @@ The following instructions are meant for development environment in Windows x64.
 ## Architecture
 ### Game loop
 To use the raylib effectively, the order of following function calls must be respected:
-<img width="624" height="907" alt="image" src="https://github.com/user-attachments/assets/2b23ce86-4c81-48ae-a112-23e2191eefc5" />
+<img width="500" height="752" alt="image" src="https://github.com/user-attachments/assets/8b1707dc-2337-4860-91db-d3dd58e025e3" />
 
 ### Sprite and SpriteFactory classes
 - Sprite - a computer graphic which may be moved on-screen and otherwise manipulated as a single entity.
 - SpriteFactory to encapsulate the Sprite object creation - getSprite function.
 - SpriteFactoryFake class for UT purpose.
-- <img width="238" height="329" alt="image" src="https://github.com/user-attachments/assets/1bd86bed-d3e5-4418-aad6-d469b0f836d1" />
+- <img width="172" height="231" alt="image" src="https://github.com/user-attachments/assets/7a7f9ce4-03e6-4502-999c-8b6d8f880def" />
 - Types of Sprites defined:
+  - Player
   - Explosion
   - Laser
   - Meteor
@@ -40,13 +41,15 @@ To use the raylib effectively, the order of following function calls must be res
   - Powerup
   - Star
   - SpriteMock (UT purpose)
+  - CircSpriteMock (UT purpose)
+  - RectSpriteMock (UT purpose)
+  - PlayerMock (UT purpose)
 - Each sprite defines own update and draw methods.
-- <img width="1128" height="316" alt="image" src="https://github.com/user-attachments/assets/bbc88af9-5014-47bc-bba7-605b21da8c0d" />
-
-### PlayerInterface and Player classes
-- Player class is a special type of Sprite, with more unique enhancements.
-- PlayerMock for UT purpose.
-- <img width="477" height="269" alt="image" src="https://github.com/user-attachments/assets/789a43a9-8d34-4b4e-8d0d-4bb8f2456fd6" />
+- For collision checking purpose, depending on the its natural fitting, each sprite may inherit from additional CircFeature or RectFeature interfaces.
+- Player sprite is a special case as it has more its own unique features, thus the extra layer of interface of PlayerInterface.
+- <img width="318" height="185" alt="image" src="https://github.com/user-attachments/assets/e1579113-a9f8-4736-959f-bf64103a4141" />
+- <img width="311" height="187" alt="image" src="https://github.com/user-attachments/assets/ce8479da-f4bf-4372-a95d-d22ef2b59b46" />
+- <img width="717" height="339" alt="image" src="https://github.com/user-attachments/assets/ae817311-8293-46e8-a594-bbf48ed3a882" />
 
 ### RaylibInterface
 - Raylib is included into project as a static library.
@@ -54,8 +57,8 @@ To use the raylib effectively, the order of following function calls must be res
 - <img width="428" height="277" alt="image" src="https://github.com/user-attachments/assets/490b7769-7271-41af-9c3f-7271cca4a0cc" />
 
 ### Game class
-- Keep track of the all the game objects in different lists (creation and destruction)
-- Responsible to check for collisions in between game objects
+- Keep track of the all the game objects in different lists (creation and destruction).
+- Responsible to check for collisions in between game objects.
 - Composed of:
   - SpriteFactory
   - RaylibInterface
@@ -70,7 +73,7 @@ To use the raylib effectively, the order of following function calls must be res
   - GAME_OVER page
 - Button clicks to trigger the transition among the pages.
 - A state machine is used to handle all these pages and the transitions, each page is a state.
-- EXIT_GAME - state to consolidate the handling of the window closing and resource deallocation.
+- EXIT_GAME - state to consolidate the exit point of the Game loop and the handling of the resource deallocation and window closing.
 - <img width="945" height="1101" alt="image" src="https://github.com/user-attachments/assets/2d527c9b-3ac7-4933-96e9-f6edfda13b6d" />
 
 ### Player state machine
