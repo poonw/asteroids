@@ -21,8 +21,7 @@ public:
         UNDEFINED
     };
 
-    SpriteFactory(void);
-    ~SpriteFactory(void);
+    virtual ~SpriteFactory(void) = default;
 
     virtual std::shared_ptr<Sprite> getSprite(SpriteType                                type,
                                               std::shared_ptr<RaylibInterface>          raylibPtr,

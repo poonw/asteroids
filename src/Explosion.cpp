@@ -31,24 +31,6 @@ void Explosion::draw(void)
     m_raylibPtr->drawTextureEx(m_textures[m_index], m_position, 0, m_scale, WHITE);
 }
 
-Vector2 Explosion::getCenter(void)
-{
-    assert(false);
-    return {0, 0};
-}
-
-float Explosion::getRadius(void)
-{
-    assert(false);
-    return 0;
-}
-
-Rectangle Explosion::getRect(void)
-{
-    assert(false);
-    return (Rectangle(0, 0, 0, 0));
-}
-
 void Explosion::setTextures(std::vector<Texture2D> textures)
 {
     assert(textures.size() > 1);

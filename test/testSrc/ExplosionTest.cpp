@@ -75,21 +75,6 @@ TEST_F(ExplosionTest, draw)
     m_Explosion->draw();
 }
 
-TEST_F(ExplosionTest, getCenter_death)
-{
-    EXPECT_DEATH(m_Explosion->getCenter(), "Assertion failed");
-}
-
-TEST_F(ExplosionTest, getRadius_death)
-{
-    EXPECT_DEATH(m_Explosion->getRadius(), "Assertion failed");
-}
-
-TEST_F(ExplosionTest, getRect_death)
-{
-    EXPECT_DEATH(m_Explosion->getRect(), "Assertion failed");
-}
-
 TEST_F(ExplosionTest, setTextures_death)
 {
     Texture2D fakeTexture = {0, 0, 0, 0, 0};

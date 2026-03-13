@@ -8,7 +8,7 @@ class RaylibMock : public RaylibInterface
 {
 public:
     RaylibMock(void);
-    virtual ~RaylibMock(void);
+    ~RaylibMock(void) override;
 
     MOCK_METHOD(double, getTime, (), (override));
     MOCK_METHOD(void, initWindow, (int width, int height, std::string title), (override));

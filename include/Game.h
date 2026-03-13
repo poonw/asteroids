@@ -29,6 +29,10 @@ public:
 
     Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFactory> factoryPtr);
     ~Game(void);
+    Game(const Game& game)            = delete;
+    Game& operator=(const Game& game) = delete;
+    Game(Game&& game)                 = delete;
+    Game& operator=(Game&& game)      = delete;
 
     void run(void);
     void setPlayer(std::shared_ptr<PlayerInterface> player);
@@ -72,9 +76,9 @@ private:
     void refreshSettingsPage(void);
     void refreshGameOverPage(void);
 
-    std::string                      m_gameName     = "Asteroids";
-    STATE_t                          m_state        = EXIT_GAME;
+    const std::string                m_gameName     = "Asteroids";
     const std::filesystem::path      m_resourcePath = "resources";
+    STATE_t                          m_state        = EXIT_GAME;
     std::shared_ptr<RaylibInterface> m_raylibPtr    = nullptr;
     std::shared_ptr<SpriteFactory>   m_factory      = nullptr;
 

@@ -66,21 +66,6 @@ TEST_F(StarTest, draw)
     m_Star->draw();
 }
 
-TEST_F(StarTest, getCenter_death)
-{
-    EXPECT_DEATH(m_Star->getCenter(), "Assertion failed");
-}
-
-TEST_F(StarTest, getRadius_death)
-{
-    EXPECT_DEATH(m_Star->getRadius(), "Assertion failed");
-}
-
-TEST_F(StarTest, getRect_death)
-{
-    EXPECT_DEATH(m_Star->getRect(), "Assertion failed");
-}
-
 TEST_F(StarTest, setTextures_death)
 {
     Texture2D              fakeTexture  = {0, 0, 0, 0, 0};

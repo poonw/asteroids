@@ -7,7 +7,8 @@
 class RaylibInterface
 {
 public:
-    virtual ~RaylibInterface(void)                                                                                                    = default;
+    virtual ~RaylibInterface(void) = default;
+
     virtual double    getTime(void)                                                                                                   = 0;
     virtual void      initWindow(int width, int height, std::string title)                                                            = 0;
     virtual void      closeWindow(void)                                                                                               = 0;

@@ -103,7 +103,6 @@ void Player::update(void)
             break;
         }
 
-        case INVINCIBLE:
         default:
             assert(false);
             break;
@@ -125,7 +124,6 @@ void Player::draw(void)
 
         case MOVE_IN:
         case WARMUP:
-        case INVINCIBLE:
             m_raylibPtr->drawTextureV(m_textures[0], m_position, DARKGRAY);
             break;
 

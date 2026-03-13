@@ -1,22 +1,21 @@
-#ifndef PLAYERMOCK_H
-#define PLAYERMOCK_H
+#ifndef CIRCSPRITEMOCK_H
+#define CIRCSPRITEMOCK_H
 
-#include "PlayerInterface.h"
+#include "CircFeature.h"
+#include "Sprite.h"
 #include "gmock/gmock.h"
 
-class PlayerMock : public PlayerInterface
+class CircSpriteMock : public Sprite, public CircFeature
 {
 public:
-    PlayerMock(void);
-    ~PlayerMock(void) override;
+    CircSpriteMock(void);
+    ~CircSpriteMock(void) override;
 
     MOCK_METHOD(void, update, (), (override));
     MOCK_METHOD(void, draw, (), (override));
     MOCK_METHOD(Vector2, getCenter, (), (override));
     MOCK_METHOD(float, getRadius, (), (override));
     MOCK_METHOD(void, setTextures, (std::vector<Texture2D> textures), (override));
-    MOCK_METHOD(void, setInvincible, (), (override));
-    MOCK_METHOD(void, setDispersedlaser, (), (override));
 };
 
-#endif // PLAYERMOCK_H
+#endif // CIRCSPRITEMOCK_H

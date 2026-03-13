@@ -42,18 +42,6 @@ void Laser::draw(void)
     m_raylibPtr->drawTextureEx(m_textures[0], m_position, m_rotation, 1, m_color);
 }
 
-Vector2 Laser::getCenter(void)
-{
-    assert(false);
-    return (Vector2(0, 0));
-}
-
-float Laser::getRadius(void)
-{
-    assert(false);
-    return 0;
-}
-
 Rectangle Laser::getRect(void)
 {
     assert(m_textures.size() == 1);

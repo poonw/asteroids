@@ -17,15 +17,11 @@ public:
         Color   m_color     = WHITE;
     } SpriteAttr_t;
 
-    Sprite(void) {};
-    virtual ~Sprite(void) {};
+    virtual ~Sprite(void) = default;
 
-    virtual void      update(void)                                 = 0;
-    virtual void      draw(void)                                   = 0;
-    virtual Vector2   getCenter(void)                              = 0;
-    virtual float     getRadius(void)                              = 0;
-    virtual Rectangle getRect(void)                                = 0;
-    virtual void      setTextures(std::vector<Texture2D> textures) = 0;
+    virtual void update(void)                                 = 0;
+    virtual void draw(void)                                   = 0;
+    virtual void setTextures(std::vector<Texture2D> textures) = 0;
 
     bool m_discard = false;
 

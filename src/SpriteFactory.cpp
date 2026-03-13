@@ -7,14 +7,6 @@
 #include "Powerup.h"
 #include "Star.h"
 
-SpriteFactory::SpriteFactory(void)
-{
-}
-
-SpriteFactory::~SpriteFactory(void)
-{
-}
-
 std::shared_ptr<Sprite> SpriteFactory::getSprite(SpriteType                                type,
                                                  std::shared_ptr<RaylibInterface>          raylibPtr,
                                                  Sprite::SpriteAttr_t                      attr,

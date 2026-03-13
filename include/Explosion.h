@@ -10,14 +10,11 @@ public:
     Explosion(std::shared_ptr<RaylibInterface> raylibPtr,
               Vector2                          position,
               float                            scale);
-    ~Explosion(void) = default;
+    ~Explosion(void) override = default;
 
-    void      update(void) override;
-    void      draw(void) override;
-    Vector2   getCenter(void) override;
-    float     getRadius(void) override;
-    Rectangle getRect(void) override;
-    void      setTextures(std::vector<Texture2D> textures) override;
+    void update(void) override;
+    void draw(void) override;
+    void setTextures(std::vector<Texture2D> textures) override;
 
 private:
     uint32_t m_index = 0;

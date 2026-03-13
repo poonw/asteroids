@@ -78,16 +78,6 @@ TEST_F(LaserTest, draw)
     m_Laser->draw();
 }
 
-TEST_F(LaserTest, getCenter_death)
-{
-    EXPECT_DEATH(m_Laser->getCenter(), "Assertion failed");
-}
-
-TEST_F(LaserTest, getRadius_death)
-{
-    EXPECT_DEATH(m_Laser->getRadius(), "Assertion failed");
-}
-
 TEST_F(LaserTest, getRectWithoutTextures_death)
 {
     EXPECT_DEATH(m_Laser->getRect(), "Assertion failed");

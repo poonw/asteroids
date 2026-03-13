@@ -2,20 +2,20 @@
 #define METEOR_H
 
 #include "RaylibInterface.h"
+#include "CircFeature.h"
 #include "Sprite.h"
 
-class Meteor : public Sprite
+class Meteor : public Sprite, public CircFeature
 {
 public:
     Meteor(std::shared_ptr<RaylibInterface> raylibPtr);
-    ~Meteor(void) = default;
+    ~Meteor(void) override = default;
 
-    void      update(void) override;
-    void      draw(void) override;
-    Vector2   getCenter(void) override;
-    float     getRadius(void) override;
-    Rectangle getRect(void) override;
-    void      setTextures(std::vector<Texture2D> textures) override;
+    void    update(void) override;
+    void    draw(void) override;
+    Vector2 getCenter(void) override;
+    float   getRadius(void) override;
+    void    setTextures(std::vector<Texture2D> textures) override;
 
 private:
     void move(void);
@@ -23,7 +23,6 @@ private:
     Vector2   m_direction = {0, 0};
     float     m_speed     = 0;
     float     m_rotation  = 0;
-    float     m_radius    = 0;
     Rectangle m_rect      = {0, 0, 0, 0};
     Vector2   m_origin    = {0, 0};
 };

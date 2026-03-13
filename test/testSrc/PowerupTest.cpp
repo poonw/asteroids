@@ -90,11 +90,6 @@ TEST_F(PowerupTest, getRadius)
     EXPECT_EQ(m_Powerup->getRadius(), 2);
 }
 
-TEST_F(PowerupTest, getRect_death)
-{
-    EXPECT_DEATH(m_Powerup->getRect(), "Assertion failed");
-}
-
 TEST_F(PowerupTest, setTextures_death)
 {
     Texture2D              fakeTexture  = {0, 0, 0, 0, 0};
