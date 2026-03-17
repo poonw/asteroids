@@ -11,15 +11,15 @@ class Timer;
 class Player : public PlayerInterface
 {
 public:
-    Player(std::shared_ptr<RaylibInterface>          raylibPtr,
-           std::function<void(Sprite::SpriteAttr_t)> shootLaser);
+    Player(std::shared_ptr<RaylibInterface>                 raylibPtr,
+           std::function<void(const Sprite::SpriteAttr_t&)> shootLaser);
     ~Player(void) override = default;
 
     void    update(void) override;
     void    draw(void) override;
-    Vector2 getCenter(void) override;
-    float   getRadius(void) override;
-    void    setTextures(std::vector<Texture2D> textures) override;
+    void    setTextures(const std::vector<Texture2D>& textures) override;
+    Vector2 getCenter(void) const override;
+    float   getRadius(void) const override;
     void    setInvincible(void) override;
     void    setDispersedlaser(void) override;
 
@@ -45,10 +45,10 @@ private:
     float   m_startYPos = 0.0;
     STATE_t m_state     = PLAYABLE;
 
-    std::function<void(Sprite::SpriteAttr_t)> m_shootLaser;
-    std::shared_ptr<Timer>                    m_invisibleTimer      = nullptr;
-    std::shared_ptr<Timer>                    m_warmupTimer         = nullptr;
-    std::shared_ptr<Timer>                    m_dispersedLaserTimer = nullptr;
+    std::function<void(const Sprite::SpriteAttr_t&)> m_shootLaser;
+    std::shared_ptr<Timer>                           m_invisibleTimer      = nullptr;
+    std::shared_ptr<Timer>                           m_warmupTimer         = nullptr;
+    std::shared_ptr<Timer>                           m_dispersedLaserTimer = nullptr;
 };
 
 #endif // PLAYER_H

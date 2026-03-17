@@ -31,7 +31,7 @@ void Explosion::draw(void)
     m_raylibPtr->drawTextureEx(m_textures[m_index], m_position, 0, m_scale, WHITE);
 }
 
-void Explosion::setTextures(std::vector<Texture2D> textures)
+void Explosion::setTextures(const std::vector<Texture2D>& textures)
 {
     assert(textures.size() > 1);
     m_textures   = textures;

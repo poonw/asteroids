@@ -132,6 +132,14 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
                                                 std::bind(&Game::createPowerupDispersion, this));
 
     Sprite::SpriteAttr_t attr;
+
+    m_player = std::dynamic_pointer_cast<PlayerInterface>(
+        m_factory->getSprite(SpriteFactory::PLAYER,
+                             m_raylibPtr,
+                             attr,
+                             std::bind(&Game::playerShootLaser, this, std::placeholders::_1)));
+    m_player->setTextures(m_texturesMap["player"]);
+
     for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
     {
         m_starsList[index] = m_factory->getSprite(SpriteFactory::STAR, m_raylibPtr, attr);
@@ -148,7 +156,6 @@ Game::~Game(void)
 
 void Game::run(void)
 {
-    assert(m_player != nullptr);
     while (!m_raylibPtr->windowShouldClose())
     {
         bool windowClosed = false;
@@ -187,13 +194,7 @@ void Game::run(void)
     }
 }
 
-void Game::setPlayer(std::shared_ptr<PlayerInterface> player)
-{
-    m_player = player;
-    m_player->setTextures(m_texturesMap["player"]);
-}
-
-void Game::playerShootLaser(Sprite::SpriteAttr_t attr)
+void Game::playerShootLaser(const Sprite::SpriteAttr_t& attr)
 {
     assert(m_state == PLAYING);
     std::shared_ptr<Sprite> laserM = m_factory->getSprite(SpriteFactory::RED_LASER, m_raylibPtr, attr);
@@ -203,7 +204,7 @@ void Game::playerShootLaser(Sprite::SpriteAttr_t attr)
     m_raylibPtr->playSound(m_laserSound);
 }
 
-void Game::opponentShootLaser(Sprite::SpriteAttr_t attr)
+void Game::opponentShootLaser(const Sprite::SpriteAttr_t& attr)
 {
     assert(m_state == PLAYING);
     std::shared_ptr<Sprite> laserM = m_factory->getSprite(SpriteFactory::YELLOW_LASER, m_raylibPtr, attr);
@@ -495,15 +496,15 @@ void Game::checkCollisions(void)
     {
         for (uint32_t imeteor = 0; imeteor < m_meteorsList.size(); imeteor++)
         {
-            if (m_raylibPtr->checkCollisionCircleRec(dynamic_pointer_cast<CircFeature>(m_meteorsList[imeteor])->getCenter(),
-                                                     dynamic_pointer_cast<CircFeature>(m_meteorsList[imeteor])->getRadius(),
-                                                     dynamic_pointer_cast<RectFeature>(m_playerLasersList[ilaser])->getRect()))
+            if (m_raylibPtr->checkCollisionCircleRec(std::dynamic_pointer_cast<CircFeature>(m_meteorsList[imeteor])->getCenter(),
+                                                     std::dynamic_pointer_cast<CircFeature>(m_meteorsList[imeteor])->getRadius(),
+                                                     std::dynamic_pointer_cast<RectFeature>(m_playerLasersList[ilaser])->getRect()))
             {
                 m_playerLasersList[ilaser]->m_discard = true;
                 m_meteorsList[imeteor]->m_discard     = true;
 
                 Sprite::SpriteAttr_t attr;
-                attr.m_position                   = dynamic_pointer_cast<CircFeature>(m_meteorsList[imeteor])->getCenter();
+                attr.m_position                   = std::dynamic_pointer_cast<CircFeature>(m_meteorsList[imeteor])->getCenter();
                 attr.m_scale                      = 2;
                 std::shared_ptr<Sprite> explosion = m_factory->getSprite(SpriteFactory::EXPLOSION, m_raylibPtr, attr);
                 explosion->setTextures(m_texturesMap["explosion"]);
@@ -516,15 +517,15 @@ void Game::checkCollisions(void)
 
         for (uint32_t ioppo = 0; ioppo < m_opponentsList.size(); ioppo++)
         {
-            if (m_raylibPtr->checkCollisionCircleRec(dynamic_pointer_cast<CircFeature>(m_opponentsList[ioppo])->getCenter(),
-                                                     dynamic_pointer_cast<CircFeature>(m_opponentsList[ioppo])->getRadius(),
-                                                     dynamic_pointer_cast<RectFeature>(m_playerLasersList[ilaser])->getRect()))
+            if (m_raylibPtr->checkCollisionCircleRec(std::dynamic_pointer_cast<CircFeature>(m_opponentsList[ioppo])->getCenter(),
+                                                     std::dynamic_pointer_cast<CircFeature>(m_opponentsList[ioppo])->getRadius(),
+                                                     std::dynamic_pointer_cast<RectFeature>(m_playerLasersList[ilaser])->getRect()))
             {
                 m_playerLasersList[ilaser]->m_discard = true;
                 m_opponentsList[ioppo]->m_discard     = true;
 
                 Sprite::SpriteAttr_t attr;
-                attr.m_position                   = dynamic_pointer_cast<CircFeature>(m_opponentsList[ioppo])->getCenter();
+                attr.m_position                   = std::dynamic_pointer_cast<CircFeature>(m_opponentsList[ioppo])->getCenter();
                 attr.m_scale                      = 3;
                 std::shared_ptr<Sprite> explosion = m_factory->getSprite(SpriteFactory::EXPLOSION, m_raylibPtr, attr);
                 explosion->setTextures(m_texturesMap["explosion"]);
@@ -540,8 +541,8 @@ void Game::checkCollisions(void)
     {
         if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
                                                m_player->getRadius(),
-                                               dynamic_pointer_cast<CircFeature>(m_dispersionsList[index])->getCenter(),
-                                               dynamic_pointer_cast<CircFeature>(m_dispersionsList[index])->getRadius()))
+                                               std::dynamic_pointer_cast<CircFeature>(m_dispersionsList[index])->getCenter(),
+                                               std::dynamic_pointer_cast<CircFeature>(m_dispersionsList[index])->getRadius()))
         {
             m_dispersionsList[index]->m_discard = true;
             m_player->setDispersedlaser();
@@ -555,8 +556,8 @@ void Game::checkCollisions(void)
         {
             if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
                                                    m_player->getRadius(),
-                                                   dynamic_pointer_cast<CircFeature>(m_meteorsList[index])->getCenter(),
-                                                   dynamic_pointer_cast<CircFeature>(m_meteorsList[index])->getRadius()))
+                                                   std::dynamic_pointer_cast<CircFeature>(m_meteorsList[index])->getCenter(),
+                                                   std::dynamic_pointer_cast<CircFeature>(m_meteorsList[index])->getRadius()))
             {
                 m_lives--;
                 if (m_lives == 0)
@@ -580,7 +581,7 @@ void Game::checkCollisions(void)
         {
             if (m_raylibPtr->checkCollisionCircleRec(m_player->getCenter(),
                                                      m_player->getRadius(),
-                                                     dynamic_pointer_cast<RectFeature>(m_opponentLasersList[ilaser])->getRect()))
+                                                     std::dynamic_pointer_cast<RectFeature>(m_opponentLasersList[ilaser])->getRect()))
             {
                 m_lives--;
                 if (m_lives == 0)
@@ -604,8 +605,8 @@ void Game::checkCollisions(void)
         {
             if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
                                                    m_player->getRadius(),
-                                                   dynamic_pointer_cast<CircFeature>(m_opponentsList[index])->getCenter(),
-                                                   dynamic_pointer_cast<CircFeature>(m_opponentsList[index])->getRadius()))
+                                                   std::dynamic_pointer_cast<CircFeature>(m_opponentsList[index])->getCenter(),
+                                                   std::dynamic_pointer_cast<CircFeature>(m_opponentsList[index])->getRadius()))
             {
                 m_lives--;
                 if (m_lives == 0)
@@ -674,7 +675,7 @@ void Game::checkButtonUpdate(GameButton_t& button)
     }
 }
 
-void Game::drawButton(GameButton_t button)
+void Game::drawButton(const GameButton_t& button)
 {
     m_raylibPtr->drawRectangleRounded(button.m_selectArea, 0.2, 0, button.m_backgroundColor);
     m_raylibPtr->drawTextEx(m_fontType, button.m_displayText, button.m_position, button.m_textSize, 0, LIGHTGRAY);

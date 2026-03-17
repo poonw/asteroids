@@ -7,6 +7,7 @@
 using ::testing::NiceMock;
 
 class CircSpriteMock;
+class PlayerMock;
 class RectSpriteMock;
 class SpriteMock;
 
@@ -16,11 +17,12 @@ public:
     SpriteFactoryFake(void);
     ~SpriteFactoryFake(void) override;
 
-    std::shared_ptr<Sprite> getSprite(SpriteType                                type,
-                                      std::shared_ptr<RaylibInterface>          raylibPtr,
-                                      Sprite::SpriteAttr_t                      attr,
-                                      std::function<void(Sprite::SpriteAttr_t)> shootLaser = nullptr);
+    std::shared_ptr<Sprite> getSprite(SpriteType                                       type,
+                                      std::shared_ptr<RaylibInterface>                 raylibPtr,
+                                      const Sprite::SpriteAttr_t&                      attr,
+                                      std::function<void(const Sprite::SpriteAttr_t&)> shootLaser = nullptr);
 
+    std::shared_ptr<NiceMock<PlayerMock>>                  m_playerMock = nullptr;
     std::vector<std::shared_ptr<NiceMock<SpriteMock>>>     m_starMocksList;
     std::vector<std::shared_ptr<NiceMock<SpriteMock>>>     m_explosionMocksList;
     std::vector<std::shared_ptr<NiceMock<CircSpriteMock>>> m_meteorMocksList;

@@ -3,8 +3,8 @@
 #include <random>
 #include "GameSettings.h"
 
-Opponent::Opponent(std::shared_ptr<RaylibInterface>          raylibPtr,
-                   std::function<void(Sprite::SpriteAttr_t)> shootLaser)
+Opponent::Opponent(std::shared_ptr<RaylibInterface>                 raylibPtr,
+                   std::function<void(const Sprite::SpriteAttr_t&)> shootLaser)
 {
     assert(raylibPtr->isWindowReady());
     assert(shootLaser);
@@ -71,20 +71,20 @@ void Opponent::draw(void)
     m_raylibPtr->drawTextureEx(m_textures[0], m_position, 180, 1, RED);
 }
 
-Vector2 Opponent::getCenter(void)
+Vector2 Opponent::getCenter(void) const
 {
     assert(m_textures.size() == 1);
     return (Vector2((m_position.x - ((float)(m_textures[0].width) * 0.4)),
                     (m_position.y - ((float)(m_textures[0].height) * 0.4))));
 }
 
-float Opponent::getRadius(void)
+float Opponent::getRadius(void) const
 {
     assert(m_textures.size() == 1);
     return m_radius;
 }
 
-void Opponent::setTextures(std::vector<Texture2D> textures)
+void Opponent::setTextures(const std::vector<Texture2D>& textures)
 {
     assert(textures.size() == 1);
     m_textures = textures;

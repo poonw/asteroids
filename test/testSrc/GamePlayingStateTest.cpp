@@ -25,7 +25,6 @@ extern Sequence                           seq;
 extern std::shared_ptr<Game>              m_Game;
 extern std::shared_ptr<RaylibMock>        m_raylibMock;
 extern std::shared_ptr<SpriteFactoryFake> m_spriteFactoryFake;
-extern std::shared_ptr<PlayerMock>        m_playerMock;
 
 extern void gameCommonSetup(void);
 extern void gameCommonTeardown(void);
@@ -37,8 +36,6 @@ public:
     {
         gameCommonSetup();
         m_Game->setState(Game::PLAYING);
-        EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
-        m_Game->setPlayer(m_playerMock);
     }
 
     void TearDown(void)
@@ -57,7 +54,7 @@ TEST_F(GamePlayingStateTest, loopWithOnlyPlayerAndStars)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -70,7 +67,7 @@ TEST_F(GamePlayingStateTest, loopWithOnlyPlayerAndStars)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -89,7 +86,7 @@ TEST_F(GamePlayingStateTest, loopWithOnlyPlayerAndStars)
 
     m_Game->run();
 
-    EXPECT_FALSE(m_playerMock->m_discard);
+    EXPECT_FALSE((m_spriteFactoryFake->m_playerMock)->m_discard);
     EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 0);
 }
 
@@ -106,7 +103,7 @@ TEST_F(GamePlayingStateTest, playerMeteorNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -120,7 +117,7 @@ TEST_F(GamePlayingStateTest, playerMeteorNoCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
@@ -140,8 +137,8 @@ TEST_F(GamePlayingStateTest, playerMeteorNoCollisionTest)
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), getRadius()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(false));
@@ -149,7 +146,7 @@ TEST_F(GamePlayingStateTest, playerMeteorNoCollisionTest)
     m_Game->run();
 
     EXPECT_FALSE((m_spriteFactoryFake->m_meteorMocksList[0])->m_discard);
-    EXPECT_FALSE(m_playerMock->m_discard);
+    EXPECT_FALSE((m_spriteFactoryFake->m_playerMock)->m_discard);
     EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 0);
 }
 
@@ -168,7 +165,7 @@ TEST_F(GamePlayingStateTest, playerMeteorCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -182,7 +179,7 @@ TEST_F(GamePlayingStateTest, playerMeteorCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
@@ -202,19 +199,19 @@ TEST_F(GamePlayingStateTest, playerMeteorCollisionTest)
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), getRadius()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(true));
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
 
     ////////// 2nd loop //////////
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -227,7 +224,7 @@ TEST_F(GamePlayingStateTest, playerMeteorCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     2",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -247,7 +244,7 @@ TEST_F(GamePlayingStateTest, playerMeteorCollisionTest)
     m_Game->run();
 
     EXPECT_TRUE((m_spriteFactoryFake->m_meteorMocksList[0])->m_discard);
-    EXPECT_TRUE(m_playerMock->m_discard);
+    EXPECT_TRUE((m_spriteFactoryFake->m_playerMock)->m_discard);
     EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 1);
 }
 
@@ -269,7 +266,7 @@ TEST_F(GamePlayingStateTest, meteorLaserNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -284,7 +281,7 @@ TEST_F(GamePlayingStateTest, meteorLaserNoCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerLaserMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
@@ -306,8 +303,8 @@ TEST_F(GamePlayingStateTest, meteorLaserNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), checkCollisionCircleRec(A<Vector2>(), A<float>(), A<Rectangle>()))
         .InSequence(seq)
         .WillOnce(Return(false));
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(false));
@@ -339,7 +336,7 @@ TEST_F(GamePlayingStateTest, meteorLaserCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -354,7 +351,7 @@ TEST_F(GamePlayingStateTest, meteorLaserCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerLaserMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
@@ -377,8 +374,8 @@ TEST_F(GamePlayingStateTest, meteorLaserCollisionTest)
         .InSequence(seq)
         .WillOnce(Return(true));
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(false));
@@ -387,7 +384,7 @@ TEST_F(GamePlayingStateTest, meteorLaserCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -400,7 +397,7 @@ TEST_F(GamePlayingStateTest, meteorLaserCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -437,7 +434,7 @@ TEST_F(GamePlayingStateTest, playerOpponentNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -451,7 +448,7 @@ TEST_F(GamePlayingStateTest, playerOpponentNoCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
@@ -471,8 +468,8 @@ TEST_F(GamePlayingStateTest, playerOpponentNoCollisionTest)
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), getRadius()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(false));
@@ -480,7 +477,7 @@ TEST_F(GamePlayingStateTest, playerOpponentNoCollisionTest)
     m_Game->run();
 
     EXPECT_FALSE((m_spriteFactoryFake->m_opponentMocksList[0])->m_discard);
-    EXPECT_FALSE(m_playerMock->m_discard);
+    EXPECT_FALSE((m_spriteFactoryFake->m_playerMock)->m_discard);
     EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 0);
 }
 
@@ -499,7 +496,7 @@ TEST_F(GamePlayingStateTest, playerOpponentCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -513,7 +510,7 @@ TEST_F(GamePlayingStateTest, playerOpponentCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
@@ -533,19 +530,19 @@ TEST_F(GamePlayingStateTest, playerOpponentCollisionTest)
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), getRadius()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(true));
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
 
     ////////// 2nd loop //////////
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -558,7 +555,7 @@ TEST_F(GamePlayingStateTest, playerOpponentCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     2",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -578,7 +575,7 @@ TEST_F(GamePlayingStateTest, playerOpponentCollisionTest)
     m_Game->run();
 
     EXPECT_TRUE((m_spriteFactoryFake->m_opponentMocksList[0])->m_discard);
-    EXPECT_TRUE(m_playerMock->m_discard);
+    EXPECT_TRUE((m_spriteFactoryFake->m_playerMock)->m_discard);
     EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 1);
 }
 
@@ -600,7 +597,7 @@ TEST_F(GamePlayingStateTest, opponentLaserNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -615,7 +612,7 @@ TEST_F(GamePlayingStateTest, opponentLaserNoCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerLaserMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
@@ -637,8 +634,8 @@ TEST_F(GamePlayingStateTest, opponentLaserNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), checkCollisionCircleRec(A<Vector2>(), A<float>(), A<Rectangle>()))
         .InSequence(seq)
         .WillOnce(Return(false));
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(false));
@@ -670,7 +667,7 @@ TEST_F(GamePlayingStateTest, opponentLaserCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -685,7 +682,7 @@ TEST_F(GamePlayingStateTest, opponentLaserCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerLaserMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
@@ -708,8 +705,8 @@ TEST_F(GamePlayingStateTest, opponentLaserCollisionTest)
         .InSequence(seq)
         .WillOnce(Return(true));
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(false));
@@ -718,7 +715,7 @@ TEST_F(GamePlayingStateTest, opponentLaserCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -731,7 +728,7 @@ TEST_F(GamePlayingStateTest, opponentLaserCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -769,7 +766,7 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -783,7 +780,7 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserNoCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentLaserMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
@@ -802,8 +799,8 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentLaserMocksList[0])), getRect()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircleRec(A<Vector2>(), A<float>(), A<Rectangle>()))
         .InSequence(seq)
         .WillOnce(Return(false));
@@ -811,7 +808,7 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserNoCollisionTest)
     m_Game->run();
 
     EXPECT_FALSE((m_spriteFactoryFake->m_opponentLaserMocksList[0])->m_discard);
-    EXPECT_FALSE(m_playerMock->m_discard);
+    EXPECT_FALSE((m_spriteFactoryFake->m_playerMock)->m_discard);
     EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 0);
 }
 
@@ -831,7 +828,7 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -845,7 +842,7 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentLaserMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
@@ -864,19 +861,19 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserCollisionTest)
     EXPECT_CALL((*m_raylibMock), endDrawing()).InSequence(seq);
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentLaserMocksList[0])), getRect()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircleRec(A<Vector2>(), A<float>(), A<Rectangle>()))
         .InSequence(seq)
         .WillOnce(Return(true));
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
 
     ////////// 2nd loop //////////
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -889,7 +886,7 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     2",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -909,7 +906,7 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserCollisionTest)
     m_Game->run();
 
     EXPECT_TRUE((m_spriteFactoryFake->m_opponentLaserMocksList[0])->m_discard);
-    EXPECT_TRUE(m_playerMock->m_discard);
+    EXPECT_TRUE((m_spriteFactoryFake->m_playerMock)->m_discard);
     EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 1);
 }
 
@@ -927,7 +924,7 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -941,7 +938,7 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
@@ -961,22 +958,22 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), getRadius()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(true));
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
 
     m_Game->run();
 
     EXPECT_TRUE((m_spriteFactoryFake->m_meteorMocksList[0])->m_discard);
-    EXPECT_TRUE(m_playerMock->m_discard);
+    EXPECT_TRUE((m_spriteFactoryFake->m_playerMock)->m_discard);
     EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 1);
 
     ////////// 2nd loop: collision //////////
-    m_playerMock->m_discard = false;
+    (m_spriteFactoryFake->m_playerMock)->m_discard = false;
     m_Game->createMeteor();
 
     EXPECT_TRUE(m_spriteFactoryFake->m_meteorMocksList.size() == 2);
@@ -988,7 +985,7 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -1002,7 +999,7 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[1])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     2",
@@ -1022,22 +1019,22 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[1])), getRadius()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[1])), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(true));
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
 
     m_Game->run();
 
     EXPECT_TRUE((m_spriteFactoryFake->m_meteorMocksList[1])->m_discard);
-    EXPECT_TRUE(m_playerMock->m_discard);
+    EXPECT_TRUE((m_spriteFactoryFake->m_playerMock)->m_discard);
     EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 2);
 
     ////////// 3rd loop: collision and rampdowntimer triggered //////////
-    m_playerMock->m_discard = false;
+    (m_spriteFactoryFake->m_playerMock)->m_discard = false;
     m_Game->createMeteor();
 
     EXPECT_TRUE(m_spriteFactoryFake->m_meteorMocksList.size() == 3);
@@ -1049,7 +1046,7 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -1063,7 +1060,7 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[2])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     1",
@@ -1083,19 +1080,19 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[2])), getRadius()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[2])), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(true));
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq).WillOnce(Return(1));
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
 
     m_Game->run();
 
     EXPECT_TRUE((m_spriteFactoryFake->m_meteorMocksList[2])->m_discard);
-    EXPECT_TRUE(m_playerMock->m_discard);
+    EXPECT_TRUE((m_spriteFactoryFake->m_playerMock)->m_discard);
     EXPECT_TRUE(m_spriteFactoryFake->m_explosionMocksList.size() == 3);
 
     ////////// 4th loop: transition to GAME_OVER state //////////
@@ -1107,7 +1104,7 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq).WillOnce(Return(2));
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -1120,7 +1117,7 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
                                             FieldsAre((WINDOW_WIDTH - 150), 30),
@@ -1181,7 +1178,7 @@ TEST_F(GamePlayingStateTest, playerDispersionPowerupNoCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -1195,7 +1192,7 @@ TEST_F(GamePlayingStateTest, playerDispersionPowerupNoCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_dispersionMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
@@ -1215,8 +1212,8 @@ TEST_F(GamePlayingStateTest, playerDispersionPowerupNoCollisionTest)
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_dispersionMocksList[0])), getRadius()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_dispersionMocksList[0])), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(false));
@@ -1239,7 +1236,7 @@ TEST_F(GamePlayingStateTest, playerDispersionPowerupCollisionTest)
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), update()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), update()).InSequence(seq);
     for (uint32_t n = 0; n < NUMBER_OF_STARS; n++)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
@@ -1253,7 +1250,7 @@ TEST_F(GamePlayingStateTest, playerDispersionPowerupCollisionTest)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), draw()).InSequence(seq);
     }
-    EXPECT_CALL((*m_playerMock), draw()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_dispersionMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
@@ -1273,12 +1270,12 @@ TEST_F(GamePlayingStateTest, playerDispersionPowerupCollisionTest)
 
     EXPECT_CALL((*(m_spriteFactoryFake->m_dispersionMocksList[0])), getRadius()).InSequence(seq);
     EXPECT_CALL((*(m_spriteFactoryFake->m_dispersionMocksList[0])), getCenter()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getRadius()).InSequence(seq);
-    EXPECT_CALL((*m_playerMock), getCenter()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getRadius()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), getCenter()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionCircles(A<Vector2>(), A<float>(), A<Vector2>(), A<float>()))
         .InSequence(seq)
         .WillOnce(Return(true));
-    EXPECT_CALL((*m_playerMock), setDispersedlaser()).InSequence(seq);
+    EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), setDispersedlaser()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
 
     m_Game->run();

@@ -9,24 +9,24 @@
 class Opponent : public Sprite, public CircFeature
 {
 public:
-    Opponent(std::shared_ptr<RaylibInterface>          raylibPtr,
-             std::function<void(Sprite::SpriteAttr_t)> shootLaser);
+    Opponent(std::shared_ptr<RaylibInterface>                 raylibPtr,
+             std::function<void(const Sprite::SpriteAttr_t&)> shootLaser);
     ~Opponent(void) override = default;
 
     void    update(void) override;
     void    draw(void) override;
-    Vector2 getCenter(void) override;
-    float   getRadius(void) override;
-    void    setTextures(std::vector<Texture2D> textures) override;
+    Vector2 getCenter(void) const override;
+    float   getRadius(void) const override;
+    void    setTextures(const std::vector<Texture2D>& textures) override;
 
 private:
     void move(void);
 
-    std::function<void(Sprite::SpriteAttr_t)> m_shootLaser;
-    Vector2                                   m_direction       = {0, 0};
-    float                                     m_speed           = 0;
-    uint32_t                                  m_laserInterval   = 0;
-    uint32_t                                  m_intervalCounter = 0;
+    std::function<void(const Sprite::SpriteAttr_t&)> m_shootLaser;
+    Vector2                                          m_direction       = {0, 0};
+    float                                            m_speed           = 0;
+    uint32_t                                         m_laserInterval   = 0;
+    uint32_t                                         m_intervalCounter = 0;
 };
 
 #endif // OPPONENT_H

@@ -13,9 +13,9 @@ public:
 
     void    update(void) override;
     void    draw(void) override;
-    Vector2 getCenter(void) override;
-    float   getRadius(void) override;
-    void    setTextures(std::vector<Texture2D> textures) override;
+    Vector2 getCenter(void) const override;
+    float   getRadius(void) const override;
+    void    setTextures(const std::vector<Texture2D>& textures) override;
 
 private:
     void move(void);

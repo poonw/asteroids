@@ -11,9 +11,9 @@ public:
     ~RaylibMock(void) override;
 
     MOCK_METHOD(double, getTime, (), (override));
-    MOCK_METHOD(void, initWindow, (int width, int height, std::string title), (override));
+    MOCK_METHOD(void, initWindow, (int width, int height, const std::string& title), (override));
     MOCK_METHOD(void, closeWindow, (), (override));
-    MOCK_METHOD(Texture2D, loadTexture, (std::string filename), (override));
+    MOCK_METHOD(Texture2D, loadTexture, (const std::string& filename), (override));
     MOCK_METHOD(void, unloadTexture, (Texture2D texture), (override));
     MOCK_METHOD(bool, windowShouldClose, (), (override));
     MOCK_METHOD(float, getFrameTime, (), (override));
@@ -28,15 +28,15 @@ public:
     MOCK_METHOD(bool, checkCollisionCircles, (Vector2 center1, float radius1, Vector2 center2, float radius2), (override));
     MOCK_METHOD(bool, checkCollisionCircleRec, (Vector2 center, float radius, Rectangle rec), (override));
     MOCK_METHOD(void, drawTexturePro, (Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint), (override));
-    MOCK_METHOD(Font, loadFontEx, (std::string fileName, int fontSize, int* codepoints, int codepointCount), (override));
-    MOCK_METHOD(void, drawTextEx, (Font font, std::string text, Vector2 position, float fontSize, float spacing, Color tint), (override));
+    MOCK_METHOD(Font, loadFontEx, (const std::string& fileName, int fontSize, int* codepoints, int codepointCount), (override));
+    MOCK_METHOD(void, drawTextEx, (Font font, const std::string& text, Vector2 position, float fontSize, float spacing, Color tint), (override));
     MOCK_METHOD(void, unloadFont, (Font font), (override));
     MOCK_METHOD(void, initAudioDevice, (), (override));
     MOCK_METHOD(void, closeAudioDevice, (), (override));
-    MOCK_METHOD(Sound, loadSound, (std::string fileName), (override));
+    MOCK_METHOD(Sound, loadSound, (const std::string& fileName), (override));
     MOCK_METHOD(void, playSound, (Sound sound), (override));
     MOCK_METHOD(void, unloadSound, (Sound sound), (override));
-    MOCK_METHOD(Music, loadMusicStream, (std::string fileName), (override));
+    MOCK_METHOD(Music, loadMusicStream, (const std::string& fileName), (override));
     MOCK_METHOD(void, unloadMusicStream, (Music music), (override));
     MOCK_METHOD(void, updateMusicStream, (Music music), (override));
     MOCK_METHOD(void, playMusicStream, (Music music), (override));
@@ -44,7 +44,7 @@ public:
     MOCK_METHOD(Vector2, getMousePosition, (), (override));
     MOCK_METHOD(bool, checkCollisionPointRec, (Vector2 point, Rectangle rec), (override));
     MOCK_METHOD(bool, isMouseButtonPressed, (int button), (override));
-    MOCK_METHOD(Vector2, measureTextEx, (Font font, std::string text, float fontSize, float spacing), (override));
+    MOCK_METHOD(Vector2, measureTextEx, (Font font, const std::string& text, float fontSize, float spacing), (override));
 };
 
 #endif // RAYLIBMOCK_H

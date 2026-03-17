@@ -46,19 +46,19 @@ void Powerup::draw(void)
     m_raylibPtr->drawTextureV(m_textures[0], m_position, WHITE);
 }
 
-Vector2 Powerup::getCenter(void)
+Vector2 Powerup::getCenter(void) const
 {
     assert(m_textures.size() == 1);
     return m_position;
 }
 
-float Powerup::getRadius(void)
+float Powerup::getRadius(void) const
 {
     assert(m_textures.size() == 1);
     return m_radius;
 }
 
-void Powerup::setTextures(std::vector<Texture2D> textures)
+void Powerup::setTextures(const std::vector<Texture2D>& textures)
 {
     assert(textures.size() == 1);
     m_textures = textures;

@@ -48,19 +48,19 @@ void Meteor::draw(void)
     m_raylibPtr->drawTexturePro(m_textures[0], m_rect, targetRect, m_origin, m_rotation, WHITE);
 }
 
-Vector2 Meteor::getCenter(void)
+Vector2 Meteor::getCenter(void) const
 {
     assert(m_textures.size() == 1);
     return m_position;
 }
 
-float Meteor::getRadius(void)
+float Meteor::getRadius(void) const
 {
     assert(m_textures.size() == 1);
     return m_radius;
 }
 
-void Meteor::setTextures(std::vector<Texture2D> textures)
+void Meteor::setTextures(const std::vector<Texture2D>& textures)
 {
     assert(textures.size() == 1);
     m_textures = textures;

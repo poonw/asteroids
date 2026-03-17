@@ -4,18 +4,23 @@
 #include "Laser.h"
 #include "Meteor.h"
 #include "Opponent.h"
+#include "Player.h"
 #include "Powerup.h"
 #include "Star.h"
 
-std::shared_ptr<Sprite> SpriteFactory::getSprite(SpriteType                                type,
-                                                 std::shared_ptr<RaylibInterface>          raylibPtr,
-                                                 Sprite::SpriteAttr_t                      attr,
-                                                 std::function<void(Sprite::SpriteAttr_t)> shootLaser)
+std::shared_ptr<Sprite> SpriteFactory::getSprite(SpriteType                                       type,
+                                                 std::shared_ptr<RaylibInterface>                 raylibPtr,
+                                                 const Sprite::SpriteAttr_t&                      attr,
+                                                 std::function<void(const Sprite::SpriteAttr_t&)> shootLaser)
 {
     std::shared_ptr<Sprite> ret = nullptr;
 
     switch (type)
     {
+        case PLAYER:
+            ret = std::make_shared<Player>(raylibPtr, shootLaser);
+            break;
+
         case EXPLOSION:
             ret = std::make_shared<Explosion>(raylibPtr, attr.m_position, attr.m_scale);
             break;

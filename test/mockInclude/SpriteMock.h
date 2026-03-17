@@ -12,7 +12,7 @@ public:
 
     MOCK_METHOD(void, update, (), (override));
     MOCK_METHOD(void, draw, (), (override));
-    MOCK_METHOD(void, setTextures, (std::vector<Texture2D> textures), (override));
+    MOCK_METHOD(void, setTextures, (const std::vector<Texture2D>& textures), (override));
 };
 
 #endif // SPRITEMOCK_H
