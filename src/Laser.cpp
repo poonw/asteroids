@@ -42,13 +42,13 @@ void Laser::draw(void)
     m_raylibPtr->drawTextureEx(m_textures[0], m_position, m_rotation, 1, m_color);
 }
 
-Rectangle Laser::getRect(void)
+Rectangle Laser::getRect(void) const
 {
     assert(m_textures.size() == 1);
     return (Rectangle(m_position.x, m_position.y, m_textures[0].width, m_textures[0].height));
 }
 
-void Laser::setTextures(std::vector<Texture2D> textures)
+void Laser::setTextures(const std::vector<Texture2D>& textures)
 {
     assert(textures.size() == 1);
     m_textures = textures;

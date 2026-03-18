@@ -23,7 +23,6 @@ extern Sequence                           seq;
 extern std::shared_ptr<Game>              m_Game;
 extern std::shared_ptr<RaylibMock>        m_raylibMock;
 extern std::shared_ptr<SpriteFactoryFake> m_spriteFactoryFake;
-extern std::shared_ptr<PlayerMock>        m_playerMock;
 
 extern void gameCommonSetup(void);
 extern void gameCommonTeardown(void);
@@ -35,8 +34,6 @@ public:
     {
         gameCommonSetup();
         m_Game->setState(Game::SETTINGS);
-        EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
-        m_Game->setPlayer(m_playerMock);
     }
 
     void TearDown(void)
@@ -72,28 +69,28 @@ TEST_F(GameSettingsStateTest, mouseNotPointingToBackButton)
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), A<float>(), A<int>(), A<Color>())).InSequence(seq);
 
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
@@ -143,28 +140,28 @@ TEST_F(GameSettingsStateTest, mousePointingToBackButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), A<float>(), A<int>(), A<Color>())).InSequence(seq);
 
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
@@ -214,28 +211,28 @@ TEST_F(GameSettingsStateTest, mousePointingToBackButtonAndClickAndTransitionToWe
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), A<float>(), A<int>(), A<Color>())).InSequence(seq);
 
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,
                                             FieldsAre(245, 245, 245, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
-                                            A<std::string>(),
+                                            A<const std::string&>(),
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE + 10,
                                             0,

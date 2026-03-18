@@ -17,8 +17,8 @@ public:
 
     void      update(void) override;
     void      draw(void) override;
-    Rectangle getRect(void) override;
-    void      setTextures(std::vector<Texture2D> textures) override;
+    Rectangle getRect(void) const override;
+    void      setTextures(const std::vector<Texture2D>& textures) override;
 
 private:
     void move(void);

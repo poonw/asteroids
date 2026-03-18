@@ -8,7 +8,7 @@ class RectFeature
 public:
     virtual ~RectFeature(void) = default;
 
-    virtual Rectangle getRect(void) = 0;
+    virtual Rectangle getRect(void) const = 0;
 
 protected:
 };

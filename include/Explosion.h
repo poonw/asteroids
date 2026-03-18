@@ -14,7 +14,7 @@ public:
 
     void update(void) override;
     void draw(void) override;
-    void setTextures(std::vector<Texture2D> textures) override;
+    void setTextures(const std::vector<Texture2D>& textures) override;
 
 private:
     uint32_t m_index = 0;

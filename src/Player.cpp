@@ -4,8 +4,8 @@
 #include "GameSettings.h"
 #include "Timer.h"
 
-Player::Player(std::shared_ptr<RaylibInterface>          raylibPtr,
-               std::function<void(Sprite::SpriteAttr_t)> shootLaser)
+Player::Player(std::shared_ptr<RaylibInterface>                 raylibPtr,
+               std::function<void(const Sprite::SpriteAttr_t&)> shootLaser)
 {
     assert(raylibPtr->isWindowReady());
     assert(shootLaser);
@@ -133,20 +133,20 @@ void Player::draw(void)
     }
 }
 
-Vector2 Player::getCenter(void)
+Vector2 Player::getCenter(void) const
 {
     assert(m_textures.size() == 1);
     return (Vector2((m_position.x + ((float)(m_textures[0].width) / 2)),
                     (m_position.y + ((float)(m_textures[0].height) / 2))));
 }
 
-float Player::getRadius(void)
+float Player::getRadius(void) const
 {
     assert(m_textures.size() == 1);
     return m_radius;
 }
 
-void Player::setTextures(std::vector<Texture2D> textures)
+void Player::setTextures(const std::vector<Texture2D>& textures)
 {
     assert(textures.size() == 1);
     m_textures  = textures;

@@ -13,9 +13,9 @@ public:
 
     MOCK_METHOD(void, update, (), (override));
     MOCK_METHOD(void, draw, (), (override));
-    MOCK_METHOD(Vector2, getCenter, (), (override));
-    MOCK_METHOD(float, getRadius, (), (override));
-    MOCK_METHOD(void, setTextures, (std::vector<Texture2D> textures), (override));
+    MOCK_METHOD(Vector2, getCenter, (), (const, override));
+    MOCK_METHOD(float, getRadius, (), (const, override));
+    MOCK_METHOD(void, setTextures, (const std::vector<Texture2D>& textures), (override));
 };
 
 #endif // CIRCSPRITEMOCK_H

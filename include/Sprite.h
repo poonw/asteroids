@@ -19,9 +19,9 @@ public:
 
     virtual ~Sprite(void) = default;
 
-    virtual void update(void)                                 = 0;
-    virtual void draw(void)                                   = 0;
-    virtual void setTextures(std::vector<Texture2D> textures) = 0;
+    virtual void update(void)                                        = 0;
+    virtual void draw(void)                                          = 0;
+    virtual void setTextures(const std::vector<Texture2D>& textures) = 0;
 
     bool m_discard = false;
 

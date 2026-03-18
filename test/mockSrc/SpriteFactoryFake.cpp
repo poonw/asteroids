@@ -1,5 +1,6 @@
 #include "SpriteFactoryFake.h"
 #include "CircSpriteMock.h"
+#include "PlayerMock.h"
 #include "RectSpriteMock.h"
 #include "SpriteMock.h"
 
@@ -11,15 +12,20 @@ SpriteFactoryFake::~SpriteFactoryFake(void)
 {
 }
 
-std::shared_ptr<Sprite> SpriteFactoryFake::getSprite(SpriteType                                type,
-                                                     std::shared_ptr<RaylibInterface>          raylibPtr,
-                                                     Sprite::SpriteAttr_t                      attr,
-                                                     std::function<void(Sprite::SpriteAttr_t)> shootLaser)
+std::shared_ptr<Sprite> SpriteFactoryFake::getSprite(SpriteType                                       type,
+                                                     std::shared_ptr<RaylibInterface>                 raylibPtr,
+                                                     const Sprite::SpriteAttr_t&                      attr,
+                                                     std::function<void(const Sprite::SpriteAttr_t&)> shootLaser)
 {
     std::shared_ptr<Sprite> ret = nullptr;
 
     switch (type)
     {
+        case PLAYER:
+            m_playerMock = std::make_shared<NiceMock<PlayerMock>>();
+            ret          = m_playerMock;
+            break;
+
         case EXPLOSION:
             ret = std::make_shared<NiceMock<SpriteMock>>();
             m_explosionMocksList.push_back(std::dynamic_pointer_cast<NiceMock<SpriteMock>>(ret));

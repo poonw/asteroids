@@ -35,9 +35,8 @@ public:
     Game& operator=(Game&& game)      = delete;
 
     void run(void);
-    void setPlayer(std::shared_ptr<PlayerInterface> player);
-    void playerShootLaser(Sprite::SpriteAttr_t attr);
-    void opponentShootLaser(Sprite::SpriteAttr_t attr);
+    void playerShootLaser(const Sprite::SpriteAttr_t& attr);
+    void opponentShootLaser(const Sprite::SpriteAttr_t& attr);
     void createMeteor(void);
     void createOpponent(void);
     void createPowerupDispersion(void);
@@ -68,7 +67,7 @@ private:
     void checkCollisions(void);
     void drawStats(void);
     void checkButtonUpdate(GameButton_t& button);
-    void drawButton(GameButton_t button);
+    void drawButton(const GameButton_t& button);
     void drawSettingsText(void);
     void gameoverReset(void);
     void refreshPlayingPage(void);

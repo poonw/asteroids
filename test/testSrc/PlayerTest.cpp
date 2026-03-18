@@ -18,7 +18,7 @@ public:
     std::shared_ptr<Player>     m_Player     = nullptr;
     std::shared_ptr<RaylibMock> m_raylibMock = nullptr;
 
-    void shootLaser(Sprite::SpriteAttr_t attr)
+    void shootLaser(const Sprite::SpriteAttr_t& attr)
     {
     }
 

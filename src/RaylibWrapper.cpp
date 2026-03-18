@@ -5,7 +5,7 @@ double RaylibWrapper::getTime(void)
     return GetTime();
 }
 
-void RaylibWrapper::initWindow(int width, int height, std::string title)
+void RaylibWrapper::initWindow(int width, int height, const std::string& title)
 {
     InitWindow(width, height, title.c_str());
 }
@@ -15,7 +15,7 @@ void RaylibWrapper::closeWindow(void)
     CloseWindow();
 }
 
-Texture2D RaylibWrapper::loadTexture(std::string filename)
+Texture2D RaylibWrapper::loadTexture(const std::string& filename)
 {
     const char* filefullpath = filename.c_str();
     return LoadTexture(filefullpath);
@@ -91,13 +91,13 @@ void RaylibWrapper::drawTexturePro(Texture2D texture, Rectangle source, Rectangl
     DrawTexturePro(texture, source, dest, origin, rotation, tint);
 }
 
-Font RaylibWrapper::loadFontEx(std::string fileName, int fontSize, int* codepoints, int codepointCount)
+Font RaylibWrapper::loadFontEx(const std::string& fileName, int fontSize, int* codepoints, int codepointCount)
 {
     const char* filefullpath = fileName.c_str();
     return (LoadFontEx(filefullpath, fontSize, codepoints, codepointCount));
 }
 
-void RaylibWrapper::drawTextEx(Font font, std::string text, Vector2 position, float fontSize, float spacing, Color tint)
+void RaylibWrapper::drawTextEx(Font font, const std::string& text, Vector2 position, float fontSize, float spacing, Color tint)
 {
     const char* charText = text.c_str();
     DrawTextEx(font, charText, position, fontSize, spacing, tint);
@@ -118,7 +118,7 @@ void RaylibWrapper::closeAudioDevice(void)
     CloseAudioDevice();
 }
 
-Sound RaylibWrapper::loadSound(std::string fileName)
+Sound RaylibWrapper::loadSound(const std::string& fileName)
 {
     return (LoadSound(fileName.c_str()));
 }
@@ -128,7 +128,7 @@ void RaylibWrapper::unloadSound(Sound sound)
     UnloadSound(sound);
 }
 
-Music RaylibWrapper::loadMusicStream(std::string fileName)
+Music RaylibWrapper::loadMusicStream(const std::string& fileName)
 {
     return (LoadMusicStream(fileName.c_str()));
 }
@@ -173,7 +173,7 @@ bool RaylibWrapper::isMouseButtonPressed(int button)
     return (IsMouseButtonPressed(button));
 }
 
-Vector2 RaylibWrapper::measureTextEx(Font font, std::string text, float fontSize, float spacing)
+Vector2 RaylibWrapper::measureTextEx(Font font, const std::string& text, float fontSize, float spacing)
 {
     return (MeasureTextEx(font, text.c_str(), fontSize, spacing));
 }

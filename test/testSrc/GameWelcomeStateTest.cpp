@@ -23,17 +23,14 @@ Sequence                           seq;
 std::shared_ptr<Game>              m_Game              = nullptr;
 std::shared_ptr<RaylibMock>        m_raylibMock        = nullptr;
 std::shared_ptr<SpriteFactoryFake> m_spriteFactoryFake = nullptr;
-std::shared_ptr<PlayerMock>        m_playerMock        = nullptr;
 
 void gameCommonSetup(void)
 {
     m_raylibMock        = std::make_shared<RaylibMock>();
     m_spriteFactoryFake = std::make_shared<SpriteFactoryFake>();
-    m_playerMock        = std::make_shared<PlayerMock>();
 
     ASSERT_TRUE(m_raylibMock != nullptr);
     ASSERT_TRUE(m_spriteFactoryFake != nullptr);
-    ASSERT_TRUE(m_playerMock != nullptr);
 
     EXPECT_CALL((*m_raylibMock), initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Asteroids"))
         .Times(Exactly(1))
@@ -43,7 +40,7 @@ void gameCommonSetup(void)
         .Times(Exactly(1))
         .InSequence(seq);
 
-    EXPECT_CALL((*m_raylibMock), loadTexture(A<std::string>()))
+    EXPECT_CALL((*m_raylibMock), loadTexture(A<const std::string&>()))
         .Times(Exactly(34))
         .InSequence(seq);
 
@@ -51,11 +48,11 @@ void gameCommonSetup(void)
         .Times(Exactly(1))
         .InSequence(seq);
 
-    EXPECT_CALL((*m_raylibMock), loadSound(A<std::string>()))
+    EXPECT_CALL((*m_raylibMock), loadSound(A<const std::string&>()))
         .Times(Exactly(6))
         .InSequence(seq);
 
-    EXPECT_CALL((*m_raylibMock), loadMusicStream(A<std::string>()))
+    EXPECT_CALL((*m_raylibMock), loadMusicStream(A<const std::string&>()))
         .Times(Exactly(1))
         .InSequence(seq);
 
@@ -91,7 +88,6 @@ void gameCommonTeardown(void)
     m_Game              = nullptr;
     m_raylibMock        = nullptr;
     m_spriteFactoryFake = nullptr;
-    m_playerMock        = nullptr;
 }
 
 class GameWelcomeStateTest : public ::testing::Test
@@ -108,16 +104,8 @@ public:
     }
 };
 
-TEST_F(GameWelcomeStateTest, gameRunWithoutPlayerSet_death)
-{
-    EXPECT_DEATH(m_Game->run(), "Assertion failed");
-}
-
 TEST_F(GameWelcomeStateTest, mousePointingToNothing)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
-    m_Game->setPlayer(m_playerMock);
-
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
@@ -183,9 +171,6 @@ TEST_F(GameWelcomeStateTest, mousePointingToNothing)
 
 TEST_F(GameWelcomeStateTest, mousePointingToStartButtonButNotClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
-    m_Game->setPlayer(m_playerMock);
-
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
@@ -253,9 +238,6 @@ TEST_F(GameWelcomeStateTest, mousePointingToStartButtonButNotClick)
 
 TEST_F(GameWelcomeStateTest, mousePointingToStartButtonAndClickAndTransitionToPlaying)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
-    m_Game->setPlayer(m_playerMock);
-
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
@@ -323,9 +305,6 @@ TEST_F(GameWelcomeStateTest, mousePointingToStartButtonAndClickAndTransitionToPl
 
 TEST_F(GameWelcomeStateTest, mousePointingToSettingsButtonButNotClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
-    m_Game->setPlayer(m_playerMock);
-
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
@@ -395,9 +374,6 @@ TEST_F(GameWelcomeStateTest, mousePointingToSettingsButtonButNotClick)
 
 TEST_F(GameWelcomeStateTest, mousePointingToSettingsButtonAndClickAndTransitionToSettings)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
-    m_Game->setPlayer(m_playerMock);
-
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
@@ -467,9 +443,6 @@ TEST_F(GameWelcomeStateTest, mousePointingToSettingsButtonAndClickAndTransitionT
 
 TEST_F(GameWelcomeStateTest, mousePointingToQuitButtonButNotClick)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
-    m_Game->setPlayer(m_playerMock);
-
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));
@@ -539,9 +512,6 @@ TEST_F(GameWelcomeStateTest, mousePointingToQuitButtonButNotClick)
 
 TEST_F(GameWelcomeStateTest, mousePointingToQuitButtonAndClickAndTransitionToQuit)
 {
-    EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
-    m_Game->setPlayer(m_playerMock);
-
     EXPECT_CALL((*m_raylibMock), windowShouldClose())
         .WillOnce(Return(false))
         .WillOnce(Return(true));

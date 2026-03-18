@@ -39,7 +39,7 @@ void Star::draw(void)
     m_raylibPtr->drawTextureEx(m_textures[0], m_position, 0, m_scale, WHITE);
 }
 
-void Star::setTextures(std::vector<Texture2D> textures)
+void Star::setTextures(const std::vector<Texture2D>& textures)
 {
     assert(textures.size() == 1);
     m_textures = textures;

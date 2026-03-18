@@ -11,6 +11,7 @@ class SpriteFactory
 public:
     enum SpriteType
     {
+        PLAYER,
         EXPLOSION,
         RED_LASER,
         YELLOW_LASER,
@@ -23,10 +24,10 @@ public:
 
     virtual ~SpriteFactory(void) = default;
 
-    virtual std::shared_ptr<Sprite> getSprite(SpriteType                                type,
-                                              std::shared_ptr<RaylibInterface>          raylibPtr,
-                                              Sprite::SpriteAttr_t                      attr,
-                                              std::function<void(Sprite::SpriteAttr_t)> shootLaser = nullptr);
+    virtual std::shared_ptr<Sprite> getSprite(SpriteType                                       type,
+                                              std::shared_ptr<RaylibInterface>                 raylibPtr,
+                                              const Sprite::SpriteAttr_t&                      attr,
+                                              std::function<void(const Sprite::SpriteAttr_t&)> shootLaser = nullptr);
 };
 
 #endif // SPRITEFACTORY_H

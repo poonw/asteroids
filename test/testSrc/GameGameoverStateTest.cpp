@@ -23,7 +23,6 @@ extern Sequence                           seq;
 extern std::shared_ptr<Game>              m_Game;
 extern std::shared_ptr<RaylibMock>        m_raylibMock;
 extern std::shared_ptr<SpriteFactoryFake> m_spriteFactoryFake;
-extern std::shared_ptr<PlayerMock>        m_playerMock;
 
 extern void gameCommonSetup(void);
 extern void gameCommonTeardown(void);
@@ -35,8 +34,6 @@ public:
     {
         gameCommonSetup();
         m_Game->setState(Game::GAME_OVER);
-        EXPECT_CALL((*m_playerMock), setTextures(A<std::vector<Texture2D>>())).InSequence(seq);
-        m_Game->setPlayer(m_playerMock);
     }
 
     void TearDown(void)
