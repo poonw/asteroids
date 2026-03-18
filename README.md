@@ -62,8 +62,7 @@ To use the raylib effectively, the order of following function calls must be res
 - Composed of:
   - SpriteFactory
   - RaylibInterface
-  - PlayerInterface
-- <img width="672" height="480" alt="image" src="https://github.com/user-attachments/assets/0ea2ebdb-3d16-4453-93da-78d00846455c" />
+- <img width="458" height="326" alt="image" src="https://github.com/user-attachments/assets/988a0ab4-b750-45ea-83ae-16f08a174720" />
 
 ### Game multi-page handling
 - There are many “pages” in the Game:
