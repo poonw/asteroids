@@ -22,6 +22,11 @@ public:
     float   getRadius(void) const override;
     void    setInvincible(void) override;
     void    setDispersedlaser(void) override;
+    void    setLeftKey(KeyboardKey key) override;
+    void    setRightKey(KeyboardKey key) override;
+    void    setUpKey(KeyboardKey key) override;
+    void    setDownKey(KeyboardKey key) override;
+    void    setShootKey(KeyboardKey key) override;
 
 private:
     void input(void);

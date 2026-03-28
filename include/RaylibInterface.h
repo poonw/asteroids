@@ -1,6 +1,7 @@
 #ifndef RAYLIBINTERFACE_H
 #define RAYLIBINTERFACE_H
 
+#include "raygui.h"
 #include "raylib.h"
 #include <string>
 
@@ -44,6 +45,9 @@ public:
     virtual bool      checkCollisionPointRec(Vector2 point, Rectangle rec)                                                            = 0;
     virtual bool      isMouseButtonPressed(int button)                                                                                = 0;
     virtual Vector2   measureTextEx(Font font, const std::string& text, float fontSize, float spacing)                                = 0;
+    virtual int       guiDropdownBox(Rectangle bounds, const std::string& text, int* active, bool editMode)                           = 0;
+    virtual void      guiSetFont(Font font)                                                                                           = 0;
+    virtual void      guiSetStyle(int control, int property, int value)                                                               = 0;
 };
 
 #endif // RAYLIBINTERFACE_H

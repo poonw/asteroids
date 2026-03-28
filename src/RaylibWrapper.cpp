@@ -1,4 +1,11 @@
 #include "RaylibWrapper.h"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wenum-compare"
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
+#pragma GCC diagnostic pop
 
 double RaylibWrapper::getTime(void)
 {
@@ -176,4 +183,19 @@ bool RaylibWrapper::isMouseButtonPressed(int button)
 Vector2 RaylibWrapper::measureTextEx(Font font, const std::string& text, float fontSize, float spacing)
 {
     return (MeasureTextEx(font, text.c_str(), fontSize, spacing));
+}
+
+int RaylibWrapper::guiDropdownBox(Rectangle bounds, const std::string& text, int* active, bool editMode)
+{
+    return (GuiDropdownBox(bounds, text.c_str(), active, editMode));
+}
+
+void RaylibWrapper::guiSetFont(Font font)
+{
+    GuiSetFont(font);
+}
+
+void RaylibWrapper::guiSetStyle(int control, int property, int value)
+{
+    GuiSetStyle(control, property, value);
 }

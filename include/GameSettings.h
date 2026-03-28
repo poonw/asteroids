@@ -9,8 +9,9 @@
 #define OPPONENT_TIMER_DURATION   2
 #define DISPERSION_TIMER_DURATION 30
 #define STAT_FONTSIZE             30
-#define GAME_TITLE_FONTSIZE       120
-#define MENU_ITEM_FONTSIZE        40
 #define GAME_OVER_FONTSIZE        200
+#define GAME_TITLE_FONTSIZE       120
+#define SETTINGS_FONTSIZE         20
+#define MENU_ITEM_FONTSIZE        40
 #define NUMBER_OF_STARS           50
 #define MAX_LIVES                 3

@@ -60,7 +60,8 @@ void gameCommonSetup(void)
         .Times(Exactly(1))
         .InSequence(seq);
 
-    EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Back", (MENU_ITEM_FONTSIZE + 10), 0)).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Reset", (MENU_ITEM_FONTSIZE + 10), 0)).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "OK", (MENU_ITEM_FONTSIZE + 10), 0)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Game Over", GAME_OVER_FONTSIZE, 0)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Retry", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Quit", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);

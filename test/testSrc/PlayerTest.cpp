@@ -45,7 +45,7 @@ TEST_F(PlayerTest, updateWithoutTextures_death)
     EXPECT_DEATH(m_Player->update(), "Assertion failed");
 }
 
-TEST_F(PlayerTest, updatePlayableWithoutSpaceKeyPressed)
+TEST_F(PlayerTest, updatePlayableDefaultKeysSetWithoutShootPressed)
 {
     Texture2D fakeTexture = {0, 0, 0, 0, 0};
     m_Player->setTextures({fakeTexture});
@@ -61,7 +61,7 @@ TEST_F(PlayerTest, updatePlayableWithoutSpaceKeyPressed)
     m_Player->update();
 }
 
-TEST_F(PlayerTest, updatePlayableWithSpaceKeyPressedNonDispersedLaser)
+TEST_F(PlayerTest, updatePlayableDefaultKeysSetWithShootKeyPressedNonDispersedLaser)
 {
     Texture2D fakeTexture = {0, 0, 0, 0, 0};
     m_Player->setTextures({fakeTexture});
@@ -72,6 +72,28 @@ TEST_F(PlayerTest, updatePlayableWithSpaceKeyPressedNonDispersedLaser)
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_DOWN)).Times(Exactly(1));
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_UP)).Times(Exactly(1));
     EXPECT_CALL((*m_raylibMock), isKeyPressed(KEY_SPACE)).WillOnce(Return(true));
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).Times(Exactly(1));
+
+    m_Player->update();
+}
+
+TEST_F(PlayerTest, updatePlayableCustomKeysSetWithoutShootPressed)
+{
+    Texture2D fakeTexture = {0, 0, 0, 0, 0};
+    m_Player->setTextures({fakeTexture});
+    m_Player->m_discard = false;
+
+    m_Player->setLeftKey(KEY_A);
+    m_Player->setRightKey(KEY_D);
+    m_Player->setUpKey(KEY_W);
+    m_Player->setDownKey(KEY_S);
+    m_Player->setShootKey(KEY_ENTER);
+
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_D)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_A)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_S)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_W)).Times(Exactly(1));
+    EXPECT_CALL((*m_raylibMock), isKeyPressed(KEY_ENTER)).WillOnce(Return(false));
     EXPECT_CALL((*m_raylibMock), getFrameTime()).Times(Exactly(1));
 
     m_Player->update();
@@ -119,7 +141,7 @@ TEST_F(PlayerTest, setTextures_death)
     EXPECT_DEATH(m_Player->setTextures(fakeTextures), "Assertion failed");
 }
 
-TEST_F(PlayerTest, stateMachine)
+TEST_F(PlayerTest, stateMachineWithDefaultKeysSet)
 {
     Texture2D fakeTexture = {0, 0, 0, 0, 0};
     m_Player->setTextures({fakeTexture});

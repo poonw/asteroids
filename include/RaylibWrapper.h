@@ -43,6 +43,9 @@ public:
     bool      checkCollisionPointRec(Vector2 point, Rectangle rec) override;
     bool      isMouseButtonPressed(int button) override;
     Vector2   measureTextEx(Font font, const std::string& text, float fontSize, float spacing) override;
+    int       guiDropdownBox(Rectangle bounds, const std::string& text, int* active, bool editMode) override;
+    void      guiSetFont(Font font) override;
+    void      guiSetStyle(int control, int property, int value) override;
 };
 
 #endif // RAYLIBWRAPPER_H
