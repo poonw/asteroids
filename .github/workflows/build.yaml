@@ -1,0 +1,40 @@
+name: Build with w64devkit
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: milliewalky/setup-7-zip@v2
+
+      - name: Install w64devkit
+        shell: cmd
+        run: |
+          curl.exe -L "https://github.com/skeeto/w64devkit/releases/download/v2.4.0/w64devkit-x64-2.4.0.7z.exe" -o w64devkit.7z
+          7z x w64devkit.7z
+          echo "./w64devkit/bin" >> "%GITHUB_PATH%"
+
+      - name: Build with Make
+        shell: cmd
+        run: |
+          make --version
+          make
+
+  test:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Clone googletest repo
+        shell: cmd
+        run: |
+          git clone https://github.com/google/googletest.git "../googletest"
+
+      - name: Run the test suite
+        shell: cmd
+        run: |
+          make test
+          asteroidsTest.exe
