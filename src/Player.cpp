@@ -27,10 +27,10 @@ Player::Player(std::shared_ptr<RaylibInterface>                 raylibPtr,
 
 void Player::input(void)
 {
-    m_direction.x = int(m_raylibPtr->isKeyDown(KEY_RIGHT)) - int(m_raylibPtr->isKeyDown(KEY_LEFT));
-    m_direction.y = int(m_raylibPtr->isKeyDown(KEY_DOWN)) - int(m_raylibPtr->isKeyDown(KEY_UP));
+    m_direction.x = int(m_raylibPtr->isKeyDown(m_rightKeySetting)) - int(m_raylibPtr->isKeyDown(m_leftKeySetting));
+    m_direction.y = int(m_raylibPtr->isKeyDown(m_downKeySetting)) - int(m_raylibPtr->isKeyDown(m_upKeySetting));
 
-    if (m_raylibPtr->isKeyPressed(KEY_SPACE))
+    if (m_raylibPtr->isKeyPressed(m_shootKeySetting))
     {
         Sprite::SpriteAttr_t laserAttr;
         laserAttr.m_position.x = m_position.x + (m_textures[0].width / 2);
@@ -173,6 +173,31 @@ void Player::setDispersedlaser(void)
         m_dispersedLaser = true;
         m_dispersedLaserTimer->activate();
     }
+}
+
+void Player::setLeftKey(KeyboardKey key)
+{
+    m_leftKeySetting = key;
+}
+
+void Player::setRightKey(KeyboardKey key)
+{
+    m_rightKeySetting = key;
+}
+
+void Player::setUpKey(KeyboardKey key)
+{
+    m_upKeySetting = key;
+}
+
+void Player::setDownKey(KeyboardKey key)
+{
+    m_downKeySetting = key;
+}
+
+void Player::setShootKey(KeyboardKey key)
+{
+    m_shootKeySetting = key;
 }
 
 void Player::resetDispersedlaser(void)

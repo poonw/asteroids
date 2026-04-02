@@ -47,13 +47,14 @@ public:
 private:
     typedef struct GameButton_s
     {
-        Vector2     m_position;
-        Rectangle   m_selectArea;
-        Color       m_backgroundColor;
-        uint32_t    m_textSize;
-        std::string m_displayText;
-        STATE_t     m_nextState;
-        bool        m_selectSoundPlayed;
+        Vector2                   m_position;
+        Rectangle                 m_selectArea;
+        Color                     m_backgroundColor;
+        uint32_t                  m_textSize;
+        std::string               m_displayText;
+        STATE_t                   m_nextState;
+        bool                      m_selectSoundPlayed;
+        std::function<void(void)> m_callBack = nullptr;
     } GameButton_t;
 
     void loadResources(void);
@@ -70,6 +71,8 @@ private:
     void drawButton(const GameButton_t& button);
     void drawSettingsText(void);
     void gameoverReset(void);
+    void resetSettingsToDefault(void);
+    void setSettings(void);
     void refreshPlayingPage(void);
     void refreshWelcomePage(void);
     void refreshSettingsPage(void);
@@ -99,15 +102,61 @@ private:
     GameButton_t m_quitButton;
 
     // settings page
-    GameButton_t m_backButton;
-    Rectangle    m_settingsPageBackground;
+    std::unordered_map<int, KeyboardKey> m_leftKeyMap = {
+        {0, KEY_LEFT},
+        {1, KEY_A   }
+    };
+
+    std::unordered_map<int, KeyboardKey> m_rightKeyMap = {
+        {0, KEY_RIGHT},
+        {1, KEY_D    }
+    };
+
+    std::unordered_map<int, KeyboardKey> m_upKeyMap = {
+        {0, KEY_UP},
+        {1, KEY_W }
+    };
+
+    std::unordered_map<int, KeyboardKey> m_downKeyMap = {
+        {0, KEY_DOWN},
+        {1, KEY_S   }
+    };
+
+    std::unordered_map<int, KeyboardKey> m_shootKeyMap = {
+        {0, KEY_SPACE},
+        {1, KEY_ENTER}
+    };
+
+    GameButton_t      m_backButton;
+    GameButton_t      m_okButton;
+    Rectangle         m_settingsPageBackground;
+    int               m_leftControlSetting  = 0;
+    int               m_rightControlSetting = 0;
+    int               m_upControlSetting    = 0;
+    int               m_downControlSetting  = 0;
+    int               m_shootControlSetting = 0;
+    bool              m_dropDown1Active     = false;
+    bool              m_dropDown2Active     = false;
+    bool              m_dropDown3Active     = false;
+    bool              m_dropDown4Active     = false;
+    bool              m_dropDown5Active     = false;
+    const std::string m_descRow1Text        = "Move left";
+    const std::string m_descRow2Text        = "Move right";
+    const std::string m_descRow3Text        = "Move up";
+    const std::string m_descRow4Text        = "Move down";
+    const std::string m_descRow5Text        = "Shoot laser";
+    const std::string m_dropDown1Text       = "Left Arrow;A";
+    const std::string m_dropDown2Text       = "Right Arrow;D";
+    const std::string m_dropDown3Text       = "Up Arrow;W";
+    const std::string m_dropDown4Text       = "Down Arrow;S";
+    const std::string m_dropDown5Text       = "Space Bar;Enter";
 
     // game over page
-    GameButton_t m_newgameButton;
-    GameButton_t m_gameoverQuitButton;
-    std::string  m_gameoverText = "Game Over";
-    Vector2      m_gameoverTextPosition;
-    float        m_gameoverTextMaxHeight = 0;
+    GameButton_t      m_newgameButton;
+    GameButton_t      m_gameoverQuitButton;
+    const std::string m_gameoverText = "Game Over";
+    Vector2           m_gameoverTextPosition;
+    float             m_gameoverTextMaxHeight = 0;
 
     // playing page
     uint32_t                                             m_score           = 0;

@@ -45,6 +45,9 @@ public:
     MOCK_METHOD(bool, checkCollisionPointRec, (Vector2 point, Rectangle rec), (override));
     MOCK_METHOD(bool, isMouseButtonPressed, (int button), (override));
     MOCK_METHOD(Vector2, measureTextEx, (Font font, const std::string& text, float fontSize, float spacing), (override));
+    MOCK_METHOD(int, guiDropdownBox, (Rectangle bounds, const std::string& text, int* active, bool editMode), (override));
+    MOCK_METHOD(void, guiSetFont, (Font font), (override));
+    MOCK_METHOD(void, guiSetStyle, (int control, int property, int value), (override));
 };
 
 #endif // RAYLIBMOCK_H

@@ -17,6 +17,11 @@ public:
     MOCK_METHOD(void, setTextures, (const std::vector<Texture2D>& textures), (override));
     MOCK_METHOD(void, setInvincible, (), (override));
     MOCK_METHOD(void, setDispersedlaser, (), (override));
+    MOCK_METHOD(void, setLeftKey, (KeyboardKey key), (override));
+    MOCK_METHOD(void, setRightKey, (KeyboardKey key), (override));
+    MOCK_METHOD(void, setUpKey, (KeyboardKey key), (override));
+    MOCK_METHOD(void, setDownKey, (KeyboardKey key), (override));
+    MOCK_METHOD(void, setShootKey, (KeyboardKey key), (override));
 };
 
 #endif // PLAYERMOCK_H

@@ -35,6 +35,7 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_startButton.m_displayText       = "Start";
     m_startButton.m_nextState         = PLAYING;
     m_startButton.m_selectSoundPlayed = false;
+    m_startButton.m_callBack          = nullptr;
 
     m_settingsButton.m_selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) + 50), welcomeMenuSize.x, welcomeMenuSize.y};
     m_settingsButton.m_position          = {m_settingsButton.m_selectArea.x + 10, m_settingsButton.m_selectArea.y + 10};
@@ -43,6 +44,7 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_settingsButton.m_displayText       = "Settings";
     m_settingsButton.m_nextState         = SETTINGS;
     m_settingsButton.m_selectSoundPlayed = false;
+    m_settingsButton.m_callBack          = nullptr;
 
     m_quitButton.m_selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) + 130), welcomeMenuSize.x, welcomeMenuSize.y};
     m_quitButton.m_position          = {m_quitButton.m_selectArea.x + 10, m_quitButton.m_selectArea.y + 10};
@@ -51,6 +53,7 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_quitButton.m_displayText       = "Quit";
     m_quitButton.m_nextState         = EXIT_GAME;
     m_quitButton.m_selectSoundPlayed = false;
+    m_quitButton.m_callBack          = nullptr;
 
     ////// settings page //////
     float settingsMargin     = 100;
@@ -59,13 +62,26 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_backButton.m_selectArea        = {(WINDOW_WIDTH - 300), (WINDOW_HEIGHT - 200), 150, 80};
     m_backButton.m_backgroundColor   = BLANK;
     m_backButton.m_textSize          = MENU_ITEM_FONTSIZE + 10;
-    m_backButton.m_displayText       = "Back";
+    m_backButton.m_displayText       = "Reset";
     m_backButton.m_nextState         = WELCOME;
     m_backButton.m_selectSoundPlayed = false;
+    m_backButton.m_callBack          = std::bind(&Game::resetSettingsToDefault, this);
 
     textsize                  = m_raylibPtr->measureTextEx(m_fontType, m_backButton.m_displayText, m_backButton.m_textSize, 0);
     m_backButton.m_position.x = (m_backButton.m_selectArea.x + ((m_backButton.m_selectArea.width - textsize.x) / 2));
     m_backButton.m_position.y = (m_backButton.m_selectArea.y + ((m_backButton.m_selectArea.height - textsize.y) / 2));
+
+    m_okButton.m_selectArea        = {(WINDOW_WIDTH - 500), (WINDOW_HEIGHT - 200), 150, 80};
+    m_okButton.m_backgroundColor   = BLANK;
+    m_okButton.m_textSize          = MENU_ITEM_FONTSIZE + 10;
+    m_okButton.m_displayText       = "OK";
+    m_okButton.m_nextState         = WELCOME;
+    m_okButton.m_selectSoundPlayed = false;
+    m_okButton.m_callBack          = std::bind(&Game::setSettings, this);
+
+    textsize                = m_raylibPtr->measureTextEx(m_fontType, m_okButton.m_displayText, m_okButton.m_textSize, 0);
+    m_okButton.m_position.x = (m_okButton.m_selectArea.x + ((m_okButton.m_selectArea.width - textsize.x) / 2));
+    m_okButton.m_position.y = (m_okButton.m_selectArea.y + ((m_okButton.m_selectArea.height - textsize.y) / 2));
 
     ////// game over page //////
     textsize                 = m_raylibPtr->measureTextEx(m_fontType, m_gameoverText, GAME_OVER_FONTSIZE, 0);
@@ -87,6 +103,7 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_newgameButton.m_displayText       = "Retry";
     m_newgameButton.m_nextState         = WELCOME;
     m_newgameButton.m_selectSoundPlayed = false;
+    m_newgameButton.m_callBack          = nullptr;
 
     textsize                     = m_raylibPtr->measureTextEx(m_fontType, m_newgameButton.m_displayText, m_newgameButton.m_textSize, 0);
     m_newgameButton.m_position.x = (m_newgameButton.m_selectArea.x + ((m_newgameButton.m_selectArea.width - textsize.x) / 2));
@@ -101,6 +118,7 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_gameoverQuitButton.m_displayText       = "Quit";
     m_gameoverQuitButton.m_nextState         = EXIT_GAME;
     m_gameoverQuitButton.m_selectSoundPlayed = false;
+    m_gameoverQuitButton.m_callBack          = nullptr;
 
     textsize                          = m_raylibPtr->measureTextEx(m_fontType, m_gameoverQuitButton.m_displayText, m_gameoverQuitButton.m_textSize, 0);
     m_gameoverQuitButton.m_position.x = (m_gameoverQuitButton.m_selectArea.x + ((m_gameoverQuitButton.m_selectArea.width - textsize.x) / 2));
@@ -656,6 +674,10 @@ void Game::checkButtonUpdate(GameButton_t& button)
         if (m_raylibPtr->isMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             m_state = button.m_nextState;
+            if (button.m_callBack != nullptr)
+            {
+                button.m_callBack();
+            }
         }
 
         if (!(button.m_selectSoundPlayed))
@@ -683,15 +705,46 @@ void Game::drawButton(const GameButton_t& button)
 
 void Game::drawSettingsText(void)
 {
-    std::string row1col1 = "Spacebar";
-    std::string row1col2 = "- shoot laser";
-    std::string row2col1 = "Arrow keys";
-    std::string row2col2 = "- move the spaceship";
+    float   vecticalGap     = 80;
+    float   initialY        = 200;
+    float   col1InitialX    = 200;
+    float   col2InitialX    = 500;
+    Vector2 dropDownBoxSize = {200, 50};
 
-    m_raylibPtr->drawTextEx(m_fontType, row1col1, Vector2(150, 180), MENU_ITEM_FONTSIZE + 10, 0, RAYWHITE);
-    m_raylibPtr->drawTextEx(m_fontType, row1col2, Vector2(480, 180), MENU_ITEM_FONTSIZE + 10, 0, RAYWHITE);
-    m_raylibPtr->drawTextEx(m_fontType, row2col1, Vector2(150, 240), MENU_ITEM_FONTSIZE + 10, 0, RAYWHITE);
-    m_raylibPtr->drawTextEx(m_fontType, row2col2, Vector2(480, 240), MENU_ITEM_FONTSIZE + 10, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, m_descRow1Text, Vector2(col1InitialX, initialY + 0 * vecticalGap), MENU_ITEM_FONTSIZE, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, m_descRow2Text, Vector2(col1InitialX, initialY + 1 * vecticalGap), MENU_ITEM_FONTSIZE, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, m_descRow3Text, Vector2(col1InitialX, initialY + 2 * vecticalGap), MENU_ITEM_FONTSIZE, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, m_descRow4Text, Vector2(col1InitialX, initialY + 3 * vecticalGap), MENU_ITEM_FONTSIZE, 0, RAYWHITE);
+    m_raylibPtr->drawTextEx(m_fontType, m_descRow5Text, Vector2(col1InitialX, initialY + 4 * vecticalGap), MENU_ITEM_FONTSIZE, 0, RAYWHITE);
+
+    m_raylibPtr->guiSetFont(m_fontType);
+    m_raylibPtr->guiSetStyle(DEFAULT, TEXT_SIZE, SETTINGS_FONTSIZE);
+    Rectangle box1 = {col2InitialX, initialY + 0 * vecticalGap, dropDownBoxSize.x, dropDownBoxSize.y};
+    Rectangle box2 = {col2InitialX, initialY + 1 * vecticalGap, dropDownBoxSize.x, dropDownBoxSize.y};
+    Rectangle box3 = {col2InitialX, initialY + 2 * vecticalGap, dropDownBoxSize.x, dropDownBoxSize.y};
+    Rectangle box4 = {col2InitialX, initialY + 3 * vecticalGap, dropDownBoxSize.x, dropDownBoxSize.y};
+    Rectangle box5 = {col2InitialX, initialY + 4 * vecticalGap, dropDownBoxSize.x, dropDownBoxSize.y};
+
+    if (m_raylibPtr->guiDropdownBox(box5, m_dropDown5Text, &m_shootControlSetting, m_dropDown5Active))
+    {
+        m_dropDown5Active = !m_dropDown5Active;
+    }
+    if (m_raylibPtr->guiDropdownBox(box4, m_dropDown4Text, &m_rightControlSetting, m_dropDown4Active))
+    {
+        m_dropDown4Active = !m_dropDown4Active;
+    }
+    if (m_raylibPtr->guiDropdownBox(box3, m_dropDown3Text, &m_leftControlSetting, m_dropDown3Active))
+    {
+        m_dropDown3Active = !m_dropDown3Active;
+    }
+    if (m_raylibPtr->guiDropdownBox(box2, m_dropDown2Text, &m_downControlSetting, m_dropDown2Active))
+    {
+        m_dropDown2Active = !m_dropDown2Active;
+    }
+    if (m_raylibPtr->guiDropdownBox(box1, m_dropDown1Text, &m_upControlSetting, m_dropDown1Active))
+    {
+        m_dropDown1Active = !m_dropDown1Active;
+    }
 }
 
 void Game::gameoverReset(void)
@@ -701,6 +754,24 @@ void Game::gameoverReset(void)
     m_lives                  = MAX_LIVES;
     m_score                  = 0;
     m_state                  = GAME_OVER;
+}
+
+void Game::resetSettingsToDefault(void)
+{
+    m_leftControlSetting  = 0;
+    m_rightControlSetting = 0;
+    m_upControlSetting    = 0;
+    m_downControlSetting  = 0;
+    m_shootControlSetting = 0;
+}
+
+void Game::setSettings(void)
+{
+    m_player->setLeftKey(m_leftKeyMap[m_leftControlSetting]);
+    m_player->setRightKey(m_rightKeyMap[m_rightControlSetting]);
+    m_player->setUpKey(m_upKeyMap[m_upControlSetting]);
+    m_player->setDownKey(m_downKeyMap[m_downControlSetting]);
+    m_player->setShootKey(m_shootKeyMap[m_shootControlSetting]);
 }
 
 void Game::refreshPlayingPage(void)
@@ -743,6 +814,7 @@ void Game::refreshSettingsPage(void)
         m_starsList[index]->update();
     }
 
+    checkButtonUpdate(m_okButton);
     checkButtonUpdate(m_backButton);
     m_raylibPtr->updateMusicStream(m_backGroundMusic);
 
@@ -752,6 +824,7 @@ void Game::refreshSettingsPage(void)
     drawStars();
     m_raylibPtr->drawRectangleRounded(m_settingsPageBackground, 0.05, 0, {30, 30, 30, 200});
     drawSettingsText();
+    drawButton(m_okButton);
     drawButton(m_backButton);
     m_raylibPtr->endDrawing();
 }
