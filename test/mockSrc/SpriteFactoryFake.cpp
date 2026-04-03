@@ -58,7 +58,7 @@ std::shared_ptr<Sprite> SpriteFactoryFake::getSprite(SpriteType                 
 
         case POWERUP:
             ret = std::make_shared<NiceMock<CircSpriteMock>>();
-            m_dispersionMocksList.push_back(std::dynamic_pointer_cast<NiceMock<CircSpriteMock>>(ret));
+            m_powerupMocksList.push_back(std::dynamic_pointer_cast<NiceMock<CircSpriteMock>>(ret));
             break;
 
         case UNDEFINED:
