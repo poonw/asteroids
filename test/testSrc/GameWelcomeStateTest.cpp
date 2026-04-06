@@ -41,7 +41,7 @@ void gameCommonSetup(void)
         .InSequence(seq);
 
     EXPECT_CALL((*m_raylibMock), loadTexture(A<const std::string&>()))
-        .Times(Exactly(34))
+        .Times(Exactly(35))
         .InSequence(seq);
 
     EXPECT_CALL((*m_raylibMock), loadFontEx(_, _, _, _))
@@ -66,9 +66,7 @@ void gameCommonSetup(void)
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Retry", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Quit", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
 
-    EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
-    EXPECT_CALL((*m_raylibMock), getTime()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), getTime()).Times(Exactly(4)).InSequence(seq);
 
     m_Game = std::make_shared<Game>(m_raylibMock, m_spriteFactoryFake);
 
@@ -81,7 +79,7 @@ void gameCommonTeardown(void)
     EXPECT_CALL((*m_raylibMock), unloadMusicStream(A<Music>())).Times(Exactly(1)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), unloadSound(A<Sound>())).Times(Exactly(6)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), unloadFont(A<Font>())).Times(Exactly(1)).InSequence(seq);
-    EXPECT_CALL((*m_raylibMock), unloadTexture(A<Texture2D>())).Times(Exactly(34)).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), unloadTexture(A<Texture2D>())).Times(Exactly(35)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), closeAudioDevice()).Times(Exactly(1)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), closeWindow()).Times(Exactly(1)).InSequence(seq);
 

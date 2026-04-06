@@ -40,6 +40,7 @@ public:
     void createMeteor(void);
     void createOpponent(void);
     void createPowerupDispersion(void);
+    void createPowerupExtralife(void);
 #ifdef DEBUG_
     void setState(STATE_t state);
 #endif
@@ -166,6 +167,7 @@ private:
     std::shared_ptr<Timer>                               m_rampdownTimer   = nullptr;
     std::shared_ptr<Timer>                               m_opponentTimer   = nullptr;
     std::shared_ptr<Timer>                               m_dispersionTimer = nullptr;
+    std::shared_ptr<Timer>                               m_extralifeTimer  = nullptr;
     std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starsList;
     std::vector<std::shared_ptr<Sprite>>                 m_playerLasersList;
     std::vector<std::shared_ptr<Sprite>>                 m_meteorsList;

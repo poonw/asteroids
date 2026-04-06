@@ -27,7 +27,7 @@ public:
     std::vector<std::shared_ptr<NiceMock<SpriteMock>>>     m_explosionMocksList;
     std::vector<std::shared_ptr<NiceMock<CircSpriteMock>>> m_meteorMocksList;
     std::vector<std::shared_ptr<NiceMock<CircSpriteMock>>> m_opponentMocksList;
-    std::vector<std::shared_ptr<NiceMock<CircSpriteMock>>> m_dispersionMocksList;
+    std::vector<std::shared_ptr<NiceMock<CircSpriteMock>>> m_powerupMocksList;
     std::vector<std::shared_ptr<NiceMock<RectSpriteMock>>> m_playerLaserMocksList;
     std::vector<std::shared_ptr<NiceMock<RectSpriteMock>>> m_opponentLaserMocksList;
 };

@@ -149,6 +149,12 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
                                                 true,
                                                 std::bind(&Game::createPowerupDispersion, this));
 
+    m_extralifeTimer = std::make_shared<Timer>(m_raylibPtr,
+                                               EXTRALIFE_TIMER_DURATION,
+                                               true,
+                                               true,
+                                               std::bind(&Game::createPowerupExtralife, this));
+
     Sprite::SpriteAttr_t attr;
 
     m_player = std::dynamic_pointer_cast<PlayerInterface>(
@@ -259,6 +265,15 @@ void Game::createPowerupDispersion(void)
     powerup->setTextures(m_texturesMap["dispersion"]);
     m_dispersionsList.push_back(powerup);
 }
+
+void Game::createPowerupExtralife(void)
+{
+    assert(m_state == PLAYING);
+    Sprite::SpriteAttr_t    attr;
+    std::shared_ptr<Sprite> powerup = m_factory->getSprite(SpriteFactory::POWERUP, m_raylibPtr, attr);
+    powerup->setTextures(m_texturesMap["extralife"]);
+    m_extralifesList.push_back(powerup);
+}
 #ifdef DEBUG_
 void Game::setState(STATE_t state)
 {
@@ -278,6 +293,7 @@ void Game::loadResources(void)
     m_texturesMap["meteor"]        = {m_raylibPtr->loadTexture((imagesPath / "meteor.png").string())};
     m_texturesMap["dispersion"]    = {m_raylibPtr->loadTexture((imagesPath / "dispersion.png").string())};
     m_texturesMap["invincibility"] = {m_raylibPtr->loadTexture((imagesPath / "invincibility.png").string())};
+    m_texturesMap["extralife"]     = {m_raylibPtr->loadTexture((imagesPath / "heart.png").string())};
 
     uint32_t               numberOfExplosionTextures = 28;
     std::vector<Texture2D> explosionTextures(numberOfExplosionTextures);
@@ -315,6 +331,7 @@ void Game::unloadResources(void)
         m_raylibPtr->unloadTexture(m_texturesMap["explosion"][index]);
     }
 
+    m_raylibPtr->unloadTexture(m_texturesMap["extralife"][0]);
     m_raylibPtr->unloadTexture(m_texturesMap["invincibility"][0]);
     m_raylibPtr->unloadTexture(m_texturesMap["dispersion"][0]);
     m_raylibPtr->unloadTexture(m_texturesMap["meteor"][0]);
@@ -326,6 +343,7 @@ void Game::unloadResources(void)
 void Game::updatePlayingPage(void)
 {
     m_meteorTimer->update();
+    m_extralifeTimer->update();
     m_dispersionTimer->update();
     m_opponentTimer->update();
     m_rampdownTimer->update();
@@ -357,6 +375,10 @@ void Game::updatePlayingPage(void)
     for (uint32_t index = 0; index < m_dispersionsList.size(); index++)
     {
         m_dispersionsList[index]->update();
+    }
+    for (uint32_t index = 0; index < m_extralifesList.size(); index++)
+    {
+        m_extralifesList[index]->update();
     }
     m_raylibPtr->updateMusicStream(m_backGroundMusic);
 }
@@ -407,6 +429,10 @@ void Game::drawSprites(void)
     for (uint32_t index = 0; index < m_dispersionsList.size(); index++)
     {
         m_dispersionsList[index]->draw();
+    }
+    for (uint32_t index = 0; index < m_extralifesList.size(); index++)
+    {
+        m_extralifesList[index]->draw();
     }
 }
 
@@ -478,6 +504,17 @@ void Game::discardSprites(void)
             ++it;
         }
     }
+    for (auto it = m_extralifesList.begin(); it != m_extralifesList.end();)
+    {
+        if ((*(*it)).m_discard)
+        {
+            it = m_extralifesList.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 void Game::discardAllSprites(void)
@@ -505,6 +542,10 @@ void Game::discardAllSprites(void)
     for (auto it = m_dispersionsList.begin(); it != m_dispersionsList.end();)
     {
         it = m_dispersionsList.erase(it);
+    }
+    for (auto it = m_extralifesList.begin(); it != m_extralifesList.end();)
+    {
+        it = m_extralifesList.erase(it);
     }
 }
 
@@ -565,6 +606,19 @@ void Game::checkCollisions(void)
             m_dispersionsList[index]->m_discard = true;
             m_player->setDispersedlaser();
             m_raylibPtr->playSound(m_dispersionSound);
+        }
+    }
+
+    for (uint32_t index = 0; index < m_extralifesList.size(); index++)
+    {
+        if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
+                                               m_player->getRadius(),
+                                               std::dynamic_pointer_cast<CircFeature>(m_extralifesList[index])->getCenter(),
+                                               std::dynamic_pointer_cast<CircFeature>(m_extralifesList[index])->getRadius()))
+        {
+            m_extralifesList[index]->m_discard = true;
+            m_lives++;
+            m_raylibPtr->playSound(m_extralifeSound);
         }
     }
 
