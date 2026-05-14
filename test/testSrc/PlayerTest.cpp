@@ -28,6 +28,9 @@ public:
         ASSERT_TRUE(m_raylibMock != nullptr);
 
         EXPECT_CALL((*m_raylibMock), isWindowReady()).WillOnce(Return(true));
+        EXPECT_CALL((*m_raylibMock), getCurrentMonitor()).WillOnce(Return(0));
+        EXPECT_CALL((*m_raylibMock), getMonitorWidth(0)).WillOnce(Return(1600));
+        EXPECT_CALL((*m_raylibMock), getMonitorHeight(0)).WillOnce(Return(900));
 
         std::function<void(Sprite::SpriteAttr_t)> f_shootLaser = std::bind(&PlayerTest::shootLaser, this, std::placeholders::_1);
         m_Player                                               = std::make_shared<Player>(m_raylibMock, f_shootLaser);

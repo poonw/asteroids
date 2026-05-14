@@ -24,7 +24,7 @@ public:
         m_raylibMock = std::make_shared<RaylibMock>();
         ASSERT_TRUE(m_raylibMock != nullptr);
 
-        Vector2 startPos  = {0, WINDOW_HEIGHT};
+        Vector2 startPos  = {0, 900};
         Vector2 direction = {0, -1};
         float   rotation  = 180;
         Color   color     = WHITE;
@@ -88,7 +88,7 @@ TEST_F(LaserTest, getRect)
     Texture2D fakeTexture = {0, 5, 15, 0, 0};
     m_Laser->setTextures({fakeTexture});
 
-    EXPECT_THAT(m_Laser->getRect(), FieldsAre(5, (WINDOW_HEIGHT + 15), 5, 15));
+    EXPECT_THAT(m_Laser->getRect(), FieldsAre(5, (900 + 15), 5, 15));
 }
 
 TEST_F(LaserTest, setTextures_death)

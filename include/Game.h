@@ -79,11 +79,15 @@ private:
     void refreshSettingsPage(void);
     void refreshGameOverPage(void);
 
-    const std::string                m_gameName     = "Asteroids";
-    const std::filesystem::path      m_resourcePath = "resources";
-    STATE_t                          m_state        = EXIT_GAME;
-    std::shared_ptr<RaylibInterface> m_raylibPtr    = nullptr;
-    std::shared_ptr<SpriteFactory>   m_factory      = nullptr;
+    const std::string           m_gameName     = "Asteroids";
+    const std::filesystem::path m_resourcePath = "resources";
+    STATE_t                     m_state        = EXIT_GAME;
+
+    float m_windowWidth  = 0;
+    float m_windowHeight = 0;
+
+    std::shared_ptr<RaylibInterface> m_raylibPtr = nullptr;
+    std::shared_ptr<SpriteFactory>   m_factory   = nullptr;
 
     std::unordered_map<std::string, std::vector<Texture2D>> m_texturesMap;
 

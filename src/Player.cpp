@@ -13,6 +13,10 @@ Player::Player(std::shared_ptr<RaylibInterface>                 raylibPtr,
     m_shootLaser = shootLaser;
     m_speed      = PLAYER_SPEED;
 
+    int monitor    = m_raylibPtr->getCurrentMonitor();
+    m_windowWidth  = m_raylibPtr->getMonitorWidth(monitor);
+    m_windowHeight = m_raylibPtr->getMonitorHeight(monitor);
+
     std::function<void(void)> renderWarmupCallback        = std::bind(&Player::renderWarmup, this);
     std::function<void(void)> renderVincibleCallback      = std::bind(&Player::renderPlayable, this);
     std::function<void(void)> resetDispersedlaserCallback = std::bind(&Player::resetDispersedlaser, this);
@@ -76,7 +80,7 @@ void Player::update(void)
                 m_state          = INVISIBLE;
                 m_dispersedLaser = false;
                 m_position.x     = m_startXPos;
-                m_position.y     = WINDOW_HEIGHT + 100;
+                m_position.y     = m_windowHeight + 100;
                 m_invisibleTimer->activate();
             }
             else
@@ -150,8 +154,8 @@ void Player::setTextures(const std::vector<Texture2D>& textures)
 {
     assert(textures.size() == 1);
     m_textures  = textures;
-    m_maxXPos   = (float)(WINDOW_WIDTH - m_textures[0].width);
-    m_maxYPos   = (float)(WINDOW_HEIGHT - m_textures[0].height);
+    m_maxXPos   = (m_windowWidth - m_textures[0].width);
+    m_maxYPos   = (m_windowHeight - m_textures[0].height);
     m_startXPos = (m_maxXPos / 2);
     m_startYPos = (m_maxYPos - 100);
 

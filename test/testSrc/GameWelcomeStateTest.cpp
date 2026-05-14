@@ -23,6 +23,8 @@ Sequence                           seq;
 std::shared_ptr<Game>              m_Game              = nullptr;
 std::shared_ptr<RaylibMock>        m_raylibMock        = nullptr;
 std::shared_ptr<SpriteFactoryFake> m_spriteFactoryFake = nullptr;
+extern const float                 m_testWindowWidth   = 1920;
+extern const float                 m_testWindowHeight  = 1080;
 
 void gameCommonSetup(void)
 {
@@ -32,7 +34,19 @@ void gameCommonSetup(void)
     ASSERT_TRUE(m_raylibMock != nullptr);
     ASSERT_TRUE(m_spriteFactoryFake != nullptr);
 
-    EXPECT_CALL((*m_raylibMock), initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Asteroids"))
+    EXPECT_CALL((*m_raylibMock), setConfigFlags(FLAG_WINDOW_MAXIMIZED))
+        .Times(Exactly(1))
+        .InSequence(seq);
+
+    EXPECT_CALL((*m_raylibMock), initWindow(0, 0, "Asteroids"))
+        .Times(Exactly(1))
+        .InSequence(seq);
+
+    EXPECT_CALL((*m_raylibMock), getCurrentMonitor()).InSequence(seq).WillOnce(Return(0));
+    EXPECT_CALL((*m_raylibMock), getMonitorWidth(0)).InSequence(seq).WillOnce(Return(m_testWindowWidth));
+    EXPECT_CALL((*m_raylibMock), getMonitorHeight(0)).InSequence(seq).WillOnce(Return(m_testWindowHeight));
+
+    EXPECT_CALL((*m_raylibMock), setWindowSize(1920, 1080))
         .Times(Exactly(1))
         .InSequence(seq);
 

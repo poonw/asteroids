@@ -48,6 +48,11 @@ public:
     virtual int       guiDropdownBox(Rectangle bounds, const std::string& text, int* active, bool editMode)                           = 0;
     virtual void      guiSetFont(Font font)                                                                                           = 0;
     virtual void      guiSetStyle(int control, int property, int value)                                                               = 0;
+    virtual void      setConfigFlags(unsigned int flags)                                                                              = 0;
+    virtual int       getCurrentMonitor(void)                                                                                         = 0;
+    virtual int       getMonitorWidth(int monitor)                                                                                    = 0;
+    virtual int       getMonitorHeight(int monitor)                                                                                   = 0;
+    virtual void      setWindowSize(int width, int height)                                                                            = 0;
 };
 
 #endif // RAYLIBINTERFACE_H

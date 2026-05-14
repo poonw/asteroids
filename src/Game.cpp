@@ -17,7 +17,12 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
 
     ////// raylib init //////
     m_state = WELCOME;
-    m_raylibPtr->initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, m_gameName);
+    m_raylibPtr->setConfigFlags(FLAG_WINDOW_MAXIMIZED);
+    m_raylibPtr->initWindow(0, 0, m_gameName);
+    int current    = m_raylibPtr->getCurrentMonitor();
+    m_windowWidth  = (float)(m_raylibPtr->getMonitorWidth(current));
+    m_windowHeight = (float)(m_raylibPtr->getMonitorHeight(current));
+    m_raylibPtr->setWindowSize(m_windowWidth, m_windowHeight);
     m_raylibPtr->initAudioDevice();
     loadResources();
 
@@ -25,10 +30,10 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
 
     ////// welcome page //////
     Vector2 welcomeMenuSize = {280, 60};
-    m_titlePosition.x       = ((WINDOW_WIDTH - ((m_gameName.length() / 2) * GAME_TITLE_FONTSIZE)) / 3);
-    m_titlePosition.y       = ((WINDOW_HEIGHT / 2) - 200);
+    m_titlePosition.x       = ((m_windowWidth - ((m_gameName.length() / 2) * GAME_TITLE_FONTSIZE)) / 3);
+    m_titlePosition.y       = ((m_windowHeight / 2) - 200);
 
-    m_startButton.m_selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) - 30), welcomeMenuSize.x, welcomeMenuSize.y};
+    m_startButton.m_selectArea        = {m_titlePosition.x + 20, ((m_windowHeight / 2) - 30), welcomeMenuSize.x, welcomeMenuSize.y};
     m_startButton.m_position          = {m_startButton.m_selectArea.x + 10, m_startButton.m_selectArea.y + 10};
     m_startButton.m_backgroundColor   = BLANK;
     m_startButton.m_textSize          = MENU_ITEM_FONTSIZE;
@@ -37,7 +42,7 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_startButton.m_selectSoundPlayed = false;
     m_startButton.m_callBack          = nullptr;
 
-    m_settingsButton.m_selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) + 50), welcomeMenuSize.x, welcomeMenuSize.y};
+    m_settingsButton.m_selectArea        = {m_titlePosition.x + 20, ((m_windowHeight / 2) + 50), welcomeMenuSize.x, welcomeMenuSize.y};
     m_settingsButton.m_position          = {m_settingsButton.m_selectArea.x + 10, m_settingsButton.m_selectArea.y + 10};
     m_settingsButton.m_backgroundColor   = BLANK;
     m_settingsButton.m_textSize          = MENU_ITEM_FONTSIZE;
@@ -46,7 +51,7 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_settingsButton.m_selectSoundPlayed = false;
     m_settingsButton.m_callBack          = nullptr;
 
-    m_quitButton.m_selectArea        = {m_titlePosition.x + 20, ((WINDOW_HEIGHT / 2) + 130), welcomeMenuSize.x, welcomeMenuSize.y};
+    m_quitButton.m_selectArea        = {m_titlePosition.x + 20, ((m_windowHeight / 2) + 130), welcomeMenuSize.x, welcomeMenuSize.y};
     m_quitButton.m_position          = {m_quitButton.m_selectArea.x + 10, m_quitButton.m_selectArea.y + 10};
     m_quitButton.m_backgroundColor   = BLANK;
     m_quitButton.m_textSize          = MENU_ITEM_FONTSIZE;
@@ -57,9 +62,9 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
 
     ////// settings page //////
     float settingsMargin     = 100;
-    m_settingsPageBackground = {settingsMargin, settingsMargin, (WINDOW_WIDTH - (2 * settingsMargin)), (WINDOW_HEIGHT - (2 * settingsMargin))};
+    m_settingsPageBackground = {settingsMargin, settingsMargin, (m_windowWidth - (2 * settingsMargin)), (m_windowHeight - (2 * settingsMargin))};
 
-    m_backButton.m_selectArea        = {(WINDOW_WIDTH - 300), (WINDOW_HEIGHT - 200), 150, 80};
+    m_backButton.m_selectArea        = {(m_windowWidth - 300), (m_windowHeight - 200), 150, 80};
     m_backButton.m_backgroundColor   = BLANK;
     m_backButton.m_textSize          = MENU_ITEM_FONTSIZE + 10;
     m_backButton.m_displayText       = "Reset";
@@ -71,7 +76,7 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_backButton.m_position.x = (m_backButton.m_selectArea.x + ((m_backButton.m_selectArea.width - textsize.x) / 2));
     m_backButton.m_position.y = (m_backButton.m_selectArea.y + ((m_backButton.m_selectArea.height - textsize.y) / 2));
 
-    m_okButton.m_selectArea        = {(WINDOW_WIDTH - 500), (WINDOW_HEIGHT - 200), 150, 80};
+    m_okButton.m_selectArea        = {(m_windowWidth - 500), (m_windowHeight - 200), 150, 80};
     m_okButton.m_backgroundColor   = BLANK;
     m_okButton.m_textSize          = MENU_ITEM_FONTSIZE + 10;
     m_okButton.m_displayText       = "OK";
@@ -85,17 +90,17 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
 
     ////// game over page //////
     textsize                 = m_raylibPtr->measureTextEx(m_fontType, m_gameoverText, GAME_OVER_FONTSIZE, 0);
-    m_gameoverTextPosition.x = (WINDOW_WIDTH - textsize.x) / 2;
-    m_gameoverTextPosition.y = WINDOW_HEIGHT;
-    m_gameoverTextMaxHeight  = (WINDOW_HEIGHT - textsize.y) / 2;
+    m_gameoverTextPosition.x = (m_windowWidth - textsize.x) / 2;
+    m_gameoverTextPosition.y = m_windowHeight;
+    m_gameoverTextMaxHeight  = (m_windowHeight - textsize.y) / 2;
 
     Vector2  gameoverMenuSize     = {240, 120};
     float    verticalOffset       = 100;
     float    buttonMargin         = 10;
     uint32_t gameoverMenuFontSize = MENU_ITEM_FONTSIZE + 30;
 
-    m_newgameButton.m_selectArea        = {((WINDOW_WIDTH / 2) - gameoverMenuSize.x - buttonMargin),
-                                           ((WINDOW_HEIGHT / 2) + verticalOffset),
+    m_newgameButton.m_selectArea        = {((m_windowWidth / 2) - gameoverMenuSize.x - buttonMargin),
+                                           ((m_windowHeight / 2) + verticalOffset),
                                            gameoverMenuSize.x,
                                            gameoverMenuSize.y};
     m_newgameButton.m_backgroundColor   = BLANK;
@@ -109,8 +114,8 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_newgameButton.m_position.x = (m_newgameButton.m_selectArea.x + ((m_newgameButton.m_selectArea.width - textsize.x) / 2));
     m_newgameButton.m_position.y = (m_newgameButton.m_selectArea.y + ((m_newgameButton.m_selectArea.height - textsize.y) / 2));
 
-    m_gameoverQuitButton.m_selectArea        = {((WINDOW_WIDTH / 2) + buttonMargin),
-                                                ((WINDOW_HEIGHT / 2) + verticalOffset),
+    m_gameoverQuitButton.m_selectArea        = {((m_windowWidth / 2) + buttonMargin),
+                                                ((m_windowHeight / 2) + verticalOffset),
                                                 gameoverMenuSize.x,
                                                 gameoverMenuSize.y};
     m_gameoverQuitButton.m_backgroundColor   = BLANK;
@@ -704,14 +709,14 @@ void Game::drawStats(void)
 {
     m_raylibPtr->drawTextEx(m_fontType,
                             "lives: " + std::format("{:>5}", std::to_string(m_lives)),
-                            Vector2((WINDOW_WIDTH - 150), 30),
+                            Vector2((m_windowWidth - 150), 30),
                             STAT_FONTSIZE,
                             0,
                             WHITE);
 
     m_raylibPtr->drawTextEx(m_fontType,
                             "score: " + std::format("{:>4}", std::to_string(m_score)),
-                            Vector2((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                            Vector2((m_windowWidth - 150), (30 + STAT_FONTSIZE)),
                             STAT_FONTSIZE,
                             0,
                             WHITE);
@@ -804,7 +809,7 @@ void Game::drawSettingsText(void)
 void Game::gameoverReset(void)
 {
     discardAllSprites();
-    m_gameoverTextPosition.y = WINDOW_HEIGHT;
+    m_gameoverTextPosition.y = m_windowHeight;
     m_lives                  = MAX_LIVES;
     m_score                  = 0;
     m_state                  = GAME_OVER;

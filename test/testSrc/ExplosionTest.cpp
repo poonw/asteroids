@@ -24,7 +24,7 @@ public:
         m_raylibMock = std::make_shared<RaylibMock>();
         ASSERT_TRUE(m_raylibMock != nullptr);
 
-        Vector2 startPos = {0, WINDOW_HEIGHT};
+        Vector2 startPos = {0, 900};
         EXPECT_CALL((*m_raylibMock), isWindowReady()).WillOnce(Return(true));
 
         m_Explosion = std::make_shared<Explosion>(m_raylibMock, startPos, 1);
