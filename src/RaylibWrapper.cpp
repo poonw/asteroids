@@ -199,3 +199,28 @@ void RaylibWrapper::guiSetStyle(int control, int property, int value)
 {
     GuiSetStyle(control, property, value);
 }
+
+void RaylibWrapper::setConfigFlags(unsigned int flags)
+{
+    SetConfigFlags(flags);
+}
+
+int RaylibWrapper::getCurrentMonitor(void)
+{
+    return (GetCurrentMonitor());
+}
+
+int RaylibWrapper::getMonitorWidth(int monitor)
+{
+    return (GetMonitorWidth(monitor));
+}
+
+int RaylibWrapper::getMonitorHeight(int monitor)
+{
+    return (GetMonitorHeight(monitor));
+}
+
+void RaylibWrapper::setWindowSize(int width, int height)
+{
+    SetWindowSize(width, height);
+}

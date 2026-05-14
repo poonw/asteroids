@@ -29,6 +29,8 @@ protected:
     std::shared_ptr<RaylibInterface> m_raylibPtr = nullptr;
     Vector2                          m_position  = {0, 0};
     std::vector<Texture2D>           m_textures;
+    float                            m_windowWidth  = 0;
+    float                            m_windowHeight = 0;
 };
 
 #endif // SPRITE_H

@@ -25,6 +25,7 @@ extern Sequence                           seq;
 extern std::shared_ptr<Game>              m_Game;
 extern std::shared_ptr<RaylibMock>        m_raylibMock;
 extern std::shared_ptr<SpriteFactoryFake> m_spriteFactoryFake;
+extern const float                        m_testWindowWidth;
 
 extern void gameCommonSetup(void);
 extern void gameCommonTeardown(void);
@@ -68,14 +69,14 @@ TEST_F(GamePlayingStateTest, loopWithOnlyPlayerAndStars)
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -117,14 +118,14 @@ TEST_F(GamePlayingStateTest, playerMeteorNoCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -177,14 +178,14 @@ TEST_F(GamePlayingStateTest, playerMeteorCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -219,14 +220,14 @@ TEST_F(GamePlayingStateTest, playerMeteorCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     2",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -276,14 +277,14 @@ TEST_F(GamePlayingStateTest, meteorLaserNoCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -344,14 +345,14 @@ TEST_F(GamePlayingStateTest, meteorLaserCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -386,14 +387,14 @@ TEST_F(GamePlayingStateTest, meteorLaserCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    1",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -436,14 +437,14 @@ TEST_F(GamePlayingStateTest, playerOpponentNoCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -496,14 +497,14 @@ TEST_F(GamePlayingStateTest, playerOpponentCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -538,14 +539,14 @@ TEST_F(GamePlayingStateTest, playerOpponentCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     2",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -595,14 +596,14 @@ TEST_F(GamePlayingStateTest, opponentLaserNoCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -663,14 +664,14 @@ TEST_F(GamePlayingStateTest, opponentLaserCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -705,14 +706,14 @@ TEST_F(GamePlayingStateTest, opponentLaserCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:   10",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -756,14 +757,14 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserNoCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentLaserMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -816,14 +817,14 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_opponentLaserMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -857,14 +858,14 @@ TEST_F(GamePlayingStateTest, playerOpponentLaserCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     2",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -908,14 +909,14 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -967,14 +968,14 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[1])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     2",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -1026,14 +1027,14 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     EXPECT_CALL((*(m_spriteFactoryFake->m_meteorMocksList[2])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     1",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -1080,14 +1081,14 @@ TEST_F(GamePlayingStateTest, playerMeteor3xCollisionsTestAndTransitionToGameOver
     EXPECT_CALL((*(m_spriteFactoryFake->m_playerMock)), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -1154,14 +1155,14 @@ TEST_F(GamePlayingStateTest, playerDispersionPowerupNoCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_powerupMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -1210,14 +1211,14 @@ TEST_F(GamePlayingStateTest, playerDispersionPowerupCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_powerupMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -1269,14 +1270,14 @@ TEST_F(GamePlayingStateTest, playerExtralifePowerupNoCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_powerupMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
@@ -1326,14 +1327,14 @@ TEST_F(GamePlayingStateTest, playerExtralifePowerupCollisionTest)
     EXPECT_CALL((*(m_spriteFactoryFake->m_powerupMocksList[0])), draw()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "lives:     3",
-                                            FieldsAre((WINDOW_WIDTH - 150), 30),
+                                            FieldsAre((m_testWindowWidth - 150), 30),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))
         .InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "score:    0",
-                                            FieldsAre((WINDOW_WIDTH - 150), (30 + STAT_FONTSIZE)),
+                                            FieldsAre((m_testWindowWidth - 150), (30 + STAT_FONTSIZE)),
                                             STAT_FONTSIZE,
                                             0,
                                             FieldsAre(255, 255, 255, 255)))

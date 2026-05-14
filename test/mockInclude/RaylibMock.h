@@ -48,6 +48,11 @@ public:
     MOCK_METHOD(int, guiDropdownBox, (Rectangle bounds, const std::string& text, int* active, bool editMode), (override));
     MOCK_METHOD(void, guiSetFont, (Font font), (override));
     MOCK_METHOD(void, guiSetStyle, (int control, int property, int value), (override));
+    MOCK_METHOD(void, setConfigFlags, (unsigned int flags), (override));
+    MOCK_METHOD(int, getCurrentMonitor, (), (override));
+    MOCK_METHOD(int, getMonitorWidth, (int monitor), (override));
+    MOCK_METHOD(int, getMonitorHeight, (int monitor), (override));
+    MOCK_METHOD(void, setWindowSize, (int width, int height), (override));
 };
 
 #endif // RAYLIBMOCK_H

@@ -8,11 +8,15 @@ Meteor::Meteor(std::shared_ptr<RaylibInterface> raylibPtr)
     assert(raylibPtr->isWindowReady());
     m_raylibPtr = raylibPtr;
 
+    int monitor    = m_raylibPtr->getCurrentMonitor();
+    m_windowWidth  = m_raylibPtr->getMonitorWidth(monitor);
+    m_windowHeight = m_raylibPtr->getMonitorHeight(monitor);
+
     // Random number generator
     std::random_device rd;
     std::mt19937       gen(rd()); // Mersenne Twister engine
 
-    std::uniform_int_distribution<>       distX(0, WINDOW_WIDTH);
+    std::uniform_int_distribution<>       distX(0, m_windowWidth);
     std::uniform_int_distribution<>       distY(-150, -50);
     std::uniform_int_distribution<>       distSpeed(300, 400);
     std::uniform_real_distribution<float> distDirection(-0.5, 0.5);
@@ -35,7 +39,7 @@ void Meteor::update(void)
     assert(m_textures.size() == 1);
     move();
 
-    if ((m_position.y - m_textures[0].height) > WINDOW_HEIGHT)
+    if ((m_position.y - m_textures[0].height) > m_windowHeight)
     {
         m_discard = true;
     }

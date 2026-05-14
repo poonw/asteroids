@@ -54,7 +54,7 @@ TEST_F(GameGameoverStateTest, mousePointingToNothing)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
-    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(8));
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
@@ -127,7 +127,7 @@ TEST_F(GameGameoverStateTest, mousePointingToRetryButtonButNotClick)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
-    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(8));
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
@@ -202,7 +202,7 @@ TEST_F(GameGameoverStateTest, mousePointingToRetryButtonAndClickAndTransitionToW
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
-    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(8));
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
@@ -277,7 +277,7 @@ TEST_F(GameGameoverStateTest, mousePointingToQuitButtonButNotClick)
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
-    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(8));
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);
@@ -352,7 +352,7 @@ TEST_F(GameGameoverStateTest, mousePointingToQuitButtonAndClickAndTransitionToQu
     {
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
-    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(5));
+    EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(8));
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), beginDrawing()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), clearBackground(FieldsAre(0, 0, 0, 255))).InSequence(seq);

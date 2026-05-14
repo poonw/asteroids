@@ -8,12 +8,16 @@ Star::Star(std::shared_ptr<RaylibInterface> raylibPtr)
     assert(raylibPtr->isWindowReady());
     m_raylibPtr = raylibPtr;
 
+    int monitor    = m_raylibPtr->getCurrentMonitor();
+    m_windowWidth  = m_raylibPtr->getMonitorWidth(monitor);
+    m_windowHeight = m_raylibPtr->getMonitorHeight(monitor);
+
     // Random number generator
     std::random_device rd;
     std::mt19937       gen(rd()); // Mersenne Twister engine
 
-    std::uniform_int_distribution<>       distX(0, WINDOW_WIDTH);
-    std::uniform_int_distribution<>       distY(0, WINDOW_HEIGHT);
+    std::uniform_int_distribution<>       distX(0, m_windowWidth);
+    std::uniform_int_distribution<>       distY(0, m_windowHeight);
     std::uniform_real_distribution<float> distScale(0.5, 1.6);
 
     m_position.x = distX(gen);
@@ -27,9 +31,9 @@ void Star::update(void)
 
     float dt      = m_raylibPtr->getFrameTime();
     m_position.y += STAR_SPEED * dt;
-    if (m_position.y > WINDOW_HEIGHT)
+    if (m_position.y > m_windowHeight)
     {
-        m_position.y -= WINDOW_HEIGHT;
+        m_position.y -= m_windowHeight;
     }
 }
 

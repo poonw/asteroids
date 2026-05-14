@@ -46,6 +46,11 @@ public:
     int       guiDropdownBox(Rectangle bounds, const std::string& text, int* active, bool editMode) override;
     void      guiSetFont(Font font) override;
     void      guiSetStyle(int control, int property, int value) override;
+    void      setConfigFlags(unsigned int flags) override;
+    int       getCurrentMonitor(void) override;
+    int       getMonitorWidth(int monitor) override;
+    int       getMonitorHeight(int monitor) override;
+    void      setWindowSize(int width, int height) override;
 };
 
 #endif // RAYLIBWRAPPER_H

@@ -24,6 +24,9 @@ public:
         ASSERT_TRUE(m_raylibMock != nullptr);
 
         EXPECT_CALL((*m_raylibMock), isWindowReady()).WillOnce(Return(true));
+        EXPECT_CALL((*m_raylibMock), getCurrentMonitor()).WillOnce(Return(0));
+        EXPECT_CALL((*m_raylibMock), getMonitorWidth(0)).WillOnce(Return(0));
+        EXPECT_CALL((*m_raylibMock), getMonitorHeight(0)).WillOnce(Return(0));
 
         m_Meteor = std::make_shared<Meteor>(m_raylibMock);
         ASSERT_TRUE(m_Meteor != nullptr);
