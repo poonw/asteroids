@@ -15,6 +15,7 @@ public:
     MOCK_METHOD(Vector2, getCenter, (), (const, override));
     MOCK_METHOD(float, getRadius, (), (const, override));
     MOCK_METHOD(void, setTextures, (const std::vector<Texture2D>& textures), (override));
+    MOCK_METHOD(bool, isInvincible, (), (const, override));
     MOCK_METHOD(void, setInvincible, (), (override));
     MOCK_METHOD(void, setDispersedlaser, (), (override));
     MOCK_METHOD(void, setLeftKey, (KeyboardKey key), (override));

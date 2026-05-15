@@ -11,6 +11,7 @@ class PlayerInterface : public Sprite, public CircFeature
 public:
     virtual ~PlayerInterface(void) = default;
 
+    virtual bool isInvincible(void) const     = 0;
     virtual void setInvincible(void)          = 0;
     virtual void setDispersedlaser(void)      = 0;
     virtual void setLeftKey(KeyboardKey key)  = 0;

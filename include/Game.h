@@ -40,6 +40,7 @@ public:
     void createMeteor(void);
     void createOpponent(void);
     void createPowerupDispersion(void);
+    void createPowerupInvincibility(void);
     void createPowerupExtralife(void);
 #ifdef DEBUG_
     void setState(STATE_t state);
@@ -164,14 +165,15 @@ private:
     float             m_gameoverTextMaxHeight = 0;
 
     // playing page
-    uint32_t                                             m_score           = 0;
-    uint32_t                                             m_lives           = MAX_LIVES;
-    std::shared_ptr<PlayerInterface>                     m_player          = nullptr;
-    std::shared_ptr<Timer>                               m_meteorTimer     = nullptr;
-    std::shared_ptr<Timer>                               m_rampdownTimer   = nullptr;
-    std::shared_ptr<Timer>                               m_opponentTimer   = nullptr;
-    std::shared_ptr<Timer>                               m_dispersionTimer = nullptr;
-    std::shared_ptr<Timer>                               m_extralifeTimer  = nullptr;
+    uint32_t                                             m_score              = 0;
+    uint32_t                                             m_lives              = MAX_LIVES;
+    std::shared_ptr<PlayerInterface>                     m_player             = nullptr;
+    std::shared_ptr<Timer>                               m_meteorTimer        = nullptr;
+    std::shared_ptr<Timer>                               m_rampdownTimer      = nullptr;
+    std::shared_ptr<Timer>                               m_opponentTimer      = nullptr;
+    std::shared_ptr<Timer>                               m_dispersionTimer    = nullptr;
+    std::shared_ptr<Timer>                               m_invincibilityTimer = nullptr;
+    std::shared_ptr<Timer>                               m_extralifeTimer     = nullptr;
     std::array<std::shared_ptr<Sprite>, NUMBER_OF_STARS> m_starsList;
     std::vector<std::shared_ptr<Sprite>>                 m_playerLasersList;
     std::vector<std::shared_ptr<Sprite>>                 m_meteorsList;

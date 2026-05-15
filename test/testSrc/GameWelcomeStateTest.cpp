@@ -80,7 +80,7 @@ void gameCommonSetup(void)
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Retry", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Quit", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
 
-    EXPECT_CALL((*m_raylibMock), getTime()).Times(Exactly(4)).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), getTime()).Times(Exactly(5)).InSequence(seq);
 
     m_Game = std::make_shared<Game>(m_raylibMock, m_spriteFactoryFake);
 
