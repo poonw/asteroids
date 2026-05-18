@@ -154,6 +154,12 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
                                                 true,
                                                 std::bind(&Game::createPowerupDispersion, this));
 
+    m_invincibilityTimer = std::make_shared<Timer>(m_raylibPtr,
+                                                   INVINCIBILITY_TIMER_DURATION,
+                                                   true,
+                                                   true,
+                                                   std::bind(&Game::createPowerupInvincibility, this));
+
     m_extralifeTimer = std::make_shared<Timer>(m_raylibPtr,
                                                EXTRALIFE_TIMER_DURATION,
                                                true,
@@ -271,6 +277,15 @@ void Game::createPowerupDispersion(void)
     m_dispersionsList.push_back(powerup);
 }
 
+void Game::createPowerupInvincibility(void)
+{
+    assert(m_state == PLAYING);
+    Sprite::SpriteAttr_t    attr;
+    std::shared_ptr<Sprite> powerup = m_factory->getSprite(SpriteFactory::POWERUP, m_raylibPtr, attr);
+    powerup->setTextures(m_texturesMap["invincibility"]);
+    m_invincibilitiesList.push_back(powerup);
+}
+
 void Game::createPowerupExtralife(void)
 {
     assert(m_state == PLAYING);
@@ -350,6 +365,7 @@ void Game::updatePlayingPage(void)
     m_meteorTimer->update();
     m_extralifeTimer->update();
     m_dispersionTimer->update();
+    m_invincibilityTimer->update();
     m_opponentTimer->update();
     m_rampdownTimer->update();
     m_player->update();
@@ -380,6 +396,10 @@ void Game::updatePlayingPage(void)
     for (uint32_t index = 0; index < m_dispersionsList.size(); index++)
     {
         m_dispersionsList[index]->update();
+    }
+    for (uint32_t index = 0; index < m_invincibilitiesList.size(); index++)
+    {
+        m_invincibilitiesList[index]->update();
     }
     for (uint32_t index = 0; index < m_extralifesList.size(); index++)
     {
@@ -434,6 +454,10 @@ void Game::drawSprites(void)
     for (uint32_t index = 0; index < m_dispersionsList.size(); index++)
     {
         m_dispersionsList[index]->draw();
+    }
+    for (uint32_t index = 0; index < m_invincibilitiesList.size(); index++)
+    {
+        m_invincibilitiesList[index]->draw();
     }
     for (uint32_t index = 0; index < m_extralifesList.size(); index++)
     {
@@ -509,6 +533,17 @@ void Game::discardSprites(void)
             ++it;
         }
     }
+    for (auto it = m_invincibilitiesList.begin(); it != m_invincibilitiesList.end();)
+    {
+        if ((*(*it)).m_discard)
+        {
+            it = m_invincibilitiesList.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
     for (auto it = m_extralifesList.begin(); it != m_extralifesList.end();)
     {
         if ((*(*it)).m_discard)
@@ -547,6 +582,10 @@ void Game::discardAllSprites(void)
     for (auto it = m_dispersionsList.begin(); it != m_dispersionsList.end();)
     {
         it = m_dispersionsList.erase(it);
+    }
+    for (auto it = m_invincibilitiesList.begin(); it != m_invincibilitiesList.end();)
+    {
+        it = m_invincibilitiesList.erase(it);
     }
     for (auto it = m_extralifesList.begin(); it != m_extralifesList.end();)
     {
@@ -614,6 +653,19 @@ void Game::checkCollisions(void)
         }
     }
 
+    for (uint32_t index = 0; index < m_invincibilitiesList.size(); index++)
+    {
+        if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
+                                               m_player->getRadius(),
+                                               std::dynamic_pointer_cast<CircFeature>(m_invincibilitiesList[index])->getCenter(),
+                                               std::dynamic_pointer_cast<CircFeature>(m_invincibilitiesList[index])->getRadius()))
+        {
+            m_invincibilitiesList[index]->m_discard = true;
+            m_player->setInvincible();
+            m_raylibPtr->playSound(m_invincibilitySound);
+        }
+    }
+
     for (uint32_t index = 0; index < m_extralifesList.size(); index++)
     {
         if (m_raylibPtr->checkCollisionCircles(m_player->getCenter(),
@@ -627,7 +679,7 @@ void Game::checkCollisions(void)
         }
     }
 
-    if (!(m_player->m_discard))
+    if ((!(m_player->m_discard)) && (!(m_player->isInvincible())))
     {
         for (uint32_t index = 0; index < m_meteorsList.size(); index++)
         {

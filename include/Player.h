@@ -20,6 +20,7 @@ public:
     void    setTextures(const std::vector<Texture2D>& textures) override;
     Vector2 getCenter(void) const override;
     float   getRadius(void) const override;
+    bool    isInvincible(void) const override;
     void    setInvincible(void) override;
     void    setDispersedlaser(void) override;
     void    setLeftKey(KeyboardKey key) override;
@@ -32,6 +33,7 @@ private:
     void input(void);
     void move(void);
     void resetDispersedlaser(void);
+    void resetInvincible(void);
     void moveIntoWindow(void);
     void renderWarmup(void);
     void renderPlayable(void);
@@ -51,9 +53,11 @@ private:
     STATE_t m_state     = PLAYABLE;
 
     std::function<void(const Sprite::SpriteAttr_t&)> m_shootLaser;
-    std::shared_ptr<Timer>                           m_invisibleTimer      = nullptr;
-    std::shared_ptr<Timer>                           m_warmupTimer         = nullptr;
-    std::shared_ptr<Timer>                           m_dispersedLaserTimer = nullptr;
+
+    std::shared_ptr<Timer> m_invisibleTimer      = nullptr;
+    std::shared_ptr<Timer> m_warmupTimer         = nullptr;
+    std::shared_ptr<Timer> m_dispersedLaserTimer = nullptr;
+    std::shared_ptr<Timer> m_invincibleTimer     = nullptr;
 };
 
 #endif // PLAYER_H

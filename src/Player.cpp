@@ -20,10 +20,12 @@ Player::Player(std::shared_ptr<RaylibInterface>                 raylibPtr,
     std::function<void(void)> renderWarmupCallback        = std::bind(&Player::renderWarmup, this);
     std::function<void(void)> renderVincibleCallback      = std::bind(&Player::renderPlayable, this);
     std::function<void(void)> resetDispersedlaserCallback = std::bind(&Player::resetDispersedlaser, this);
+    std::function<void(void)> resetInvincibleCallback     = std::bind(&Player::resetInvincible, this);
 
     m_invisibleTimer      = std::make_shared<Timer>(m_raylibPtr, 1, false, false, renderWarmupCallback);
     m_warmupTimer         = std::make_shared<Timer>(m_raylibPtr, 4, false, false, renderVincibleCallback);
     m_dispersedLaserTimer = std::make_shared<Timer>(m_raylibPtr, 15, false, false, resetDispersedlaserCallback);
+    m_invincibleTimer     = std::make_shared<Timer>(m_raylibPtr, 10, false, false, resetInvincibleCallback);
 
     m_state   = PLAYABLE;
     m_discard = true;
@@ -42,6 +44,11 @@ void Player::input(void)
         laserAttr.m_direction  = {0, -1};
         laserAttr.m_rotation   = 180;
         m_shootLaser(laserAttr);
+
+        if (m_invincible)
+        {
+            m_invincibleTimer->update();
+        }
 
         if (m_dispersedLaser)
         {
@@ -78,6 +85,7 @@ void Player::update(void)
             if (m_discard)
             {
                 m_state          = INVISIBLE;
+                m_invincible     = false;
                 m_dispersedLaser = false;
                 m_position.x     = m_startXPos;
                 m_position.y     = m_windowHeight + 100;
@@ -120,7 +128,14 @@ void Player::draw(void)
     switch (m_state)
     {
         case PLAYABLE:
-            m_raylibPtr->drawTextureV(m_textures[0], m_position, WHITE);
+            if (m_invincible)
+            {
+                m_raylibPtr->drawTextureV(m_textures[0], m_position, DARKGRAY);
+            }
+            else
+            {
+                m_raylibPtr->drawTextureV(m_textures[0], m_position, WHITE);
+            }
             break;
 
         case INVISIBLE:
@@ -165,9 +180,18 @@ void Player::setTextures(const std::vector<Texture2D>& textures)
     m_radius = (float)(std::min(m_textures[0].width, m_textures[0].height)) / 2;
 }
 
+bool Player::isInvincible(void) const
+{
+    return m_invincible;
+}
+
 void Player::setInvincible(void)
 {
-    m_invincible = true;
+    if (m_state != INVISIBLE)
+    {
+        m_invincible = true;
+        m_invincibleTimer->activate();
+    }
 }
 
 void Player::setDispersedlaser(void)
@@ -207,6 +231,11 @@ void Player::setShootKey(KeyboardKey key)
 void Player::resetDispersedlaser(void)
 {
     m_dispersedLaser = false;
+}
+
+void Player::resetInvincible(void)
+{
+    m_invincible = false;
 }
 
 void Player::moveIntoWindow(void)

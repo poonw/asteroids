@@ -156,19 +156,24 @@ TEST_F(PlayerTest, stateMachineWithDefaultKeysSet)
     m_Player->update();
     m_Player->draw();
     m_Player->setDispersedlaser(); //no effect
+    m_Player->setInvincible();     //no effect
     EXPECT_TRUE(m_Player->m_discard);
+    EXPECT_FALSE(m_Player->isInvincible());
 
     // INVISIBLE --> MOVE_IN
     EXPECT_CALL((*m_raylibMock), getTime())
         .WillOnce(Return(2))  //m_invisibleTimer timeout
         .WillOnce(Return(2))  //m_warmupTimer activate
-        .WillOnce(Return(2)); //m_dispersedLaserTimer activate
+        .WillOnce(Return(2))  //m_dispersedLaserTimer activate
+        .WillOnce(Return(2)); //m_invincibleTimer activate
     EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(80, 80, 80, 255)))
         .Times(Exactly(1));
     m_Player->update();
     m_Player->draw();
     m_Player->setDispersedlaser();
+    m_Player->setInvincible();
     EXPECT_TRUE(m_Player->m_discard);
+    EXPECT_TRUE(m_Player->isInvincible());
 
     // MOVE_IN
     EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(0.1)); //moveIntoWindow() call
@@ -177,6 +182,7 @@ TEST_F(PlayerTest, stateMachineWithDefaultKeysSet)
     m_Player->update();
     m_Player->draw();
     EXPECT_TRUE(m_Player->m_discard);
+    EXPECT_TRUE(m_Player->isInvincible());
 
     // MOVE_IN --> WARMUP
     EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(1)); //moveIntoWindow() reach the start position
@@ -185,6 +191,7 @@ TEST_F(PlayerTest, stateMachineWithDefaultKeysSet)
     m_Player->update();
     m_Player->draw();
     EXPECT_TRUE(m_Player->m_discard);
+    EXPECT_TRUE(m_Player->isInvincible());
 
     // WARMUP --> PLAYABLE (dispersed laser)
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_RIGHT)).Times(Exactly(1));
@@ -194,6 +201,7 @@ TEST_F(PlayerTest, stateMachineWithDefaultKeysSet)
     EXPECT_CALL((*m_raylibMock), isKeyPressed(KEY_SPACE)).WillOnce(Return(true));
     EXPECT_CALL((*m_raylibMock), getFrameTime()).WillOnce(Return(1)); //move() call
     EXPECT_CALL((*m_raylibMock), getTime())
+        .WillOnce(Return(17)) //m_invincibleTimer timeout
         .WillOnce(Return(17)) //m_dispersedLaserTimer timeout
         .WillOnce(Return(6)); //m_warmupTimer timeout
     EXPECT_CALL((*m_raylibMock), drawTextureV(A<Texture2D>(), A<Vector2>(), FieldsAre(255, 255, 255, 255)))
@@ -201,6 +209,7 @@ TEST_F(PlayerTest, stateMachineWithDefaultKeysSet)
     m_Player->update();
     m_Player->draw();
     EXPECT_FALSE(m_Player->m_discard);
+    EXPECT_FALSE(m_Player->isInvincible());
 
     // PLAYABLE (single laser)
     EXPECT_CALL((*m_raylibMock), isKeyDown(KEY_RIGHT)).Times(Exactly(1));
@@ -214,6 +223,7 @@ TEST_F(PlayerTest, stateMachineWithDefaultKeysSet)
     m_Player->update();
     m_Player->draw();
     EXPECT_FALSE(m_Player->m_discard);
+    EXPECT_FALSE(m_Player->isInvincible());
 }
 
 } // namespace PlayerTest
