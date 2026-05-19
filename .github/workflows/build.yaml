@@ -16,6 +16,18 @@ jobs:
           7z x w64devkit.7z
           echo "./w64devkit/bin" >> "%GITHUB_PATH%"
 
+      - name: Get raylib5.5
+        shell: cmd
+        run: |
+          curl.exe -L https://github.com/raysan5/raylib/releases/download/5.5/raylib-5.5_win64_mingw-w64.zip -o raylib.zip
+          7z x raylib.zip
+
+      - name: Get raygui4.0
+        shell: cmd
+        run: |
+          curl.exe -L https://github.com/raysan5/raygui/archive/refs/tags/4.0.zip -o raygui.zip
+          7z x raygui.zip
+
       - name: Build with Make
         shell: cmd
         run: |
@@ -23,10 +35,30 @@ jobs:
           make
 
   test:
-    needs: build
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
+
+      - uses: milliewalky/setup-7-zip@v2
+
+      - name: Install w64devkit
+        shell: cmd
+        run: |
+          curl.exe -L "https://github.com/skeeto/w64devkit/releases/download/v2.4.0/w64devkit-x64-2.4.0.7z.exe" -o w64devkit.7z
+          7z x w64devkit.7z
+          echo "./w64devkit/bin" >> "%GITHUB_PATH%"
+
+      - name: Get raylib5.5
+        shell: cmd
+        run: |
+          curl.exe -L https://github.com/raysan5/raylib/releases/download/5.5/raylib-5.5_win64_mingw-w64.zip -o raylib.zip
+          7z x raylib.zip
+
+      - name: Get raygui4.0
+        shell: cmd
+        run: |
+          curl.exe -L https://github.com/raysan5/raygui/archive/refs/tags/4.0.zip -o raygui.zip
+          7z x raygui.zip
 
       - name: Clone googletest repo
         shell: cmd

@@ -32,7 +32,10 @@ CC := gcc
 CCFLAGS := -g $(DEFINEFLAGS)
 
 INCDIR := include
-RAYLIBINCDIR := raylib/include
+RAYLIB := raylib-5.5_win64_mingw-w64
+RAYGUI := raygui-4.0
+RAYLIBINCDIR := $(RAYLIB)/include
+RAYGUIINCDIR := $(RAYGUI)/src
 GOOGLETESTBIN := googletestbin
 GOOGLETESTDIR := ../googletest
 GOOGLETESTINCDIR := $(GOOGLETESTDIR)/googletest/include
@@ -44,10 +47,10 @@ SRCDIR := src
 TESTSRCDIR := test/testSrc
 MOCKINCDIR := test/mockInclude
 MOCKSRCDIR := test/mockSrc
-LIBS := -L ./raylib/lib/ -lraylib -lgdi32 -lwinmm
+LIBS := -L ./$(RAYLIB)/lib/ -lraylib -lgdi32 -lwinmm
 TESTLIBS := $(GOOGLETESTBIN)/libgtest.a $(GOOGLETESTBIN)/libgtest_main.a $(GOOGLETESTBIN)/libgmock.a $(GOOGLETESTBIN)/libgmock_main.a -lgcov
 
-INC := $(INCDIR) $(RAYLIBINCDIR)
+INC := $(INCDIR) $(RAYLIBINCDIR) $(RAYGUIINCDIR)
 INCLUDE := $(INC:%=-I%)
 
 TESTINC := $(GOOGLETESTINCDIR) $(GOOGLEMOCKINCDIR) $(MOCKINCDIR)

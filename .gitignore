@@ -1,4 +1,7 @@
 obj/
+raylib*/
+raygui*/
+*.zip
 *.o
 *.exe
 *.a
