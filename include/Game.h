@@ -23,6 +23,7 @@ public:
         WELCOME = 0,
         PLAYING,
         SETTINGS,
+        HIGHSCORES,
         GAME_OVER,
         EXIT_GAME
     } STATE_t;
@@ -78,6 +79,7 @@ private:
     void refreshPlayingPage(void);
     void refreshWelcomePage(void);
     void refreshSettingsPage(void);
+    void refreshHighscoresPage(void);
     void refreshGameOverPage(void);
 
     const std::string           m_gameName     = "Asteroids";
@@ -105,6 +107,7 @@ private:
     Vector2      m_titlePosition;
     GameButton_t m_startButton;
     GameButton_t m_settingsButton;
+    GameButton_t m_highscoresButton;
     GameButton_t m_quitButton;
 
     // settings page
@@ -133,7 +136,7 @@ private:
         {1, KEY_ENTER}
     };
 
-    GameButton_t      m_backButton;
+    GameButton_t      m_resetButton;
     GameButton_t      m_okButton;
     Rectangle         m_settingsPageBackground;
     int               m_leftControlSetting  = 0;
@@ -156,6 +159,10 @@ private:
     const std::string m_dropDown3Text       = "Up Arrow;W";
     const std::string m_dropDown4Text       = "Down Arrow;S";
     const std::string m_dropDown5Text       = "Space Bar;Enter";
+
+    // highscores page
+    GameButton_t      m_backButton;
+    Rectangle         m_highscoresPageBackground;
 
     // game over page
     GameButton_t      m_newgameButton;

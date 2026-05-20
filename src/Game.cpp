@@ -51,7 +51,16 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     m_settingsButton.m_selectSoundPlayed = false;
     m_settingsButton.m_callBack          = nullptr;
 
-    m_quitButton.m_selectArea        = {m_titlePosition.x + 20, ((m_windowHeight / 2) + 130), welcomeMenuSize.x, welcomeMenuSize.y};
+    m_highscoresButton.m_selectArea        = {m_titlePosition.x + 20, ((m_windowHeight / 2) + 130), welcomeMenuSize.x, welcomeMenuSize.y};
+    m_highscoresButton.m_position          = {m_highscoresButton.m_selectArea.x + 10, m_highscoresButton.m_selectArea.y + 10};
+    m_highscoresButton.m_backgroundColor   = BLANK;
+    m_highscoresButton.m_textSize          = MENU_ITEM_FONTSIZE;
+    m_highscoresButton.m_displayText       = "Highscores";
+    m_highscoresButton.m_nextState         = HIGHSCORES;
+    m_highscoresButton.m_selectSoundPlayed = false;
+    m_highscoresButton.m_callBack          = nullptr;
+
+    m_quitButton.m_selectArea        = {m_titlePosition.x + 20, ((m_windowHeight / 2) + 210), welcomeMenuSize.x, welcomeMenuSize.y};
     m_quitButton.m_position          = {m_quitButton.m_selectArea.x + 10, m_quitButton.m_selectArea.y + 10};
     m_quitButton.m_backgroundColor   = BLANK;
     m_quitButton.m_textSize          = MENU_ITEM_FONTSIZE;
@@ -64,17 +73,17 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     float settingsMargin     = 100;
     m_settingsPageBackground = {settingsMargin, settingsMargin, (m_windowWidth - (2 * settingsMargin)), (m_windowHeight - (2 * settingsMargin))};
 
-    m_backButton.m_selectArea        = {(m_windowWidth - 300), (m_windowHeight - 200), 150, 80};
-    m_backButton.m_backgroundColor   = BLANK;
-    m_backButton.m_textSize          = MENU_ITEM_FONTSIZE + 10;
-    m_backButton.m_displayText       = "Reset";
-    m_backButton.m_nextState         = WELCOME;
-    m_backButton.m_selectSoundPlayed = false;
-    m_backButton.m_callBack          = std::bind(&Game::resetSettingsToDefault, this);
+    m_resetButton.m_selectArea        = {(m_windowWidth - 300), (m_windowHeight - 200), 150, 80};
+    m_resetButton.m_backgroundColor   = BLANK;
+    m_resetButton.m_textSize          = MENU_ITEM_FONTSIZE + 10;
+    m_resetButton.m_displayText       = "Reset";
+    m_resetButton.m_nextState         = WELCOME;
+    m_resetButton.m_selectSoundPlayed = false;
+    m_resetButton.m_callBack          = std::bind(&Game::resetSettingsToDefault, this);
 
-    textsize                  = m_raylibPtr->measureTextEx(m_fontType, m_backButton.m_displayText, m_backButton.m_textSize, 0);
-    m_backButton.m_position.x = (m_backButton.m_selectArea.x + ((m_backButton.m_selectArea.width - textsize.x) / 2));
-    m_backButton.m_position.y = (m_backButton.m_selectArea.y + ((m_backButton.m_selectArea.height - textsize.y) / 2));
+    textsize                  = m_raylibPtr->measureTextEx(m_fontType, m_resetButton.m_displayText, m_resetButton.m_textSize, 0);
+    m_resetButton.m_position.x = (m_resetButton.m_selectArea.x + ((m_resetButton.m_selectArea.width - textsize.x) / 2));
+    m_resetButton.m_position.y = (m_resetButton.m_selectArea.y + ((m_resetButton.m_selectArea.height - textsize.y) / 2));
 
     m_okButton.m_selectArea        = {(m_windowWidth - 500), (m_windowHeight - 200), 150, 80};
     m_okButton.m_backgroundColor   = BLANK;
@@ -87,6 +96,22 @@ Game::Game(std::shared_ptr<RaylibInterface> raylibPtr, std::shared_ptr<SpriteFac
     textsize                = m_raylibPtr->measureTextEx(m_fontType, m_okButton.m_displayText, m_okButton.m_textSize, 0);
     m_okButton.m_position.x = (m_okButton.m_selectArea.x + ((m_okButton.m_selectArea.width - textsize.x) / 2));
     m_okButton.m_position.y = (m_okButton.m_selectArea.y + ((m_okButton.m_selectArea.height - textsize.y) / 2));
+
+    ////// highscores page //////
+    float highscoresMargin     = 100;
+    m_highscoresPageBackground = {highscoresMargin, highscoresMargin, (m_windowWidth - (2 * highscoresMargin)), (m_windowHeight - (2 * highscoresMargin))};
+
+    m_backButton.m_selectArea        = {(m_windowWidth - 300), (m_windowHeight - 200), 150, 80};
+    m_backButton.m_backgroundColor   = BLANK;
+    m_backButton.m_textSize          = MENU_ITEM_FONTSIZE + 10;
+    m_backButton.m_displayText       = "Back";
+    m_backButton.m_nextState         = WELCOME;
+    m_backButton.m_selectSoundPlayed = false;
+    m_backButton.m_callBack          = nullptr;
+
+    textsize                  = m_raylibPtr->measureTextEx(m_fontType, m_backButton.m_displayText, m_backButton.m_textSize, 0);
+    m_backButton.m_position.x = (m_backButton.m_selectArea.x + ((m_backButton.m_selectArea.width - textsize.x) / 2));
+    m_backButton.m_position.y = (m_backButton.m_selectArea.y + ((m_backButton.m_selectArea.height - textsize.y) / 2));
 
     ////// game over page //////
     textsize                 = m_raylibPtr->measureTextEx(m_fontType, m_gameoverText, GAME_OVER_FONTSIZE, 0);
@@ -203,6 +228,10 @@ void Game::run(void)
 
             case SETTINGS:
                 refreshSettingsPage();
+                break;
+
+            case HIGHSCORES:
+                refreshHighscoresPage();
                 break;
 
             case PLAYING:
@@ -902,6 +931,7 @@ void Game::refreshWelcomePage(void)
 
     checkButtonUpdate(m_startButton);
     checkButtonUpdate(m_settingsButton);
+    checkButtonUpdate(m_highscoresButton);
     checkButtonUpdate(m_quitButton);
 
     m_raylibPtr->updateMusicStream(m_backGroundMusic);
@@ -913,6 +943,7 @@ void Game::refreshWelcomePage(void)
     m_raylibPtr->drawTextEx(m_fontType, m_gameName, m_titlePosition, GAME_TITLE_FONTSIZE, 0, GOLD);
     drawButton(m_startButton);
     drawButton(m_settingsButton);
+    drawButton(m_highscoresButton);
     drawButton(m_quitButton);
 
     m_raylibPtr->endDrawing();
@@ -926,7 +957,7 @@ void Game::refreshSettingsPage(void)
     }
 
     checkButtonUpdate(m_okButton);
-    checkButtonUpdate(m_backButton);
+    checkButtonUpdate(m_resetButton);
     m_raylibPtr->updateMusicStream(m_backGroundMusic);
 
     m_raylibPtr->beginDrawing();
@@ -936,6 +967,25 @@ void Game::refreshSettingsPage(void)
     m_raylibPtr->drawRectangleRounded(m_settingsPageBackground, 0.05, 0, {30, 30, 30, 200});
     drawSettingsText();
     drawButton(m_okButton);
+    drawButton(m_resetButton);
+    m_raylibPtr->endDrawing();
+}
+
+void Game::refreshHighscoresPage(void)
+{
+    for (uint32_t index = 0; index < NUMBER_OF_STARS; index++)
+    {
+        m_starsList[index]->update();
+    }
+
+    checkButtonUpdate(m_backButton);
+    m_raylibPtr->updateMusicStream(m_backGroundMusic);
+
+    m_raylibPtr->beginDrawing();
+
+    m_raylibPtr->clearBackground(BLACK);
+    drawStars();
+    m_raylibPtr->drawRectangleRounded(m_settingsPageBackground, 0.05, 0, {30, 30, 30, 200});
     drawButton(m_backButton);
     m_raylibPtr->endDrawing();
 }

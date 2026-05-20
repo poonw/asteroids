@@ -76,6 +76,7 @@ void gameCommonSetup(void)
 
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Reset", (MENU_ITEM_FONTSIZE + 10), 0)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "OK", (MENU_ITEM_FONTSIZE + 10), 0)).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Back", (MENU_ITEM_FONTSIZE + 10), 0)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Game Over", GAME_OVER_FONTSIZE, 0)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Retry", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), measureTextEx(A<Font>(), "Quit", (MENU_ITEM_FONTSIZE + 30), 0)).InSequence(seq);
@@ -134,6 +135,8 @@ TEST_F(GameWelcomeStateTest, mousePointingToNothing)
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
 
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
@@ -163,6 +166,14 @@ TEST_F(GameWelcomeStateTest, mousePointingToNothing)
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Highscores",
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE,
                                             0,
@@ -201,6 +212,8 @@ TEST_F(GameWelcomeStateTest, mousePointingToStartButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
 
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
@@ -230,6 +243,14 @@ TEST_F(GameWelcomeStateTest, mousePointingToStartButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Highscores",
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE,
                                             0,
@@ -268,6 +289,8 @@ TEST_F(GameWelcomeStateTest, mousePointingToStartButtonAndClickAndTransitionToPl
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
 
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
@@ -297,6 +320,14 @@ TEST_F(GameWelcomeStateTest, mousePointingToStartButtonAndClickAndTransitionToPl
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Highscores",
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE,
                                             0,
@@ -335,6 +366,8 @@ TEST_F(GameWelcomeStateTest, mousePointingToSettingsButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
 
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
@@ -365,6 +398,15 @@ TEST_F(GameWelcomeStateTest, mousePointingToSettingsButtonButNotClick)
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(80, 80, 80, 255))).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Highscores",
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE,
                                             0,
@@ -404,6 +446,8 @@ TEST_F(GameWelcomeStateTest, mousePointingToSettingsButtonAndClickAndTransitionT
     EXPECT_CALL((*m_raylibMock), playSound(A<Sound>())).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
 
     EXPECT_CALL((*m_raylibMock), updateMusicStream(A<Music>())).InSequence(seq);
 
@@ -442,6 +486,15 @@ TEST_F(GameWelcomeStateTest, mousePointingToSettingsButtonAndClickAndTransitionT
 
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Highscores",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Quit",
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE,
@@ -465,6 +518,8 @@ TEST_F(GameWelcomeStateTest, mousePointingToQuitButtonButNotClick)
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -509,6 +564,15 @@ TEST_F(GameWelcomeStateTest, mousePointingToQuitButtonButNotClick)
                                             FieldsAre(200, 200, 200, 255)))
         .InSequence(seq);
 
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Highscores",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(80, 80, 80, 255))).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Quit",
@@ -534,6 +598,8 @@ TEST_F(GameWelcomeStateTest, mousePointingToQuitButtonAndClickAndTransitionToQui
         EXPECT_CALL((*(m_spriteFactoryFake->m_starMocksList[n])), update()).InSequence(seq);
     }
 
+    EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), checkCollisionPointRec(A<Vector2>(), A<Rectangle>())).InSequence(seq).WillOnce(Return(false));
     EXPECT_CALL((*m_raylibMock), getMousePosition()).InSequence(seq);
@@ -572,6 +638,15 @@ TEST_F(GameWelcomeStateTest, mousePointingToQuitButtonAndClickAndTransitionToQui
     EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
     EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
                                             "Settings",
+                                            A<Vector2>(),
+                                            MENU_ITEM_FONTSIZE,
+                                            0,
+                                            FieldsAre(200, 200, 200, 255)))
+        .InSequence(seq);
+
+    EXPECT_CALL((*m_raylibMock), drawRectangleRounded(A<Rectangle>(), 0.2, 0, FieldsAre(0, 0, 0, 0))).InSequence(seq);
+    EXPECT_CALL((*m_raylibMock), drawTextEx(A<Font>(),
+                                            "Highscores",
                                             A<Vector2>(),
                                             MENU_ITEM_FONTSIZE,
                                             0,
